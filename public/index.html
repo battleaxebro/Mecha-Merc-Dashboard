@@ -1,0 +1,1393 @@
+<title>Mecha Merc Terminal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --ground:#0b0e14; --ground-2:#0d1119; --panel:#12161f; --panel-2:#161c27; --panel-3:#1b222f;
+  --line:#243244; --line-soft:#1a2230; --line-bright:#2f4258;
+  --ink:#d9e2ee; --ink-mid:#9fb0c4; --ink-dim:#6b7c92; --ink-faint:#4a5769;
+  --pilot:#37e0c8; --pilot-dim:#1e6d63; --pilot-glow:rgba(55,224,200,.16);
+  --mech:#f2a13e; --mech-dim:#7a5320; --mech-glow:rgba(242,161,62,.16);
+  --danger:#ff5d73; --danger-dim:#6e2130; --warn:#f2c14e; --energy:#8b7bff; --good:#5ad19a;
+  --accent:var(--pilot); --accent-dim:var(--pilot-dim); --accent-glow:var(--pilot-glow);
+  --radius:10px; --radius-sm:6px;
+  --shadow:0 8px 28px rgba(0,0,0,.5);
+  --f-display:'Chakra Petch',system-ui,sans-serif;
+  --f-body:'IBM Plex Sans',system-ui,sans-serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+[data-mode="mech"]{--accent:var(--mech);--accent-dim:var(--mech-dim);--accent-glow:var(--mech-glow);}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:
+    radial-gradient(1200px 700px at 80% -10%, rgba(55,224,200,.05), transparent 60%),
+    radial-gradient(900px 600px at -10% 110%, rgba(139,123,255,.05), transparent 55%),
+    var(--ground);
+  color:var(--ink); font-family:var(--f-body); font-size:14px; line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:var(--f-display);font-weight:600;margin:0;letter-spacing:.01em}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+button{font-family:inherit;cursor:pointer;color:inherit;border:none;background:none}
+button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:var(--line-bright);border-radius:6px;border:2px solid var(--ground)}
+::-webkit-scrollbar-track{background:transparent}
+.eyebrow{font-family:var(--f-display);text-transform:uppercase;letter-spacing:.16em;font-size:10px;color:var(--ink-dim)}
+
+/* ---------- shell ---------- */
+#app{display:grid;grid-template-columns:238px 1fr;grid-template-rows:auto 1fr;height:100vh;
+     grid-template-areas:"brand top" "rail main";}
+.topbar{grid-area:top;display:flex;align-items:center;gap:16px;padding:10px 18px;
+   border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--panel),var(--ground-2));min-height:58px}
+.brand{grid-area:brand;display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);
+   border-right:1px solid var(--line);background:var(--ground-2)}
+.brand .logo{width:30px;height:30px;border:1.5px solid var(--accent);border-radius:7px;display:grid;place-items:center;
+   color:var(--accent);box-shadow:0 0 14px var(--accent-glow);font-family:var(--f-display);font-weight:700;transition:.3s}
+.brand b{font-family:var(--f-display);font-weight:700;font-size:14px;letter-spacing:.04em}
+.brand .sub{font-size:9px;letter-spacing:.22em;color:var(--ink-dim);text-transform:uppercase}
+.rail{grid-area:rail;border-right:1px solid var(--line);background:var(--ground-2);overflow-y:auto;padding:12px 10px;display:flex;flex-direction:column;gap:6px}
+.main{grid-area:main;overflow-y:auto;padding:18px 20px 60px}
+
+/* ---------- roster rail ---------- */
+.rail .eyebrow{padding:6px 8px 2px}
+.pilot{display:flex;align-items:center;gap:10px;padding:8px;border:1px solid transparent;border-radius:var(--radius-sm);
+   text-align:left;width:100%;transition:.15s;position:relative}
+.pilot:hover{background:var(--panel)}
+.pilot.active{background:var(--panel-2);border-color:var(--line-bright)}
+.pilot.active::before{content:"";position:absolute;left:-10px;top:8px;bottom:8px;width:3px;border-radius:3px;background:var(--accent);box-shadow:0 0 10px var(--accent-glow)}
+.avatar{width:36px;height:36px;border-radius:8px;display:grid;place-items:center;font-family:var(--f-display);font-weight:700;
+   font-size:15px;color:#0b0e14;flex-shrink:0;position:relative}
+.pilot .nm{font-weight:600;font-size:13px;line-height:1.15}
+.pilot .rl{font-size:10.5px;color:var(--ink-dim)}
+.pilot .you{font-size:8.5px;color:var(--accent);border:1px solid var(--accent-dim);border-radius:4px;padding:0 4px;letter-spacing:.1em}
+.railbtn{margin-top:auto;display:flex;flex-direction:column;gap:6px;padding-top:10px;border-top:1px solid var(--line-soft)}
+.mini{font-family:var(--f-display);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-mid);
+   border:1px solid var(--line);border-radius:var(--radius-sm);padding:7px 8px;background:var(--panel);transition:.15s;text-align:center}
+.mini:hover{border-color:var(--accent-dim);color:var(--ink)}
+
+/* ---------- top bar ---------- */
+.topbar .title{font-size:15px;letter-spacing:.03em}
+.spacer{flex:1}
+.dicebar{display:flex;align-items:center;gap:5px}
+.die{width:34px;height:34px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--panel);
+   font-family:var(--f-display);font-size:11px;font-weight:600;color:var(--ink-mid);transition:.12s}
+.die:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+.advtog{display:flex;border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden}
+.advtog button{padding:0 8px;height:34px;font-family:var(--f-display);font-size:10px;letter-spacing:.05em;color:var(--ink-dim);text-transform:uppercase}
+.advtog button.on{background:var(--accent);color:#0b0e14;font-weight:700}
+.whoami{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:var(--radius-sm);padding:5px 9px;background:var(--panel)}
+.whoami .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
+.whoami small{color:var(--ink-dim);font-size:10px}
+
+/* roll feed */
+.feedbtn{position:relative}
+.feedbadge{position:absolute;top:-4px;right:-4px;background:var(--accent);color:#0b0e14;font-size:9px;font-weight:700;
+   border-radius:8px;padding:0 4px;font-family:var(--f-mono)}
+
+/* ---------- tabs ---------- */
+.tabs{display:flex;gap:2px;margin:0 0 18px;border-bottom:1px solid var(--line)}
+.tab{font-family:var(--f-display);font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-dim);
+   padding:10px 16px;border-bottom:2px solid transparent;transition:.15s;margin-bottom:-1px}
+.tab:hover{color:var(--ink)}
+.tab.active{color:var(--accent);border-color:var(--accent)}
+.tab .cnt{font-family:var(--f-mono);font-size:10px;color:var(--ink-faint);margin-left:5px}
+
+/* ---------- generic panel ---------- */
+.panel{background:linear-gradient(180deg,var(--panel),var(--panel-2));border:1px solid var(--line);border-radius:var(--radius)}
+.panel-h{display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--line-soft)}
+.panel-h h3{font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-mid)}
+.panel-b{padding:14px}
+.grid{display:grid;gap:14px}
+
+/* dashboard layout */
+.dash{grid-template-columns:300px 1fr;align-items:start}
+@media(max-width:1080px){.dash{grid-template-columns:1fr}}
+.idcard{overflow:hidden}
+.portrait{aspect-ratio:1/1;display:grid;place-items:center;position:relative;border-bottom:1px solid var(--line-soft);
+   background:radial-gradient(120% 120% at 50% 0,var(--panel-3),var(--ground-2))}
+.portrait .glyph{font-family:var(--f-display);font-weight:700;font-size:74px;letter-spacing:-.04em}
+.portrait .frame{position:absolute;inset:12px;border:1px solid var(--line-bright);border-radius:8px;pointer-events:none}
+.portrait .frame::before,.portrait .frame::after{content:"";position:absolute;width:16px;height:16px;border:2px solid var(--accent)}
+.portrait .frame::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+.portrait .frame::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+.idbody{padding:14px}
+.idbody h2{font-size:22px;letter-spacing:.01em}
+.idbody .meta{color:var(--ink-mid);font-size:12px;margin-top:3px}
+.idbody .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tag{font-size:10.5px;font-family:var(--f-display);letter-spacing:.04em;color:var(--ink-mid);border:1px solid var(--line);
+   border-radius:20px;padding:3px 9px;background:var(--panel)}
+.tag b{color:var(--accent);font-weight:600}
+
+/* vitals */
+.vitals{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px}
+.vital{border:1px solid var(--line);border-radius:var(--radius-sm);padding:9px 10px;background:var(--ground-2)}
+.vital .lab{font-family:var(--f-display);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-dim);display:flex;justify-content:space-between}
+.vital .val{font-family:var(--f-mono);font-size:19px;font-weight:600;margin-top:3px}
+.vital .val small{font-size:12px;color:var(--ink-dim)}
+.bar{height:5px;border-radius:3px;background:var(--line-soft);margin-top:7px;overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:3px;transition:width .35s}
+.step{display:inline-flex;gap:4px;margin-top:8px}
+.step button{width:24px;height:22px;border:1px solid var(--line);border-radius:5px;background:var(--panel);color:var(--ink-mid);font-size:13px;line-height:1}
+.step button:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ability cards */
+.abils{grid-template-columns:repeat(6,1fr);gap:10px}
+@media(max-width:860px){.abils{grid-template-columns:repeat(3,1fr)}}
+.abil{border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(180deg,var(--panel-2),var(--panel));
+   padding:12px 8px;text-align:center;transition:.15s;position:relative;cursor:pointer}
+.abil:hover{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent-dim),0 6px 18px rgba(0,0,0,.4);transform:translateY(-2px)}
+.abil .k{font-family:var(--f-display);font-size:11px;letter-spacing:.12em;color:var(--ink-dim)}
+.abil .m{font-family:var(--f-display);font-size:30px;font-weight:700;line-height:1.05;margin:3px 0;color:var(--ink)}
+.abil .s{font-family:var(--f-mono);font-size:11px;color:var(--ink-dim)}
+.abil .save{margin-top:7px;padding-top:6px;border-top:1px dashed var(--line-soft);font-family:var(--f-mono);font-size:11px;color:var(--ink-mid)}
+.abil .save b{color:var(--accent)}
+.abil .save.prof::after{content:"●";color:var(--accent);font-size:8px;margin-left:4px;vertical-align:middle}
+
+/* skills + saves list */
+.rows{display:flex;flex-direction:column}
+.row{display:flex;align-items:center;gap:10px;padding:6px 4px;border-bottom:1px solid var(--line-soft);transition:.12s}
+.row:last-child{border-bottom:0}
+.row:hover{background:var(--panel-2)}
+.row .pf{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--line-bright);flex-shrink:0}
+.row .pf.on{background:var(--accent);border-color:var(--accent);box-shadow:0 0 6px var(--accent-glow)}
+.row .pf.exp{background:var(--warn);border-color:var(--warn);box-shadow:0 0 6px rgba(242,193,78,.3)}
+.row .nm{flex:1;font-size:12.5px}
+.row .ab{font-family:var(--f-display);font-size:9.5px;color:var(--ink-faint);letter-spacing:.08em;text-transform:uppercase}
+.row .mod{font-family:var(--f-mono);font-size:13px;color:var(--ink);min-width:30px;text-align:right}
+.row .roll{opacity:0;font-size:11px;color:var(--accent);font-family:var(--f-display)}
+.row:hover .roll{opacity:1}
+
+/* action cards (feats/powers/weapons) */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.card{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:12px;transition:.15s;position:relative;display:flex;flex-direction:column;gap:6px}
+.card:hover{border-color:var(--line-bright)}
+.card .top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.card h4{font-size:13.5px;font-family:var(--f-display);font-weight:600;line-height:1.2}
+.card .chip{font-family:var(--f-display);font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-dim);
+   border:1px solid var(--line);border-radius:5px;padding:2px 6px;white-space:nowrap}
+.card .desc{font-size:11.5px;color:var(--ink-mid);line-height:1.45;max-height:64px;overflow:hidden;position:relative}
+.card .desc.open{max-height:none}
+.card .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.rbtn{font-family:var(--f-display);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);
+   border:1px solid var(--accent-dim);border-radius:6px;padding:4px 9px;background:var(--accent-glow);transition:.12s}
+.rbtn:hover{background:var(--accent);color:#0b0e14}
+.rbtn.ghost{color:var(--ink-dim);border-color:var(--line);background:transparent}
+.rbtn.ghost:hover{color:var(--ink);border-color:var(--line-bright)}
+.rbtn.dngr{color:var(--danger);border-color:var(--danger-dim);background:transparent}
+.rbtn.dngr:hover{background:var(--danger);color:#0b0e14}
+
+/* inventory */
+.inv-grid{grid-template-columns:1fr 300px;align-items:start}
+@media(max-width:1080px){.inv-grid{grid-template-columns:1fr}}
+.itemrow{display:flex;align-items:center;gap:10px;padding:9px 10px;border:1px solid var(--line-soft);border-radius:var(--radius-sm);background:var(--panel);margin-bottom:7px;transition:.12s}
+.itemrow:hover{border-color:var(--line-bright)}
+.itemrow.eq{border-color:var(--accent-dim);background:linear-gradient(90deg,var(--accent-glow),var(--panel) 40%)}
+.itemrow .ico{width:30px;height:30px;border-radius:6px;display:grid;place-items:center;background:var(--ground-2);border:1px solid var(--line);color:var(--accent);font-size:13px;flex-shrink:0}
+.itemrow .info{flex:1;min-width:0}
+.itemrow .info .n{font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px}
+.itemrow .info .d{font-size:11px;color:var(--ink-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qtybox{font-family:var(--f-mono);font-size:12px;color:var(--ink-mid);min-width:24px;text-align:center}
+
+/* meters / overload */
+.meter{border:1px solid var(--line);border-radius:var(--radius);padding:12px 13px;background:var(--ground-2)}
+.meter .lab{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--f-display);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-dim)}
+.meter .big{font-family:var(--f-mono);font-size:22px;font-weight:600;margin:2px 0 6px}
+.warnchip{display:flex;align-items:center;gap:8px;border:1px solid var(--danger-dim);background:rgba(255,93,115,.08);border-radius:var(--radius-sm);
+   padding:8px 11px;color:var(--danger);font-size:12px;font-family:var(--f-mono);margin-top:8px}
+.okchip{border-color:var(--pilot-dim);background:rgba(90,209,154,.06);color:var(--good)}
+
+/* enter-mech button */
+.entermech{display:flex;align-items:center;gap:10px;border:1px solid var(--accent-dim);border-radius:var(--radius);
+   padding:10px 14px;background:linear-gradient(90deg,var(--accent-glow),transparent);width:100%;transition:.2s;margin-bottom:16px}
+.entermech:hover{border-color:var(--accent);box-shadow:0 0 20px var(--accent-glow)}
+.entermech .ic{width:34px;height:34px;border:1px solid var(--accent);border-radius:8px;display:grid;place-items:center;color:var(--accent);font-size:18px}
+.entermech .tx{text-align:left;flex:1}
+.entermech .tx b{font-family:var(--f-display);font-size:14px;letter-spacing:.04em;display:block}
+.entermech .tx small{color:var(--ink-dim);font-size:11px}
+.entermech .sw{font-family:var(--f-display);font-size:11px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+
+/* modal / drawer */
+.scrim{position:fixed;inset:0;background:rgba(4,6,10,.72);backdrop-filter:blur(3px);z-index:50;display:grid;place-items:center;padding:20px}
+.modal{background:var(--panel);border:1px solid var(--line-bright);border-radius:var(--radius);box-shadow:var(--shadow);width:min(560px,96vw);max-height:88vh;display:flex;flex-direction:column;overflow:hidden}
+.modal.wide{width:min(880px,96vw)}
+.modal-h{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.modal-h h3{font-size:15px;letter-spacing:.03em;flex:1}
+.modal-b{padding:16px;overflow-y:auto}
+.x{width:30px;height:30px;border-radius:6px;border:1px solid var(--line);color:var(--ink-mid);font-size:16px}
+.x:hover{border-color:var(--danger);color:var(--danger)}
+label.fld{display:block;margin-bottom:10px}
+label.fld span{display:block;font-family:var(--f-display);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:4px}
+input,select,textarea{width:100%;background:var(--ground-2);border:1px solid var(--line);border-radius:var(--radius-sm);
+   color:var(--ink);font-family:var(--f-body);font-size:13px;padding:8px 10px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+textarea{resize:vertical;min-height:60px;font-size:12px}
+.btn{font-family:var(--f-display);font-size:12px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;
+   border-radius:var(--radius-sm);padding:9px 16px;background:var(--accent);color:#0b0e14;transition:.15s}
+.btn:hover{filter:brightness(1.08)}
+.btn.sec{background:transparent;border:1px solid var(--line);color:var(--ink-mid)}
+.btn.sec:hover{border-color:var(--accent-dim);color:var(--ink)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* catalog browser */
+.catsearch{display:flex;gap:8px;margin-bottom:12px}
+.catsearch input{flex:1}
+.chipbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.fchip{font-family:var(--f-display);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-dim);
+   border:1px solid var(--line);border-radius:20px;padding:4px 11px;transition:.12s}
+.fchip.on{background:var(--accent);color:#0b0e14;border-color:var(--accent);font-weight:600}
+.catlist{display:flex;flex-direction:column;gap:6px;max-height:52vh;overflow-y:auto}
+.catrow{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line-soft);border-radius:var(--radius-sm);background:var(--ground-2)}
+.catrow:hover{border-color:var(--line-bright)}
+.catrow .info{flex:1;min-width:0}
+.catrow .n{font-size:13px;font-weight:600}
+.catrow .m{font-size:11px;color:var(--ink-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.catrow .src{font-family:var(--f-mono);font-size:9.5px;color:var(--ink-faint);border:1px solid var(--line);border-radius:4px;padding:1px 5px}
+
+/* roll feed drawer */
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(360px,92vw);background:var(--panel);border-left:1px solid var(--line-bright);
+   box-shadow:-10px 0 40px rgba(0,0,0,.5);z-index:55;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s}
+.drawer.open{transform:none}
+.rollitem{padding:10px 14px;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:11px}
+.rollitem .rc{width:40px;height:40px;border-radius:8px;display:grid;place-items:center;font-family:var(--f-display);font-weight:700;font-size:16px;flex-shrink:0;border:1px solid var(--line)}
+.rollitem .rc.crit{border-color:var(--good);color:var(--good);box-shadow:0 0 12px rgba(90,209,154,.25)}
+.rollitem .rc.fail{border-color:var(--danger);color:var(--danger)}
+.rollitem .who{font-size:12px;font-weight:600}
+.rollitem .what{font-size:11px;color:var(--ink-dim)}
+.rollitem .brk{font-family:var(--f-mono);font-size:10.5px;color:var(--ink-faint)}
+.rollitem .tm{font-family:var(--f-mono);font-size:9.5px;color:var(--ink-faint);margin-left:auto}
+
+/* toast */
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);z-index:80;opacity:0;transition:.3s;
+   background:var(--panel);border:1px solid var(--accent);border-radius:var(--radius);padding:12px 20px;box-shadow:var(--shadow);
+   display:flex;align-items:center;gap:14px;min-width:200px}
+#toast.show{opacity:1;transform:translateX(-50%)}
+#toast .big{font-family:var(--f-display);font-size:28px;font-weight:700;color:var(--accent)}
+#toast .lab{font-size:11px;color:var(--ink-dim)}
+#toast .rn{font-size:13px;font-weight:600}
+#toast.crit{border-color:var(--good)}#toast.crit .big{color:var(--good)}
+#toast.fail{border-color:var(--danger)}#toast.fail .big{color:var(--danger)}
+
+.empty{padding:40px 20px;text-align:center;color:var(--ink-dim);font-size:13px}
+.sechead{display:flex;align-items:center;gap:10px;margin:22px 0 12px}
+.sechead h3{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-mid)}
+.sechead .ln{flex:1;height:1px;background:var(--line)}
+.addbtn{font-family:var(--f-display);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);
+   border:1px dashed var(--accent-dim);border-radius:6px;padding:4px 10px}
+.addbtn:hover{background:var(--accent-glow)}
+.hidden{display:none!important}
+.status{font-family:var(--f-mono);font-size:11px;color:var(--ink-dim)}
+/* ---- frame layout (mockup) ---- */
+.abibar{display:grid;grid-template-columns:150px repeat(6,1fr);gap:9px;align-items:stretch;margin-bottom:12px}
+.abibar .abhead{display:flex;flex-direction:column;justify-content:center;gap:7px}
+.abibar .abhead .nm{font-family:var(--f-display);font-size:13px;line-height:1.1;color:var(--ink)}
+.modeswitch{display:flex;border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden}
+.modeswitch button{flex:1;padding:6px 4px;font-family:var(--f-display);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-dim);transition:.12s}
+.modeswitch button.on{background:var(--accent);color:#0b0e14;font-weight:700}
+.frame{display:grid;grid-template-columns:232px minmax(0,1fr) 322px;gap:14px;align-items:start}
+.frame .leftcol,.frame .rightcol{position:sticky;top:0}
+@media(max-width:1240px){.frame{grid-template-columns:210px minmax(0,1fr)}.frame .rightcol{grid-column:1/-1;position:static}}
+@media(max-width:900px){.abibar{grid-template-columns:repeat(3,1fr)}.abibar .abhead{grid-column:1/-1;flex-direction:row;align-items:center;justify-content:space-between}.frame{grid-template-columns:1fr}.frame .leftcol,.frame .rightcol{position:static}}
+.hand{display:flex;gap:12px;overflow-x:auto;padding:6px 2px 14px;scroll-snap-type:x proximity;scroll-behavior:smooth}
+.hand>.card{flex:0 0 246px;scroll-snap-align:center}
+.hand>.handdiv{flex:0 0 34px;background:transparent;border:1px dashed var(--line-bright);display:flex;align-items:center;justify-content:center}
+.hand>.handdiv>div{writing-mode:vertical-rl;transform:rotate(180deg);font-family:var(--f-display);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+.hand::-webkit-scrollbar{height:8px}
+.carwrap{position:relative}
+.carbtn{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:32px;height:32px;border-radius:50%;border:1px solid var(--line-bright);background:var(--panel);color:var(--ink);font-size:16px;display:grid;place-items:center;box-shadow:var(--shadow)}
+.carbtn:hover{border-color:var(--accent);color:var(--accent)}
+.carbtn.l{left:-6px}.carbtn.r{right:-6px}
+.vital.editable{cursor:pointer}.vital.editable:hover{border-color:var(--accent)}
+.itemrow.sel{border-color:var(--accent)!important;box-shadow:0 0 0 1px var(--accent)}
+.slot.filled{cursor:pointer}.slot.armed{border-color:var(--accent);cursor:pointer;box-shadow:0 0 0 1px var(--accent-dim)}
+.slot.armed:hover{background:var(--accent-glow)}
+.slot.hot{border-color:var(--accent)!important;box-shadow:0 0 0 2px var(--accent)!important;background:var(--accent-glow)!important}
+.dragghost{position:fixed;z-index:90;pointer-events:none;transform:translate(-50%,-150%);background:var(--panel);border:1px solid var(--accent);color:var(--ink);font-size:12px;font-weight:600;padding:5px 10px;border-radius:6px;box-shadow:var(--shadow);white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis}
+.invitem{cursor:grab}
+.rbtn.catchip{text-transform:uppercase;font-size:9px;letter-spacing:.04em;color:var(--ink-mid);border-color:var(--line)}
+.rbtn.catchip:hover{color:var(--accent);border-color:var(--accent-dim)}
+.eqgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px}
+.abil .msub{margin-top:6px;padding-top:5px;border-top:1px dashed var(--line-soft);font-family:var(--f-mono);font-size:9.5px;color:var(--mech);cursor:pointer}
+.abil .msub span{color:var(--ink-faint)}
+.abil .k .pin{font-size:7px;letter-spacing:.04em;color:var(--accent);border:1px solid var(--accent-dim);border-radius:3px;padding:0 3px;vertical-align:middle;margin-left:3px}
+.portmini{width:66px;height:66px;border-radius:10px;display:grid;place-items:center;font-family:var(--f-display);font-weight:700;font-size:22px;color:#0b0e14;background:var(--c,#37e0c8);position:relative;opacity:.55;filter:grayscale(.4);transition:.18s;border:2px solid transparent}
+.portmini.act{opacity:1;filter:none;border-color:#fff3;box-shadow:0 0 16px var(--accent-glow)}
+.portmini span{position:absolute;bottom:-16px;left:0;right:0;text-align:center;font-family:var(--f-display);font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-dim)}
+/* paperdoll */
+.doll{display:grid;grid-template-columns:1fr 118px 1fr;gap:12px;align-items:start}
+@media(max-width:640px){.doll{grid-template-columns:1fr}.dollfig{display:none}}
+.dollfig{align-self:stretch;border:1px solid var(--line);border-radius:var(--radius);background:radial-gradient(120% 90% at 50% 10%,var(--panel-3),var(--ground-2));display:grid;place-items:center;min-height:340px;position:relative}
+.dollfig svg{width:92px;height:auto;color:var(--accent);opacity:.55}
+.slot{border:1px dashed var(--line-bright);border-radius:var(--radius-sm);padding:7px 10px;min-height:50px;background:var(--ground-2);transition:.12s;margin-bottom:8px}
+.slot.filled{border-style:solid;border-color:var(--accent-dim);background:linear-gradient(90deg,var(--accent-glow),var(--panel))}
+.slot.drop{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);background:var(--accent-glow)}
+.slot .sl{font-family:var(--f-display);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim)}
+.slot .si{font-size:12.5px;font-weight:600;margin-top:2px;display:flex;align-items:center;gap:6px;justify-content:space-between}
+.slot .empty2{color:var(--ink-faint);font-size:10.5px;font-style:italic;margin-top:2px}
+.invitem[draggable=true]{cursor:grab}
+.invitem.dragging{opacity:.4}
+.bonusrow{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:6px 2px;border-bottom:1px solid var(--line-soft);font-size:12px}
+.bonusrow:last-child{border-bottom:0}
+.bonusrow b{font-family:var(--f-mono);color:var(--good);white-space:nowrap}
+.bonusrow.neg b{color:var(--danger)}
+.console .last{text-align:center;padding:16px 14px;border-bottom:1px solid var(--line-soft)}
+.console .last .n{font-family:var(--f-display);font-size:46px;font-weight:700;line-height:1;color:var(--accent)}
+.console .last .n.crit{color:var(--good)}.console .last .n.fail{color:var(--danger)}
+.console .last .lbl{font-size:11px;color:var(--ink-dim);margin-top:5px}
+.effrow{display:grid;grid-template-columns:1fr 84px 34px;gap:8px;margin-bottom:8px;align-items:center}
+.effrow select,.effrow input{margin:0}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div id="app">
+  <div class="brand">
+    <div class="logo" id="logo">MM</div>
+    <div><b>MECHA MERC</b><div class="sub">Pilot Terminal</div></div>
+  </div>
+  <div class="topbar">
+    <div class="title" id="topTitle">Roster</div>
+    <span class="status" id="dbStatus">connecting…</span>
+    <div class="spacer"></div>
+    <div class="dicebar" id="diceBar"></div>
+    <div class="advtog" id="advTog">
+      <button data-adv="dis">DIS</button><button data-adv="norm" class="on">STD</button><button data-adv="adv">ADV</button>
+    </div>
+    <button class="die feedbtn" id="feedBtn" title="Roll feed" style="width:auto;padding:0 10px">FEED<span class="feedbadge hidden" id="feedBadge">0</span></button>
+    <button class="whoami" id="whoBtn"><span class="dot"></span><div style="text-align:left"><div id="whoName" style="font-size:12px;font-weight:600">—</div><small id="whoRole">tap to set</small></div></button>
+  </div>
+  <div class="rail" id="rail"></div>
+  <div class="main" id="main"></div>
+</div>
+
+<div class="drawer" id="feedDrawer">
+  <div class="modal-h" style="border-bottom:1px solid var(--line)"><h3>Roll Feed</h3><button class="x" onclick="toggleFeed(false)">×</button></div>
+  <div style="flex:1;overflow-y:auto" id="feedList"></div>
+</div>
+
+<div id="modalRoot"></div>
+<div id="toast"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+/* ============================ state ============================ */
+const S = {
+  db:null, chars:{}, mechs:{}, library:{}, settings:{}, rolls:[],
+  catalog:[], catalogReady:false,
+  identity:localStorage.getItem('mm_identity')||null,
+  sel:null, tab:'dash', mechMode:false, adv:'norm',
+  seenRolls:parseInt(localStorage.getItem('mm_seenrolls')||'0'),
+};
+const ABIL=['str','dex','con','int','wis','cha'];
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,9);
+
+/* ============================ boot (live server) ============================ */
+let socket=null;
+S.auth={party:null};
+function authPayload(){ return {party:S.auth.party, dmToken:S.auth.dmToken, pilotId:(S.identity&&S.identity!=='dm')?S.identity:undefined}; }
+function boot(){
+  loadCatalog();
+  const url=new URL(location.href);
+  let party=url.searchParams.get('party')||localStorage.getItem('mm_party');
+  const dmt=localStorage.getItem('mm_dmtoken'); if(dmt)S.auth.dmToken=dmt;
+  if(S.identity&&S.identity!=='dm')S.auth.pilotId=S.identity;
+  if(!party){ showGate(); return; }
+  startSession(party);
+}
+function startSession(party){
+  S.auth.party=party; localStorage.setItem('mm_party',party);
+  const g=document.getElementById('gate'); if(g)g.remove();
+  document.getElementById('app').style.display='';
+  connect();
+}
+function connect(){
+  socket=io({transports:['websocket','polling']});
+  socket.on('connect',()=>{ $('#dbStatus').textContent='linked'; socket.emit('hello', S.auth); });
+  socket.on('disconnect',()=>{ $('#dbStatus').textContent='reconnecting…'; });
+  socket.on('denied',()=>{ showGate('That party code was not recognized.'); });
+  socket.on('state', st=>{
+    S.chars={}; (st.characters||[]).forEach(c=>S.chars[c.id]=c);
+    S.mechs={}; (st.mechs||[]).forEach(m=>S.mechs[m.id]=m);
+    S.library={}; (st.library||[]).forEach(l=>S.library[l.id]=l);
+    S.settings=st.settings||{}; S.rolls=st.rolls||[];
+    if(!S.sel) pickDefault();
+    renderAll(); renderFeed();
+    setTimeout(()=>{ if(!S.identity && Object.keys(S.chars).length) openIdentity(); }, 500);
+  });
+  socket.on('update', ({collection,id,data})=>applyUpdate(collection,id,data));
+  socket.on('removed', ({collection,id})=>applyRemove(collection,id));
+  socket.on('roll', r=>{ S.rolls=[r,...(S.rolls||[]).filter(x=>x.id!==r.id)].slice(0,50); renderFeed(); });
+  socket.on('nope', ()=>toast('Edit rejected','Not your pilot, or DM-only'));
+}
+function applyUpdate(collection,id,data){
+  if(collection==='characters'){S.chars[id]=data; if(!S.sel)pickDefault();}
+  else if(collection==='mechs')S.mechs[id]=data;
+  else if(collection==='library')S.library[id]=data;
+  else if(collection==='settings')S.settings=data;
+  reflow(collection);
+}
+function applyRemove(collection,id){
+  if(collection==='characters')delete S.chars[id];
+  else if(collection==='mechs')delete S.mechs[id];
+  else if(collection==='library')delete S.library[id];
+  reflow(collection);
+}
+function reflow(collection){ if(collection==='library'){ if(document.getElementById('catlist'))renderCatalogList(); return; } renderRail(); renderMain(); }
+
+/* party gate */
+function showGate(err){
+  const app=document.getElementById('app'); if(app)app.style.display='none';
+  let g=document.getElementById('gate');
+  if(!g){ g=document.createElement('div'); g.id='gate'; g.className='scrim'; document.body.appendChild(g); }
+  g.innerHTML=`<div class="modal" style="width:min(420px,94vw)"><div class="modal-h"><div style="display:flex;align-items:center;gap:10px"><div class="logo" style="width:30px;height:30px;border:1.5px solid var(--accent);border-radius:7px;display:grid;place-items:center;color:var(--accent);font-family:var(--f-display);font-weight:700">MM</div><div><b style="font-family:var(--f-display);letter-spacing:.04em">MECHA MERC</b><div class="sub" style="font-size:9px;letter-spacing:.22em;color:var(--ink-dim);text-transform:uppercase">Pilot Terminal</div></div></div></div>
+    <div class="modal-b"><p style="color:var(--ink-mid);font-size:13px;margin:0 0 12px">Enter the party access code your DM shared.</p>
+    ${err?`<div class="warnchip" style="margin-bottom:10px">⚠ ${esc(err)}</div>`:''}
+    <label class="fld"><span>Party code</span><input id="gate_code" placeholder="party code" onkeydown="if(event.key==='Enter')submitGate()"></label>
+    <button class="btn" style="width:100%" onclick="submitGate()">Enter Terminal</button></div></div>`;
+  setTimeout(()=>{const i=document.getElementById('gate_code');if(i)i.focus();},50);
+}
+async function submitGate(){
+  const code=document.getElementById('gate_code').value.trim(); if(!code)return;
+  const r=await fetch('/api/party',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({party:code})}).then(r=>r.json()).catch(()=>({ok:false}));
+  if(!r.ok){ showGate('That code was not recognized.'); return; }
+  startSession(code);
+}
+async function loadCatalog(){
+  const el=document.getElementById('catalogData');
+  if(el){ try{ S.catalog=JSON.parse(el.textContent); S.catalogReady=true; return; }catch(e){} }
+  try{ const r=await fetch('catalog.json'); if(r.ok){ S.catalog=await r.json(); S.catalogReady=true; } }
+  catch(e){ S.catalogReady=false; }
+}
+function pickDefault(){
+  if(S.identity && S.chars[S.identity]) S.sel=S.identity;
+  else S.sel=Object.keys(S.chars)[0]||null;
+}
+
+/* ============================ helpers ============================ */
+function cur(){ return S.sel?S.chars[S.sel]:null; }
+function curMech(){ const c=cur(); return c&&c.mechRef?Object.values(S.mechs).find(m=>m.id===c.mechRef):null; }
+function canEdit(id){ return S.identity==='dm' || S.identity===id; }
+function isDM(){ return S.identity==='dm'; }
+function saveChar(c){ S.chars[c.id]=c; if(socket)socket.emit('write',{auth:authPayload(),collection:'characters',id:c.id,data:c}); }
+function saveMech(m){ S.mechs[m.id]=m; if(socket)socket.emit('write',{auth:authPayload(),collection:'mechs',id:m.id,data:m}); }
+function saveSettings(){ if(socket)socket.emit('write',{auth:authPayload(),collection:'settings',id:'settings',data:S.settings}); }
+const signed=n=>(n>=0?'+':'')+n;
+function pbOf(c){ return c.proficiencyBonus||3; }
+
+/* ============================ effects engine ============================ */
+const EFFECT_TARGETS=[
+  {v:'str',l:'Strength score'},{v:'dex',l:'Dexterity score'},{v:'con',l:'Constitution score'},
+  {v:'int',l:'Intelligence score'},{v:'wis',l:'Wisdom score'},{v:'cha',l:'Charisma score'},
+  {v:'ac',l:'Armor Class'},{v:'hpMax',l:'Max HP'},{v:'tpMax',l:'Max Tech Points'},
+  {v:'speed',l:'Speed (ft)'},{v:'initiative',l:'Initiative'},
+  {v:'saveAll',l:'All saving throws'},{v:'checkAll',l:'All ability checks'},
+  {v:'attack',l:'Attack rolls'},{v:'damage',l:'Damage rolls'},
+];
+const effLabel=t=>(EFFECT_TARGETS.find(x=>x.v===t)||{l:t}).l;
+function fmtEffects(eff){ return (eff||[]).map(e=>`${signed(parseFloat(e.value)||0)} ${effLabel(e.target)}`).join(' · '); }
+// active effects on a character = equipped gear + all cybernetics
+function activeCharEffects(c){
+  const list=[];
+  (c.inventory||[]).forEach(i=>{ if(i.slot)(i.effects||[]).forEach(e=>list.push(e)); });
+  (c.cybernetics||[]).forEach(cy=>(cy.effects||[]).forEach(e=>list.push(e)));
+  return list;
+}
+// returns a display-only clone with effects + cybernetic overload applied
+function withEffects(c){
+  const ec=JSON.parse(JSON.stringify(c));
+  const pb=pbOf(c);
+  let acB=0,saveAll=0,checkAll=0,atk=0,dmg=0;
+  activeCharEffects(c).forEach(e=>{ const v=parseFloat(e.value)||0;
+    if(ABIL.includes(e.target)) ec.abilities[e.target].score+=v;
+    else if(e.target==='ac') acB+=v; else if(e.target==='hpMax') ec.hp.max=(ec.hp.max||0)+v;
+    else if(e.target==='tpMax') ec.tp.max=(ec.tp.max||0)+v; else if(e.target==='speed') ec.speed=(ec.speed||30)+v;
+    else if(e.target==='initiative') ec.initiative=(ec.initiative||0)+v;
+    else if(e.target==='saveAll') saveAll+=v; else if(e.target==='checkAll') checkAll+=v;
+    else if(e.target==='attack') atk+=v; else if(e.target==='damage') dmg+=v;
+  });
+  const cyOver=Math.max(0,(c.cybernetics||[]).length-pb);
+  checkAll-=cyOver; saveAll-=cyOver;
+  ABIL.forEach(k=>{ const a=ec.abilities[k]; a.mod=Math.floor((a.score-10)/2); a.save=a.mod+(a.saveProf?pb:0)+saveAll; a.check=a.mod+checkAll; });
+  ec.ac=10+ec.abilities.dex.mod+acB; ec.initiative=ec.abilities.dex.mod+(ec.initiative-(c.abilities.dex.mod||0));
+  Object.values(ec.skills||{}).forEach(s=>{ s.mod=Math.floor((ec.abilities[s.ability].score-10)/2)+Math.round((s.rank||0)*pb)+checkAll; });
+  ec._checkBonus=checkAll; ec._saveBonus=saveAll; ec._atk=atk; ec._dmg=dmg; ec._cyOver=cyOver; ec._base=c;
+  return ec;
+}
+// mech: apply mod effects + overload penalty to attack/save
+function withMechEffects(m){
+  if(!m) return m;
+  const em=JSON.parse(JSON.stringify(m)); let acB=0,atk=0,save=0,spd=0,hull=0,shld=0;
+  const apply=(arr)=>(arr||[]).forEach(e=>{ const v=parseFloat(e.value)||0;
+    if(ABIL.includes(e.target)&&em.abilities[e.target]) em.abilities[e.target].score+=v;
+    else if(e.target==='ac') acB+=v; else if(e.target==='speed') spd+=v;
+    else if(e.target==='attack') atk+=v; else if(e.target==='saveAll') save+=v;
+    else if(e.target==='hpMax') hull+=v; else if(e.target==='tpMax') shld+=v; });
+  (m.mods||[]).forEach(md=>{ if(md.slot) apply(md.effects); });        // installed parts only
+  (m.weapons||[]).forEach(w=>{ if(w.slot) apply(w.effects); });
+  (m.augments||[]).forEach(a=>apply(a.effects));
+  const cap=m.modSlots?.capacity??4; const used=(m.mods||[]).filter(x=>x.slot==='mod').length;  // extras only
+  const over=Math.max(0,used-cap); atk-=over; save-=over;
+  Object.keys(em.abilities||{}).forEach(k=>{ const a=em.abilities[k]; a.mod=Math.floor((a.score-10)/2); });
+  em.ac=(m.ac||13)+acB; em.speed=(m.speed||30)+spd;
+  if(em.hp) em.hp.max=(m.hp&&m.hp.max||0)+hull;
+  if(em.shields) em.shields.max=(m.shields&&m.shields.max||0)+shld;
+  em._atk=atk; em._save=save; em._over=over; em._modUsed=used; em._modCap=cap;
+  return em;
+}
+
+/* ============================ dice ============================ */
+function rollDie(sides){ return 1+Math.floor(Math.random()*sides); }
+function d20roll(mod, adv){
+  let a=rollDie(20), b=rollDie(20), nat;
+  if(adv==='adv') nat=Math.max(a,b); else if(adv==='dis') nat=Math.min(a,b); else {nat=a;b=null;}
+  return {nat, other:b, total:nat+mod, mod, adv};
+}
+function parseFormula(f){ // "2d6+3" or "1d8 + mod"
+  return String(f).replace(/\s/g,'');
+}
+function rollFormula(f, mod){
+  f=parseFormula(f); let total=0, parts=[];
+  f=f.replace(/mod/gi, mod>=0?('+'+mod):(''+mod));
+  const re=/([+-]?)(\d*)d(\d+)|([+-]?\d+)/gi; let m;
+  while((m=re.exec(f))){
+    if(m[3]){ const sign=m[1]==='-'?-1:1; const n=parseInt(m[2]||'1'); const s=parseInt(m[3]); let sub=0,dice=[];
+      for(let i=0;i<n;i++){const r=rollDie(s);dice.push(r);sub+=r;} total+=sign*sub; parts.push((sign<0?'-':'')+n+'d'+s+'['+dice.join(',')+']'); }
+    else if(m[4]){ total+=parseInt(m[4]); parts.push((parseInt(m[4])>=0?'+':'')+m[4].replace('+','')); }
+  }
+  return {total, breakdown:parts.join(' ')};
+}
+function doRoll(label, mod, {kind='check', formula=null, use=null}={}){
+  const c=cur(); const who=c?c.name:(S.identity==='dm'?'DM':'Someone');
+  let res, display, brk, crit=0;
+  if(formula){ const r=rollFormula(formula, mod||0); res=r.total; display=r.total; brk=r.breakdown; }
+  else { const r=d20roll(mod||0, S.adv); res=r.total; display=r.total;
+    brk='d20['+r.nat+(r.other!=null?','+r.other:'')+']'+(mod?signed(mod):''); if(r.nat===20)crit=1; if(r.nat===1)crit=-1; }
+  showToast(display, label, brk, crit);
+  pushRoll({id:uid(), who, wid:S.identity||'?', label, kind, total:display, brk, crit, t:Date.now()});
+  if(use) applyUse(use);
+}
+function applyUse(use){ const c=cur(); if(!c||!canEdit(c.id))return;
+  if(use.tp){ const mx=withEffects(c).tp.max||99; c.tp.value=Math.max(0,Math.min(mx,(c.tp.value||0)-use.tp)); }
+  if(use.hp){ const mx=withEffects(c).hp.max; c.hp.value=Math.max(0,Math.min(mx,(c.hp.value||0)+use.hp)); }
+  if(use.tp||use.hp) saveChar(c);
+  if(use.shield){ const m=curMech(); if(m){ m.shields=m.shields||{value:0,max:0}; m.shields.value=Math.max(0,Math.min(m.shields.max,(m.shields.value||0)+use.shield)); saveMech(m); } }
+  renderMain();
+}
+function useMsg(u){ const a=[]; if(u.tp)a.push('-'+u.tp+' TP'); if(u.hp)a.push((u.hp>0?'+':'')+u.hp+' HP'); if(u.shield)a.push((u.shield>0?'+':'')+u.shield+' SH'); return a.join(' \u00b7 '); }
+function spend(label,use){ const c=cur(); if(!canEdit(c.id))return warnEdit(); applyUse(use); toast(label,useMsg(use)); }
+/* trackable vitals */
+function vitalRef(kind){ const c=cur(),m=curMech();
+  if(kind==='hp')return {g:()=>c.hp.value,s:v=>c.hp.value=v,mx:()=>withEffects(c).hp.max,sv:()=>saveChar(c),lab:'HP'};
+  if(kind==='tp')return {g:()=>c.tp.value,s:v=>c.tp.value=v,mx:()=>withEffects(c).tp.max||99,sv:()=>saveChar(c),lab:'Tech Points'};
+  if(kind==='mhp')return {g:()=>m.hp.value,s:v=>m.hp.value=v,mx:()=>m.hp.max,sv:()=>saveMech(m),lab:'Hull'};
+  m.shields=m.shields||{value:0,max:0}; return {g:()=>m.shields.value,s:v=>m.shields.value=v,mx:()=>m.shields.max,sv:()=>saveMech(m),lab:'Shields'}; }
+function adjustVital(kind,n){ const c=cur(); if(!canEdit(c.id))return warnEdit(); const r=vitalRef(kind); r.s(Math.max(0,Math.min(r.mx(),(r.g()||0)+n))); r.sv(); renderMain(); }
+function setVital(kind){ const c=cur(); if(!canEdit(c.id))return warnEdit(); const r=vitalRef(kind); askNum('Set '+r.lab+' (max '+r.mx()+')', r.g(), v=>{ if(v==null)return; r.s(Math.max(0,Math.min(r.mx(),Math.round(v)))); r.sv(); renderMain(); }); }
+function pushRoll(r){
+  S.rolls=[r,...(S.rolls||[])].slice(0,50); renderFeed();
+  if(socket)socket.emit('roll',{auth:authPayload(),roll:r});
+}
+function showToast(total,label,brk,crit){
+  const t=$('#toast'); t.className=''+(crit>0?'crit':crit<0?'fail':'');
+  t.innerHTML=`<div class="big">${esc(total)}</div><div><div class="rn">${esc(label)}</div><div class="lab">${esc(brk)}${crit>0?' · CRIT':crit<0?' · NAT 1':''}</div></div>`;
+  requestAnimationFrame(()=>t.classList.add('show'));
+  clearTimeout(showToast._t); showToast._t=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+/* ============================ render: shell ============================ */
+function renderAll(){ renderRail(); renderWho(); renderMain(); renderDice(); }
+function renderDice(){
+  const bar=$('#diceBar');
+  if(bar.childElementCount) return;
+  [4,6,8,10,12,20,100].forEach(s=>{ const b=document.createElement('button'); b.className='die'; b.textContent='d'+s;
+    b.onclick=()=>doRoll('d'+s, 0, {formula:'1d'+s}); bar.appendChild(b); });
+}
+function renderRail(){
+  const rail=$('#rail'); const chars=Object.values(S.chars).sort((a,b)=>a.name.localeCompare(b.name));
+  let h='<div class="eyebrow">Squad Roster</div>';
+  if(!chars.length) h+='<div class="empty" style="font-size:12px">No pilots loaded yet.</div>';
+  chars.forEach(c=>{
+    const you=S.identity===c.id?'<span class="you">YOU</span>':'';
+    h+=`<button class="pilot ${S.sel===c.id?'active':''}" onclick="selectChar('${c.id}')">
+      <span class="avatar" style="background:${c.avatarColor||'#37e0c8'}">${esc(initials(c.name))}</span>
+      <span style="flex:1;min-width:0"><span class="nm">${esc(c.name)}</span><div class="rl">${esc(c.class||'')} · Lv ${c.level||5}</div></span>${you}</button>`;
+  });
+  h+='<div class="railbtn">';
+  if(isDM()) h+=`<button class="mini" onclick="openRules()">⚙ House Rules</button>`;
+  h+=`<button class="mini" onclick="openIdentity()">◇ Switch Pilot Identity</button></div>`;
+  rail.innerHTML=h;
+}
+function initials(n){ return String(n).replace(/["']/g,'').split(/[\s-]+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+function renderWho(){
+  const n=$('#whoName'), r=$('#whoRole');
+  if(S.identity==='dm'){ n.textContent='Dungeon Master'; r.textContent='admin · edit all'; }
+  else if(S.identity && S.chars[S.identity]){ n.textContent=S.chars[S.identity].name; r.textContent='pilot · edits own'; }
+  else { n.textContent='Guest'; r.textContent='tap to set identity'; }
+}
+function selectChar(id){ S.sel=id; S.mechMode=false; S.pick=null; setMode('pilot'); renderAll(); }
+function setMode(m){ document.getElementById('app').setAttribute('data-mode', m==='mech'?'mech':'pilot'); }
+
+/* ============================ render: main (framed layout) ============================ */
+const CHAR_SLOTS=[
+  {k:'optics',l:'Optics',t:'optics',ex:'visors, lenses, HUDs'},{k:'head',l:'Head',t:'head',ex:'helmets, crowns'},
+  {k:'neural',l:'Neural',t:'neural',ex:'implants, collars'},{k:'shoulders',l:'Shoulders',t:'shoulders',ex:'pauldrons, cloaks'},
+  {k:'chassis',l:'Chassis',t:'armor',ex:'armor, suits'},{k:'torso',l:'Torso',t:'torso',ex:'vests, underlays'},
+  {k:'arms',l:'Arms',t:'arms',ex:'bracers, augments'},{k:'hands',l:'Hands',t:'hands',ex:'gauntlets, gloves'},
+  {k:'waist',l:'Waist',t:'waist',ex:'belts, packs'},{k:'legs',l:'Legs',t:'legs',ex:'greaves, boots'},
+  {k:'weapon1',l:'Weapon 1',t:'weapon',ex:'primary'},{k:'weapon2',l:'Weapon 2',t:'weapon',ex:'secondary'},
+];
+const MECH_WSLOTS=[{k:'handL',l:'Left Hand',t:'hand'},{k:'handR',l:'Right Hand',t:'hand'},{k:'wristL',l:'Left Wrist',t:'wrist'},{k:'wristR',l:'Right Wrist',t:'wrist'},{k:'backL',l:'Left Back',t:'back'},{k:'backR',l:'Right Back',t:'back'},{k:'chest',l:'Chest',t:'chest'}];
+const MECH_ESLOTS=[{k:'reactor',l:'Reactor',t:'reactor'},{k:'shield',l:'Deflector Shield',t:'shield'},{k:'armor',l:'Hull Armor',t:'armor'},{k:'coupling',l:'Power Coupling',t:'coupling'},{k:'hyperdrive',l:'Hyperdrive',t:'hyperdrive'},{k:'sensors',l:'Sensor Array',t:'sensors'},{k:'engines',l:'Ion Engines',t:'engines'}];
+const CHAR_CATS=['weapon','armor','outfit','optics','head','neural','shoulders','torso','arms','hands','waist','legs','utility'];
+const MECH_ECATS=['reactor','shield','armor','coupling','hyperdrive','sensors','engines','mod'];
+const MECH_MOUNTS=['hand','wrist','back','chest','any'];
+function itemSlotType(i){ if(i.slotType) return i.slotType; if(i.type==='weapon') return 'weapon'; const n=(i.name||'').toLowerCase();
+  if(/armor|plating|carapace|\bsuit\b|\bvest\b|mesh|shield/.test(n)) return 'armor';
+  if(/visor|goggle|lens|optic|\beye|hud|scope/.test(n)) return 'optics';
+  if(/helmet|\bhelm\b|\bcap\b|crown|circlet|headgear/.test(n)) return 'head';
+  if(/collar|amulet|neural|\bneck|cortex|datajack|implant chip/.test(n)) return 'neural';
+  if(/cloak|mantle|pauldron|shoulder|cape/.test(n)) return 'shoulders';
+  if(/gauntlet|glove/.test(n)) return 'hands';
+  if(/bracer|armband|\barm\b|wrist/.test(n)) return 'arms';
+  if(/belt|girdle|sash|\bwaist\b|holster/.test(n)) return 'waist';
+  if(/boot|greave|legging|\bshoe|\bleg/.test(n)) return 'legs';
+  return 'utility'; }
+function modEquipType(m){ if(m.equipType) return m.equipType; const n=(m.name||'').toLowerCase();
+  if(/reactor/.test(n)) return 'reactor';
+  if(/shield|deflect/.test(n)) return 'shield';
+  if(/armor|plating|\bhull/.test(n)) return 'armor';
+  if(/coupling|power c/.test(n)) return 'coupling';
+  if(/hyperdrive|hyperspace/.test(n)) return 'hyperdrive';
+  if(/sensor|scanner|comms|\bcomm |antenn|\bprobe/.test(n)) return 'sensors';
+  if(/thruster|\bengine|ion eng|propuls/.test(n)) return 'engines';
+  return 'mod'; }
+function weaponMount(w){ if(w.mount) return w.mount; if(isTwoHanded(w)) return 'hand'; const n=(w.name||'').toLowerCase();
+  if(/wrist/.test(n)) return 'wrist';
+  if(/\bback|missile|torpedo|shoulder|rocket|\bpod/.test(n)) return 'back';
+  if(/chest|breast|core mount/.test(n)) return 'chest';
+  return 'hand'; }
+function charAccepts(id,sd){ const c=cur(); const i=(c.inventory||[]).find(x=>x.id===id); if(!i)return false; const ft=itemFootprintTypes(i); return ft.includes('any')||ft.includes(sd.t); }
+function mechWAccepts(id,sd){ const m=curMech(); const w=(m.weapons||[]).find(x=>x.id===id); if(!w)return false; if(isTwoHanded(w)) return sd.t==='hand'; const mt=weaponMount(w); return mt==='any'||mt===sd.t; }
+function mechEAccepts(id,sd){ const m=curMech(); const md=(m.mods||[]).find(x=>x.id===id); if(!md)return false; return modEquipType(md)===sd.t; }
+function defaultCat(t){ if(t==='weapon-melee'||t==='weapon-ranged') return 'weapon'; if(t==='armor') return 'armor'; if(t==='ship-weapon') return 'hand'; if(t==='ship-modification') return 'mod'; return 'utility'; }
+function isBig(i){ const p=(i.properties||'').toLowerCase(); return i.large===true||i.twoHanded===true||/two-?hand|\b2h\b|\blarge\b|\bheavy\b/.test(p); }
+function typeToSlotKey(t){ return ({armor:'chassis',weapon:'weapon1'})[t]||t; }
+function itemFootprintTypes(i){ const st=itemSlotType(i); if(Array.isArray(i.occupies)&&i.occupies.length) return i.occupies; if(st==='weapon'&&isBig(i)) return ['weapon','weapon']; if(st==='outfit') return ['armor','torso','legs']; return [st]; }
+function itemFootprintKeys(i,clicked){ const st=itemSlotType(i); if(Array.isArray(i.occupies)&&i.occupies.length) return i.occupies.map(typeToSlotKey); if(st==='weapon'&&isBig(i)) return ['weapon1','weapon2']; if(st==='outfit') return ['chassis','torso','legs']; return [clicked||typeToSlotKey(st)]; }
+/* ---- pointer drag (mouse + touch) ---- */
+let PD=null;
+function pdName(){ const c=cur(); if(PD.ctx==='char'){ const i=(c.inventory||[]).find(x=>x.id===PD.id); return i?i.name:''; } const m=curMech(); const arr=PD.kind==='w'?(m.weapons||[]):(m.mods||[]); const it=arr.find(x=>x.id===PD.id); return it?it.name:''; }
+function pDown(ev,ctx,kind,id){ if(ev.target.closest&&ev.target.closest('.rbtn'))return; const c=cur(); if(!canEdit(c.id))return; PD={ctx,kind,id,x0:ev.clientX,y0:ev.clientY,dragging:false};
+  window.addEventListener('pointermove',pMove,{passive:false}); window.addEventListener('pointerup',pUp,{once:true}); window.addEventListener('pointercancel',pCancel,{once:true}); }
+function pMove(ev){ if(!PD)return; const dx=ev.clientX-PD.x0,dy=ev.clientY-PD.y0;
+  if(!PD.dragging){ if(Math.hypot(dx,dy)<8)return; PD.dragging=true; S.pick={ctx:PD.ctx==='char'?'char':'mech',kind:PD.kind,id:PD.id}; const g=document.createElement('div'); g.className='dragghost'; g.textContent=pdName(); document.body.appendChild(g); PD.ghost=g; renderMain(); }
+  ev.preventDefault(); PD.ghost.style.left=ev.clientX+'px'; PD.ghost.style.top=ev.clientY+'px';
+  const el=document.elementFromPoint(ev.clientX,ev.clientY), slot=el&&el.closest&&el.closest('.slot');
+  document.querySelectorAll('.slot.hot').forEach(x=>x.classList.remove('hot')); if(slot)slot.classList.add('hot'); }
+function pUp(ev){ window.removeEventListener('pointermove',pMove); window.removeEventListener('pointercancel',pCancel);
+  if(!PD)return; if(PD.dragging){ const el=document.elementFromPoint(ev.clientX,ev.clientY), slot=el&&el.closest&&el.closest('.slot'); if(PD.ghost)PD.ghost.remove(); document.querySelectorAll('.slot.hot').forEach(x=>x.classList.remove('hot'));
+    if(slot&&slot.dataset.slot){ if(PD.ctx==='char')placeSlot(slot.dataset.slot); else placeMechSlot(slot.dataset.slot); } else { S.pick=null; renderMain(); } }
+  else { if(PD.ctx==='char')pickItem(PD.id); else pickMech(PD.kind,PD.id); }
+  PD=null; }
+function pCancel(){ window.removeEventListener('pointermove',pMove); if(PD&&PD.ghost)PD.ghost.remove(); document.querySelectorAll('.slot.hot').forEach(x=>x.classList.remove('hot')); PD=null; }
+/* ---- click a slot -> place picked, or open a category picker ---- */
+function slotClick(ctx,key){ if(S.pick){ if(ctx==='char'&&S.pick.ctx==='char') return placeSlot(key); if(ctx==='mech'&&S.pick.ctx==='mech') return placeMechSlot(key); S.pick=null; } openSlotPicker(ctx,key); }
+function openSlotPicker(ctx,key){ const c=cur(); if(!canEdit(c.id))return warnEdit(); let title,cat,items=[],addScope,kind;
+  if(ctx==='char'){ const sd=CHAR_SLOTS.find(x=>x.k===key); cat=sd.t; title=sd.l+' slot'; addScope='char';
+    items=(c.inventory||[]).filter(i=>{ const ft=itemFootprintTypes(i); return ft.includes('any')||ft.includes(cat); }); }
+  else { const m=curMech(); if(MECH_WSLOTS.some(x=>x.k===key)){ const sd=MECH_WSLOTS.find(x=>x.k===key); cat=sd.t; title=sd.l; addScope='mech-weapon'; kind='w';
+      items=(m.weapons||[]).filter(w=>isTwoHanded(w)?cat==='hand':(weaponMount(w)==='any'||weaponMount(w)===cat)); }
+    else { const sd=MECH_ESLOTS.find(x=>x.k===key); cat=sd.t; title=sd.l; addScope='mech'; kind='m';
+      items=(m.mods||[]).filter(md=>modEquipType(md)===cat); } }
+  const rows= items.length? items.map(it=>{ const eqp = ctx==='char'? (it.equipped?'equipped':'') : (it.slot?'installed':'');
+      const sub=[cat, eqp, ((it.damage&&it.damage[0])?it.damage.map(d=>d.formula+' '+(d.type||'')).join(', '):(typeof it.damage==='string'?it.damage:'')), (it.properties||it.system||'')].filter(Boolean).join(' · ');
+      return `<div class="catrow"><div class="info"><div class="n">${esc(it.name)}</div><div class="m">${esc(sub.slice(0,80))}</div></div><button class="rbtn" onclick="pickInto('${ctx}','${key}','${it.id}')">Equip</button></div>`; }).join('')
+    : `<div class="empty">No ${esc(cat)} items on this sheet yet.</div>`;
+  modal(`<div class="modal"><div class="modal-h"><h3>${esc(title)}</h3><span class="status" style="margin-left:6px">fits: ${esc(cat)}</span><span style="flex:1"></span><button class="btn sec" onclick="openCatalog('${addScope}')">Browse catalog</button><button class="x" onclick="closeModal()">×</button></div>
+    <div class="modal-b"><p style="color:var(--ink-mid);font-size:12px;margin:0 0 10px">Items you own that fit this slot. Or browse the catalog to add one.</p><div class="catlist">${rows}</div></div></div>`); }
+function pickInto(ctx,key,id){ closeModal(); if(ctx==='char'){ S.pick={ctx:'char',id}; placeSlot(key); } else { const kind=MECH_WSLOTS.some(x=>x.k===key)?'w':'m'; S.pick={ctx:'mech',kind,id}; placeMechSlot(key); } }
+function isTwoHanded(w){ const p=(w.properties||'').toLowerCase(); return w.large===true||w.twoHanded===true||/two-?hand|\b2h\b|\blarge\b|\bheavy\b/.test(p); }
+const FIG_HUMAN=`<svg viewBox="0 0 64 128" fill="currentColor"><circle cx="32" cy="14" r="10"/><path d="M20 28h24l6 30-8 2-3-18v22l4 40h-8l-5-34-5 34h-8l4-40V42l-3 18-8-2z"/></svg>`;
+const FIG_MECH=`<svg viewBox="0 0 64 128" fill="currentColor"><rect x="22" y="6" width="20" height="16" rx="3"/><rect x="27" y="11" width="10" height="4" fill="#0b0e14"/><path d="M16 26h32l4 8-6 4v26H18V38l-6-4z"/><rect x="8" y="30" width="8" height="30" rx="2"/><rect x="48" y="30" width="8" height="30" rx="2"/><rect x="22" y="68" width="8" height="40" rx="2"/><rect x="34" y="68" width="8" height="40" rx="2"/><rect x="20" y="108" width="12" height="8"/><rect x="32" y="108" width="12" height="8"/></svg>`;
+let DRAGID=null, DRAGKIND=null;
+
+function renderMain(){
+  const main=$('#main'); const c=cur();
+  if(!c){ main.innerHTML=`<div class="empty">${Object.keys(S.chars).length?'Select a pilot from the roster.':'Loading roster…'}</div>`; $('#topTitle').textContent='Mecha Merc'; return; }
+  $('#topTitle').textContent=c.name;
+  const mech=curMech(); const inMech=S.mechMode&&mech;
+  const ec=withEffects(c); const em=mech?withMechEffects(mech):null;
+  const acc=inMech?mechAbilityView(ec,em):ec;
+  const modeSw = mech?`<div class="modeswitch"><button class="${!inMech?'on':''}" onclick="setMech(false)">Pilot</button><button class="${inMech?'on':''}" onclick="setMech(true)">Mech</button></div>`:'';
+  let bar=`<div class="abibar"><div class="abhead"><div class="eyebrow">${inMech?'Mech Systems':'Ability Scores'}</div><div class="nm">${inMech?esc(mech.name):esc(c.name)}</div>${modeSw}</div>`;
+  bar+=ABIL.map(k=>abilCard(acc,k,inMech)).join('')+`</div>`;
+  let tabs=`<div class="tabs">
+    <button class="tab ${S.tab==='dash'?'active':''}" onclick="setTab('dash')">Dashboard</button>
+    <button class="tab ${S.tab==='inv'?'active':''}" onclick="setTab('inv')">Inventory<span class="cnt">${(c.inventory||[]).length}</span></button>
+    <button class="tab ${S.tab==='mech'?'active':''}" onclick="setTab('mech')">Mech${mech?'<span class="cnt">'+(mech.mods||[]).length+'</span>':''}</button>
+    <button class="tab ${S.tab==='forge'?'active':''}" onclick="setTab('forge')">＋ Workshop</button></div>`;
+  const left=colSecondary(c,ec,mech,em,inMech);
+  let center,right;
+  if(S.tab==='dash'){ center=centerDash(c,ec,mech,em,inMech); right=colConsole(); }
+  else if(S.tab==='inv'){ center=centerInv(c,ec); right=colInvList(c,ec); }
+  else if(S.tab==='mech'){ if(!mech){center='<div class="empty">No mech linked to this pilot.</div>';right='';} else {center=centerMech(c,mech,em); right=colMechList(c,mech);} }
+  else { center=viewForge(c,mech); right=colForgeHelp(); }
+  main.innerHTML=bar+tabs+`<div class="frame"><div class="leftcol">${left}</div><div class="centercol">${center}</div><div class="rightcol">${right}</div></div>`;
+  if(S.tab==='dash') renderConsole();
+}
+function setTab(t){ S.tab=t; S.pick=null; renderMain(); }
+function setMech(v){ if(!curMech())return; S.mechMode=v; setMode(v?'mech':'pilot'); renderMain(); }
+function toggleMech(){ setMech(!S.mechMode); }
+
+function abilCard(o,k,inMech){
+  const a=(o.abilities||{})[k];
+  if(!a||a.mod==null) return `<div class="abil" style="opacity:.3;cursor:default"><div class="k">${k.toUpperCase()}</div><div class="m">—</div><div class="s">n/a</div></div>`;
+  const chk=a.check!=null?a.check:a.mod;
+  let bottom='';
+  if(inMech && a.mechMod!=null){
+    bottom=`<div class="msub" onclick="event.stopPropagation();doRoll('Mech ${k.toUpperCase()} (incoming)',${a.mechMod},{})" title="Mech's own score — used when the mech is targeted">MECH ${signed(a.mechMod)} <span>(${a.mechScore})</span></div>`;
+  } else if(a.save!=null){
+    bottom=`<div class="save ${a.saveProf?'prof':''}" onclick="event.stopPropagation();doRoll('${k.toUpperCase()} save',${a.save},{})" title="Roll save">SAVE <b>${signed(a.save)}</b></div>`;
+  }
+  const rl=inMech?(a.usesPilot?'Pilot '+k.toUpperCase()+' (piloting)':'Mech '+k.toUpperCase()):k.toUpperCase()+' check';
+  const pin=inMech&&a.usesPilot?' <span class="pin">pilot</span>':'';
+  return `<div class="abil" onclick="doRoll('${rl}',${chk},{})" title="Roll ${rl}">
+    <div class="k">${k.toUpperCase()}${pin}</div><div class="m">${signed(a.mod)}</div><div class="s">${a.score}</div>${bottom}</div>`;
+}
+function mechAbilityView(ec,em){
+  const pilot=['int','wis','cha']; const out={abilities:{}};
+  ABIL.forEach(k=>{ const base=pilot.includes(k)?(ec.abilities[k]||{}):(em.abilities[k]||{}); const mv=em.abilities[k]||{score:10,mod:0};
+    out.abilities[k]={score:base.score,mod:base.mod,save:base.save,saveProf:base.saveProf,check:base.check,mechScore:mv.score,mechMod:mv.mod,usesPilot:pilot.includes(k)}; });
+  return out;
+}
+
+/* ---------- left: secondary bonuses (+ skills on dash) ---------- */
+function colSecondary(c,ec,mech,em,inMech){
+  let rows='';
+  if(!inMech){
+    const agg={}; activeCharEffects(c).forEach(e=>{agg[e.target]=(agg[e.target]||0)+(parseFloat(e.value)||0);});
+    Object.entries(agg).forEach(([t,v])=>{ if(v) rows+=`<div class="bonusrow ${v<0?'neg':''}"><span>${effLabel(t)}</span><b>${signed(v)}</b></div>`; });
+    if(ec._cyOver>0) rows+=`<div class="bonusrow neg"><span>Cybernetic overload</span><b>${signed(-ec._cyOver)} chk/save</b></div>`;
+  } else {
+    (mech.mods||[]).forEach(md=>{ if(md.equipped!==false)(md.effects||[]).forEach(e=>{ if(parseFloat(e.value)) rows+=`<div class="bonusrow"><span>${esc(md.name)} · ${effLabel(e.target)}</span><b>${signed(parseFloat(e.value)||0)}</b></div>`; }); });
+    if(em&&em._over>0) rows+=`<div class="bonusrow neg"><span>Modification overload</span><b>${signed(-em._over)} atk/save</b></div>`;
+  }
+  if(!rows) rows=`<div class="empty" style="padding:12px;font-size:11px">No active bonuses yet. Equip gear or install augments/mods that carry effects.</div>`;
+  let h=`<div class="panel"><div class="panel-h"><h3>Secondary Bonuses</h3></div><div class="panel-b" style="padding:6px 12px">${rows}</div></div>`;
+  if(S.tab==='dash' && !inMech){
+    const sk=Object.entries(ec.skills||{}).sort((a,b)=>a[1].label.localeCompare(b[1].label));
+    h+=`<div class="panel" style="margin-top:14px"><div class="panel-h"><h3>Skills</h3><span style="flex:1"></span><span class="status">click to roll</span></div><div class="panel-b" style="padding:4px 10px"><div class="rows">`+
+      sk.map(([k,s])=>`<div class="row" onclick="doRoll('${esc(s.label)}',${s.mod},{})"><span class="pf ${s.rank>=2?'exp':s.rank>=1?'on':''}"></span><span class="nm">${esc(s.label)}</span><span class="ab">${s.ability}</span><span class="mod">${signed(s.mod)}</span><span class="roll">roll</span></div>`).join('')+
+      `</div></div></div>`;
+  }
+  return h;
+}
+
+/* ---------- center: dashboard ---------- */
+function centerDash(c,ec,mech,em,inMech){
+  const ed=canEdit(c.id);
+  let port=`<div class="panel"><div class="panel-b" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+    <div style="display:flex;gap:22px;padding-bottom:14px">
+      <div class="portmini ${!inMech?'act':''}" style="--c:${c.avatarColor}">${esc(initials(c.name))}<span>Pilot</span></div>
+      ${mech?`<div class="portmini ${inMech?'act':''}" style="--c:var(--mech)" onclick="setMech(true)">⬢<span>${esc(mech.name.split(' ')[0])}</span></div>`:''}
+    </div>
+    <div style="flex:1;min-width:160px">
+      <h2 style="font-size:22px">${esc(c.name)}</h2>
+      <div style="color:var(--ink-mid);font-size:12px">${esc(c.species||'')} ${esc(c.class||'')} · Lvl ${c.level||5}${c.archetype?' · '+esc(c.archetype):''}</div>
+      <div class="tags" style="margin-top:8px"><span class="tag">PB <b>${signed(pbOf(c))}</b></span><span class="tag">Init <b>${signed(ec.initiative||0)}</b></span><span class="tag">◈ <b>${(c.credits||0).toLocaleString()}</b></span></div>
+    </div></div></div>`;
+  let vit=`<div class="vitals" style="grid-template-columns:repeat(4,1fr);margin:14px 0">`;
+  if(inMech){
+    vit+=vitalCard('Hull',mech.hp.value,mech.hp.max,'var(--mech)','mhp',ed);
+    vit+=vitalCard('Shields',(mech.shields||{}).value||0,(mech.shields||{}).max||0,'var(--pilot)','msh',ed);
+    vit+=`<div class="vital"><div class="lab"><span>AC</span></div><div class="val mono">${em.ac}</div></div>`;
+    vit+=`<div class="vital"><div class="lab"><span>Speed</span></div><div class="val mono">${em.speed||30}<small>ft</small></div></div>`;
+  } else {
+    vit+=vitalCard('HP',c.hp.value,ec.hp.max,'var(--danger)','hp',ed);
+    vit+=vitalCard('Tech Pts',c.tp.value,ec.tp.max,'var(--energy)','tp',ed);
+    vit+=`<div class="vital"><div class="lab"><span>Armor</span></div><div class="val mono">${ec.ac}</div></div>`;
+    vit+=`<div class="vital"><div class="lab"><span>Speed</span></div><div class="val mono">${ec.speed||30}<small>ft</small></div></div>`;
+  }
+  vit+=`</div>`;
+  const cards=handCards(c,ec,mech,em,inMech);
+  let hand=`<div class="panel"><div class="panel-h"><h3>${inMech?'Mech Actions':'Abilities'} — Hand</h3><span style="flex:1"></span><span class="status">select a card to roll</span>${ed?`${inMech?`<button class="addbtn" onclick="openCatalog('maugment')">＋ Augment</button>`:`<button class="addbtn" onclick="openCatalog('techpower')">＋ Chit</button>`}<button class="addbtn" style="margin-left:6px" onclick="setTab('forge')">＋ New</button>`:''}</div>
+    <div class="panel-b">${cards.length?`<div class="carwrap">${cards.length>2?'<button class="carbtn l" onclick="scrollHand(-1)">‹</button>':''}<div class="hand" id="handRow">${cards.join('')}</div>${cards.length>2?'<button class="carbtn r" onclick="scrollHand(1)">›</button>':''}</div>`:`<div class="empty">No usable abilities in hand. Equip a weapon, learn a tech power, or build an ability card in the Workshop.</div>`}</div></div>`;
+  return port+vit+hand;
+}
+function isActive(a){ a=(a||'').toString().toLowerCase(); return !!a && !['other','none','passive','feature',''].includes(a); }
+function charHandCards(c,ec){
+  const cards=[];
+  (c.powers||[]).forEach(p=>cards.push(powerCard(p,ec)));
+  (c.inventory||[]).filter(i=>i.type==='weapon'&&i.slot).forEach(w=>cards.push(weaponCard(w,ec,null,'char')));
+  (c.inventory||[]).filter(i=>i.slot&&i.abilityCard).forEach(i=>cards.push(abilityItemCard(i,ec,'char')));
+  (c.cybernetics||[]).filter(cy=>cy.abilityCard).forEach(cy=>cards.push(abilityItemCard(cy,ec,'char')));
+  (c.feats||[]).filter(f=>isActive(f.activation)).forEach(f=>cards.push(featureCard(f.name,f.desc,f.activation)));
+  return cards;
+}
+function dividerCard(label){ return `<div class="card handdiv"><div>${esc(label)}</div></div>`; }
+function handCards(c,ec,mech,em,inMech){
+  const cards=[];
+  if(inMech){
+    (mech.weapons||[]).filter(w=>w.slot).forEach(w=>cards.push(weaponCard(w,ec,em,'mech')));
+    (mech.mods||[]).filter(m=>m.slot&&m.abilityCard).forEach(m=>cards.push(abilityItemCard(m,ec,'mech')));
+    (mech.features||[]).filter(f=>isActive(f.activation)).forEach(f=>cards.push(featureCard(f.name,f.desc,f.activation)));
+    (mech.augments||[]).filter(a=>a.abilityCard).forEach(a=>cards.push(abilityItemCard(a,ec,'mech')));
+    const pc=charHandCards(c,ec);
+    if(pc.length){ if(cards.length) cards.push(dividerCard('Pilot Abilities')); cards.push(...pc); }
+  } else {
+    cards.push(...charHandCards(c,ec));
+  }
+  return cards;
+}
+function scrollHand(dir){ const el=document.getElementById('handRow'); if(el)el.scrollBy({left:dir*266,behavior:'smooth'}); }
+function abilityItemCard(it,ec,scope){
+  let acts='';
+  const mod=it.rollAbility?(ec.abilities?.[it.rollAbility]?.mod||0):(scope==='mech'?0:bestCastMod(ec));
+  const use={}; if(it.tpCost)use.tp=it.tpCost; if(it.hpDelta)use.hp=it.hpDelta; if(it.shieldDelta)use.shield=it.shieldDelta;
+  const useStr=Object.keys(use).length?`,use:${JSON.stringify(use)}`:'';
+  const f=typeof it.damage==='string'?it.damage:(it.damage&&it.damage[0]?it.damage[0].formula:'');
+  if(f) acts+=`<button class="rbtn" onclick="doRoll('${esc(it.name)}',${mod},{formula:'${esc(String(f).replace(/mod/gi,mod))}'${useStr}})">${esc(String(f))} ${esc(it.damageType||'')}</button>`;
+  else if(it.rollAbility) acts+=`<button class="rbtn" onclick="doRoll('${esc(it.name)}',${mod},{${useStr.slice(1)}})">Roll ${signed(mod)}</button>`;
+  else if(Object.keys(use).length) acts+=`<button class="rbtn" onclick='spend(${JSON.stringify(it.name)},${JSON.stringify(use)})'>Use · ${esc(useMsg(use))}</button>`;
+  return baseCard(it.name, it.description||it.desc||'', it.activation||'ability', acts||`<span class="chip">passive</span>`);
+}
+function vitalCard(lab,val,max,col,kind,ed){
+  const pct=max?Math.max(0,Math.min(100,100*val/max)):0;
+  const clk=(ed&&kind)?`class="vital editable" onclick="setVital('${kind}')" title="Click the number to set exactly"`:`class="vital"`;
+  return `<div ${clk}><div class="lab"><span>${lab}</span>${max?'<span class="mono" style="color:var(--ink-faint)">'+val+'/'+max+'</span>':''}</div>
+    <div class="val mono">${val}${max?'<small> / '+max+'</small>':''}</div>
+    <div class="bar"><i style="width:${pct}%;background:${col}"></i></div>
+    ${(ed&&kind)?`<div class="step"><button onclick="event.stopPropagation();adjustVital('${kind}',-1)" title="-1">−</button><button onclick="event.stopPropagation();adjustVital('${kind}',1)" title="+1">+</button><button onclick="event.stopPropagation();adjustVital('${kind}',-5)" title="-5">≪</button><button onclick="event.stopPropagation();adjustVital('${kind}',5)" title="+5">≫</button></div>`:''}</div>`;
+}
+/* action cards */
+function powerCard(p,ec){
+  const lvl=p.level?('Lv '+p.level):(p.school==='tec'?'Tech':'At-will');
+  const tp=(p.tpCost!=null?p.tpCost:(p.level||0));
+  let acts=''; const mod=bestCastMod(ec);
+  if(tp>0) acts+=`<button class="rbtn" onclick="spend('${esc(p.name)}',{tp:${tp}})" title="Spend tech points">Cast −${tp} TP</button>`;
+  (p.damage||[]).forEach(d=>{ if(d.formula) acts+=`<button class="rbtn ghost" onclick="doRoll('${esc(p.name)} — ${esc(d.type||'dmg')}',${mod},{formula:'${esc(String(d.formula).replace(/mod/gi,mod))}'})">${esc(d.formula)} ${esc(d.type||'')}</button>`; });
+  if(p.save) acts+=`<span class="chip">save ${p.save.toUpperCase()}</span>`;
+  if(!acts) acts=`<span class="chip">utility</span>`;
+  return baseCard(p.name,p.desc,lvl+(p.activation?' · '+p.activation:'')+(tp>0?' · '+tp+' TP':''),acts);
+}
+function bestCastMod(c){ const i=c.abilities?.int?.mod||0,w=c.abilities?.wis?.mod||0,ch=c.abilities?.cha?.mod||0; return Math.max(i,w,ch); }
+function weaponCard(w,ec,mech,scope){
+  const abilKey=w.attackAbility||(String(w.properties||'').toLowerCase().includes('finesse')?'dex':'str');
+  const atkMod=(scope==='mech'?0:(ec.abilities?.[abilKey]?.mod||0)+pbOf(ec))+(ec._atk||0)+(mech&&mech._atk||0);
+  let acts=`<button class="rbtn" onclick="doRoll('${esc(w.name)} — attack',${atkMod},{})">ATK ${signed(atkMod)}</button>`;
+  (w.damage||[]).forEach(d=>{ if(d.formula){ const dm=scope==='char'?((ec.abilities?.[abilKey]?.mod||0)+(ec._dmg||0)):0;
+    const shown=String(d.formula).replace(/mod/gi,signed(dm)); const calc=String(d.formula).replace(/mod/gi,dm);
+    acts+=`<button class="rbtn ghost" onclick="doRoll('${esc(w.name)} — dmg',${dm},{formula:'${esc(calc)}'})">${esc(shown)} ${esc(d.type||'')}</button>`; } });
+  return baseCard(w.name,w.desc||'',w.properties||'weapon',acts);
+}
+function featureCard(name,desc,chip){ return baseCard(name,desc,chip||'',''); }
+function baseCard(name,desc,chip,acts){
+  return `<div class="card"><div class="top"><h4>${esc(name)}</h4>${chip?`<span class="chip">${esc(chip)}</span>`:''}</div>
+    ${desc?`<div class="desc" onclick="this.classList.toggle('open')">${esc(desc)}</div>`:''}
+    ${acts?`<div class="acts">${acts}</div>`:''}</div>`;
+}
+
+/* ---------- right: ability console (dash) ---------- */
+function colConsole(){
+  return `<div class="panel console"><div class="panel-h"><h3>Ability Console</h3><span style="flex:1"></span><span class="status">${S.adv==='norm'?'standard':S.adv}</span></div><div id="consoleBody"></div></div>`;
+}
+function renderConsole(){
+  const b=$('#consoleBody'); if(!b) return;
+  const last=(S.rolls||[])[0];
+  let h = last?`<div class="last"><div class="n ${last.crit>0?'crit':last.crit<0?'fail':''}">${esc(last.total)}</div><div class="lbl">${esc(last.who)} · ${esc(last.label)}</div><div class="lbl" style="font-family:var(--f-mono);font-size:10px">${esc(last.brk||'')}</div></div>`
+    :`<div class="last"><div class="lbl">Select any ability, skill, or card to roll.</div></div>`;
+  h+=`<div style="max-height:300px;overflow:auto">`+(S.rolls||[]).slice(1,16).map(r=>`<div class="rollitem"><div class="rc ${r.crit>0?'crit':r.crit<0?'fail':''}" style="width:32px;height:32px;font-size:13px">${esc(r.total)}</div><div style="flex:1;min-width:0"><div class="who" style="font-size:11px">${esc(r.who)}</div><div class="what" style="font-size:10px">${esc(r.label)}</div></div><div class="tm">${timeAgo(r.t)}</div></div>`).join('')+`</div>`;
+  b.innerHTML=h;
+}
+
+/* ---------- vitals steppers ---------- */
+function setHP(){ const c=cur(); if(!canEdit(c.id))return warnEdit(); const mx=withEffects(c).hp.max; const v=prompt('Set HP (0-'+mx+'):',c.hp.value); if(v!=null){ c.hp.value=Math.max(0,Math.min(mx,parseInt(v)||0)); saveChar(c); renderMain(); } }
+function setTP(){ const c=cur(); if(!canEdit(c.id))return warnEdit(); const mx=withEffects(c).tp.max||99; const v=prompt('Set Tech Points (0-'+mx+'):',c.tp.value); if(v!=null){ c.tp.value=Math.max(0,Math.min(mx,parseInt(v)||0)); saveChar(c); renderMain(); } }
+function warnEdit(){ toast("That's not your pilot","Switch identity, or sign in as DM"); }
+
+/* ---------- center: character inventory (paperdoll) ---------- */
+function carryCap(ec){ return (ec.abilities?.str?.score||10)*15; }
+function curWeight(c){ return (c.inventory||[]).reduce((s,i)=>s+(i.weight||0)*(i.qty||1),0); }
+function centerInv(c,ec){
+  const ed=canEdit(c.id);
+  const wt=curWeight(c),cap=carryCap(ec),over=wt>cap;
+  const s1=CHAR_SLOTS.slice(0,6).map(s=>slotBox(c,s,ed)).join('');
+  const s2=CHAR_SLOTS.slice(6).map(s=>slotBox(c,s,ed)).join('');
+  let doll=`<div class="panel"><div class="panel-h"><h3>Equip Slots</h3><span style="flex:1"></span><span class="status">${ed?'drag items from the list →':'view only'}</span></div>
+    <div class="panel-b"><div class="doll"><div>${s1}</div><div class="dollfig">${FIG_HUMAN}</div><div>${s2}</div></div></div></div>`;
+  let carry=`<div class="meter" style="margin-top:14px"><div class="lab"><span>Carry Load</span><span class="mono">${wt} / ${cap} lb</span></div>
+    <div class="bar" style="margin-top:8px"><i style="width:${Math.min(100,100*wt/Math.max(cap,wt||1))}%;background:${over?'var(--danger)':'var(--good)'}"></i></div>
+    ${over?`<div class="warnchip">⚠ Over capacity — speed halved &amp; disadvantage on DEX (SW5E encumbrance)</div>`:`<div class="warnchip okchip">✓ Within carry capacity (STR score ×15)</div>`}</div>`;
+  return doll+carry;
+}
+function slotBox(c,s,ed){
+  const it=(c.inventory||[]).find(i=>i.equipped&&((i.slots&&i.slots.includes(s.k))||i.slot===s.k));
+  const primary=it&&((it.slots&&it.slots[0]===s.k)||(!it.slots&&it.slot===s.k));
+  const armed=ed&&S.pick&&S.pick.ctx==='char'&&charAccepts(S.pick.id,s);
+  let body;
+  if(it&&primary){ body=`<div class="si"><span>${esc(it.name)}${(it.slots&&it.slots.length>1)?' <small style="color:var(--ink-dim)">×'+it.slots.length+'</small>':''}</span>${ed?`<button class="rbtn ghost" onclick="event.stopPropagation();unslot('${it.id}')">✕</button>`:''}</div>${it.effects&&it.effects.length?`<div class="empty2" style="font-style:normal;color:var(--accent)">${esc(fmtEffects(it.effects))}</div>`:''}`; }
+  else if(it){ body=`<div class="empty2" style="color:var(--accent)">↳ ${esc(it.name)}</div>`; }
+  else body=`<div class="empty2">${esc(s.ex||'empty')}</div>`;
+  return `<div class="slot ${it?'filled':''} ${armed?'armed':''}" data-slot="${s.k}" ${ed?`onclick="slotClick('char','${s.k}')"`:''} ondragover="slotOver(event)" ondragleave="slotLeave(event)" ondrop="slotDrop(event,'${s.k}')">
+    <div class="sl">${s.l}</div>${body}</div>`;
+}
+/* ---------- right: inventory list + augments ---------- */
+function colInvList(c,ec){
+  const ed=canEdit(c.id);
+  const items=(c.inventory||[]);
+  let h=`<div class="panel"><div class="panel-h"><h3>Inventory</h3><span class="cnt mono" style="margin-left:6px;color:var(--ink-faint)">${items.length}</span><span style="flex:1"></span>${ed?`<button class="addbtn" onclick="openCatalog('char')">＋ Add</button>`:''}</div><div class="panel-b" style="padding:10px 12px;max-height:330px;overflow:auto">`;
+  h+= items.length?items.map(i=>invListRow(i,c,ed)).join(''):`<div class="empty">Empty. Add gear from the catalog or Workshop.</div>`;
+  h+=`</div></div>`;
+  const cyber=c.cybernetics||[]; const pb=pbOf(c); const cyOver=Math.max(0,cyber.length-pb);
+  h+=`<div class="panel" style="margin-top:14px"><div class="panel-h"><h3>Cybernetics</h3><span class="mono" style="margin-left:6px;color:${cyOver?'var(--danger)':'var(--ink-dim)'}">${cyber.length}/${pb}</span><span style="flex:1"></span>${ed?`<button class="addbtn" onclick="openCatalog('cybernetic')">＋</button>`:''}</div><div class="panel-b" style="padding:8px 12px">`;
+  h+= cyber.length?cyber.map((cy,idx)=>`<div class="bonusrow"><span>✛ ${esc(cy.name)}${cy.effects&&cy.effects.length?` <small style="color:var(--accent)">${esc(fmtEffects(cy.effects))}</small>`:''}</span>${ed?`<button class="rbtn ghost" title="edit stat effects" onclick="editEffects('cyber','${idx}')">fx${(cy.effects&&cy.effects.length)?'·'+cy.effects.length:''}</button><button class="rbtn dngr" onclick="removeCyber(${idx})">✕</button>`:''}</div>`).join(''):`<div class="empty" style="padding:8px">No cybernetics installed.</div>`;
+  if(cyOver) h+=`<div class="warnchip" style="margin-top:8px">⚠ Overloaded ${signed(-cyOver)} to checks &amp; saves</div>`;
+  h+=`</div></div>`;
+  h+=`<div class="meter" style="margin-top:14px${ed?';cursor:pointer':''}" ${ed?'onclick="editCredits()"':''}><div class="lab"><span>Credits</span>${ed?'<button class="addbtn" onclick="event.stopPropagation();editCredits()">edit</button>':''}</div><div class="big" style="color:var(--accent)">◈ ${(c.credits||0).toLocaleString()}</div></div>`;
+  return h;
+}
+function invListRow(i,c,ed){
+  const dmg=(i.damage&&i.damage[0])?i.damage.map(d=>d.formula+' '+(d.type||'')).join(', '):(typeof i.damage==='string'?i.damage:'');
+  const sub=[i.type,dmg,(i.effects&&i.effects.length?fmtEffects(i.effects):''),(i.weight?i.weight+'lb':'')].filter(Boolean).join(' · ');
+  return `<div class="itemrow invitem ${i.slot?'eq':''} ${(S.pick&&S.pick.ctx==='char'&&S.pick.id===i.id)?'sel':''}" ${ed?`onpointerdown="pDown(event,'char','item','${i.id}')"`:''}>
+    <span class="ico">${({weapon:'⚔',equipment:'▣',consumable:'⚗',tool:'⚒'}[i.type]||'▪')}</span>
+    <div class="info"><div class="n">${esc(i.name)}${i.qty>1?` ×${i.qty}`:''}${i.slot?` <small style="color:var(--accent)">[${esc(i.slot)}]</small>`:''}${i.abilityCard?' <small style="color:var(--warn)">◆card</small>':''}</div><div class="d">${esc(sub||'—')}</div></div>
+    ${ed?`<button class="rbtn ghost" title="edit stat effects" onclick="event.stopPropagation();editEffects('item','${i.id}')">fx${(i.effects&&i.effects.length)?'·'+i.effects.length:''}</button><button class="rbtn ghost catchip" title="equip category — click to change" onclick="event.stopPropagation();setItemCat('${i.id}')">${esc(itemSlotType(i))}</button>${i.slot?`<button class="rbtn ghost" onclick="event.stopPropagation();unslot('${i.id}')">unequip</button>`:''}<button class="rbtn dngr" onclick="event.stopPropagation();removeItem('${i.id}')" title="Remove">✕</button>`:''}</div>`;
+}
+/* drag-drop equip */
+function dragItem(ev,id){ DRAGID=id;DRAGKIND='item'; ev.dataTransfer.setData('text/plain',id); ev.target.classList.add('dragging'); }
+function dragEnd(ev){ ev.target.classList.remove('dragging'); }
+function slotOver(ev){ ev.preventDefault(); ev.currentTarget.classList.add('drop'); }
+function slotLeave(ev){ ev.currentTarget.classList.remove('drop'); }
+function slotDrop(ev,slot){ ev.preventDefault(); ev.currentTarget.classList.remove('drop'); const id=DRAGID||ev.dataTransfer.getData('text/plain'); if(id){ S.pick={ctx:'char',id}; DRAGID=null; placeSlot(slot); } }
+function unslot(id){ const c=cur(); if(!canEdit(c.id))return warnEdit(); const i=(c.inventory||[]).find(x=>x.id===id); if(i){ i.equipped=false; i.slot=null; i.slots=null; saveChar(c); renderMain(); } }
+function toggleEquip(id){ const c=cur(); if(!canEdit(c.id))return warnEdit(); const i=(c.inventory||[]).find(x=>x.id===id); if(i){ i.equipped=!i.equipped; if(!i.equipped)i.slot=null; saveChar(c); renderMain(); } }
+function itemQty(id,n){ const c=cur(); if(!canEdit(c.id))return warnEdit(); const i=(c.inventory||[]).find(x=>x.id===id); if(i){ i.qty=Math.max(1,(i.qty||1)+n); saveChar(c); renderMain(); } }
+function removeItem(id){ const c=cur(); if(!canEdit(c.id))return warnEdit(); c.inventory=(c.inventory||[]).filter(x=>x.id!==id); saveChar(c); renderMain(); }
+function removeCyber(idx){ const c=cur(); if(!canEdit(c.id))return warnEdit(); c.cybernetics.splice(idx,1); saveChar(c); renderMain(); }
+/* ---- per-item effects editor (bonuses apply while equipped/installed) ---- */
+let FX=null;
+function editEffects(kind,id){ const c=cur(); if(!canEdit(c.id))return warnEdit();
+  let item,save;
+  if(kind==='item'){ item=(c.inventory||[]).find(x=>x.id===id); save=()=>saveChar(c); }
+  else if(kind==='cyber'){ item=(c.cybernetics||[])[+id]; save=()=>saveChar(c); }
+  else if(kind==='mod'){ const m=curMech(); item=(m.mods||[]).find(x=>x.id===id); save=()=>saveMech(m); }
+  else if(kind==='weapon'){ const m=curMech(); item=(m.weapons||[]).find(x=>x.id===id); save=()=>saveMech(m); }
+  else if(kind==='augment'){ const m=curMech(); item=(m.augments||[]).find(x=>x.id===id); save=()=>saveMech(m); }
+  if(!item)return;
+  FX={item,save,list:(item.effects||[]).map(e=>({target:e.target,value:e.value}))};
+  modal(`<div class="modal"><div class="modal-h"><h3>Effects — ${esc(item.name)}</h3><button class="x" onclick="closeModal()">✕</button></div>
+   <div class="modal-b"><p style="color:var(--ink-mid);font-size:12px;margin:0 0 10px">These bonuses apply automatically while this item is ${kind==='weapon'||kind==='mod'?'installed on the mech':(kind==='cyber'?'installed':'equipped')}. Feeds the ability scores &amp; Secondary Bonuses.</p>
+   <div id="fxlist">${fxRows()}</div>
+   <button class="addbtn" style="margin-top:6px" onclick="fxAdd()">+ Effect</button>
+   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button class="btn sec" onclick="closeModal()">Cancel</button><button class="btn" onclick="fxSave()">Save Effects</button></div>
+   </div></div>`);
+}
+function fxRows(){ return FX.list.length?FX.list.map((e,i)=>`<div class="effrow"><select onchange="FX.list[${i}].target=this.value">${EFFECT_TARGETS.map(x=>`<option value="${x.v}" ${e.target===x.v?'selected':''}>${x.l}</option>`).join('')}</select><input type="number" value="${esc(e.value)}" oninput="FX.list[${i}].value=this.value" placeholder="±"><button class="rbtn dngr" onclick="fxDel(${i})">✕</button></div>`).join(''):'<div class="empty" style="padding:8px 0">No stat effects yet. Add one (e.g. +2 Strength, +1 Armor Class).</div>'; }
+function fxAdd(){ FX.list.push({target:'str',value:1}); document.getElementById('fxlist').innerHTML=fxRows(); }
+function fxDel(i){ FX.list.splice(i,1); document.getElementById('fxlist').innerHTML=fxRows(); }
+function fxSave(){ FX.item.effects=FX.list.filter(e=>parseFloat(e.value)).map(e=>({target:e.target,value:parseFloat(e.value)})); FX.save(); closeModal(); renderMain(); toast('Effects saved',FX.item.name+(FX.item.effects.length?' · '+fmtEffects(FX.item.effects):'')); }
+function askNum(title,curv,onOk){
+  modal(`<div class="modal" style="width:min(340px,94vw)"><div class="modal-h"><h3>${esc(title)}</h3><button class="x" onclick="closeModal()">×</button></div>
+   <div class="modal-b"><input id="asknum" type="number" value="${esc(curv)}" style="font-size:18px" onkeydown="if(event.key==='Enter')document.getElementById('asknumok').click()">
+   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button class="btn sec" onclick="closeModal()">Cancel</button><button class="btn" id="asknumok">Save</button></div></div></div>`);
+  document.getElementById('asknumok').onclick=()=>{ const v=document.getElementById('asknum').value; closeModal(); onOk(v===''?null:parseFloat(v)); };
+  setTimeout(()=>{const i=document.getElementById('asknum'); if(i){i.focus(); i.select();}},40);
+}
+function askChoice(title,options,curv,onOk){
+  modal(`<div class="modal" style="width:min(360px,94vw)"><div class="modal-h"><h3>${esc(title)}</h3><button class="x" onclick="closeModal()">×</button></div>
+   <div class="modal-b"><select id="askchoice" style="font-size:14px">${options.map(o=>`<option value="${esc(o)}" ${o===curv?'selected':''}>${esc(o)}</option>`).join('')}</select>
+   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button class="btn sec" onclick="closeModal()">Cancel</button><button class="btn" id="askchoiceok">Save</button></div></div></div>`);
+  document.getElementById('askchoiceok').onclick=()=>{ const v=document.getElementById('askchoice').value; closeModal(); onOk(v); };
+}
+function editCredits(){ const c=cur(); if(!canEdit(c.id))return warnEdit(); askNum('Set credits', c.credits||0, v=>{ if(v==null)return; c.credits=Math.max(0,Math.round(v)); saveChar(c); renderMain(); }); }
+/* click-to-place equip (mouse + touch; drag also supported where available) */
+function pickItem(id){ const c=cur(); if(!canEdit(c.id))return warnEdit(); S.pick=(S.pick&&S.pick.ctx==='char'&&S.pick.id===id)?null:{ctx:'char',id}; if(S.pick){ const i=(c.inventory||[]).find(x=>x.id===id); toast('Selected: '+(i?i.name:'item'),'Now tap an equip slot'); } renderMain(); }
+function slotItems(c,key){ return (c.inventory||[]).filter(i=>i.equipped&&((i.slots&&i.slots.includes(key))||i.slot===key)); }
+function placeSlot(slot){ const c=cur(); if(!canEdit(c.id))return warnEdit();
+  if(!(S.pick&&S.pick.ctx==='char')){ const occ=slotItems(c,slot)[0]; if(occ){ occ.equipped=false; occ.slot=null; occ.slots=null; saveChar(c); renderMain(); } return; }
+  const i=(c.inventory||[]).find(x=>x.id===S.pick.id); const sd=CHAR_SLOTS.find(x=>x.k===slot);
+  if(i&&sd){ const ft=itemFootprintTypes(i); if(!ft.includes('any')&&!ft.includes(sd.t)){ toast(i.name+" doesn't fit the "+sd.l+' slot','That slot takes '+sd.t+' gear'); return; }
+    const keys=itemFootprintKeys(i,slot);
+    (c.inventory||[]).forEach(x=>{ if(x.id!==i.id&&x.equipped){ const xk=x.slots||(x.slot?[x.slot]:[]); if(xk.some(k=>keys.includes(k))){ x.equipped=false; x.slot=null; x.slots=null; } } });
+    i.equipped=true; i.slot=keys[0]; i.slots=keys; }
+  S.pick=null; saveChar(c); renderMain(); }
+function pickMech(kind,id){ const c=cur(); if(!canEdit(c.id))return warnEdit(); S.pick=(S.pick&&S.pick.ctx==='mech'&&S.pick.id===id)?null:{ctx:'mech',kind,id}; if(S.pick){ const m=curMech(); const it=kind==='w'?(m.weapons||[]).find(x=>x.id===id):(m.mods||[]).find(x=>x.id===id); toast('Selected: '+(it?it.name:'part'), kind==='w'?'Tap a weapon hardpoint':'Tap an equipment slot'); } renderMain(); }
+function placeMechSlot(slot){ const c=cur(); if(!canEdit(c.id))return warnEdit(); const m=curMech();
+  const isW=MECH_WSLOTS.some(x=>x.k===slot); const isE=MECH_ESLOTS.some(x=>x.k===slot);
+  if(!(S.pick&&S.pick.ctx==='mech')){ // no selection -> clicking clears the slot
+    if(isW){ const w=(m.weapons||[]).find(x=>x.slot===slot||(x.slot==='hands'&&(slot==='handL'||slot==='handR'))); if(w){ w.slot=null; saveMech(m); renderMain(); } }
+    else if(isE){ const md=(m.mods||[]).find(x=>x.slot===slot); if(md){ md.slot=null; saveMech(m); renderMain(); } }
+    return; }
+  if(S.pick.kind==='w'){
+    if(!isW){ toast('That slot is for equipment',''); return; }
+    const sd=MECH_WSLOTS.find(x=>x.k===slot);
+    const w=(m.weapons||[]).find(x=>x.id===S.pick.id);
+    if(w){ if(isTwoHanded(w)){ if(sd.t!=='hand'){ toast(w.name+' is two-handed','Mount it on a hand'); return; } (m.weapons||[]).forEach(x=>{ if(x.slot==='handL'||x.slot==='handR'||x.slot==='hands') x.slot=null; }); w.slot='hands'; }
+           else { const mt=weaponMount(w); if(mt!=='any'&&mt!==sd.t){ toast(w.name+' mounts on a '+mt,'not the '+sd.t); return; } (m.weapons||[]).forEach(x=>{ if(x.slot===slot) x.slot=null; }); w.slot=slot; } }
+  } else {
+    if(!isE){ toast('That slot is for a weapon',''); return; }
+    const sd=MECH_ESLOTS.find(x=>x.k===slot);
+    const md=(m.mods||[]).find(x=>x.id===S.pick.id); if(md){ const et=modEquipType(md); if(et!==sd.t){ toast(md.name+' is '+et+' equipment','Install it in its matching slot'); return; } (m.mods||[]).forEach(x=>{ if(x.slot===slot) x.slot=null; }); md.slot=slot; }
+  }
+  S.pick=null; saveMech(m); renderMain(); }
+
+/* ---------- center: mech builder (hardpoints + equipment) ---------- */
+function centerMech(c,mech,em){
+  const ed=canEdit(c.id);
+  const cap=em._modCap, used=em._modUsed, over=em._over;
+  const L=[{k:'handL',l:'Left Hand'},{k:'wristL',l:'Left Wrist'},{k:'backL',l:'Left Back'}];
+  const R=[{k:'handR',l:'Right Hand'},{k:'wristR',l:'Right Wrist'},{k:'backR',l:'Right Back'}];
+  const armed=ed&&S.pick&&S.pick.ctx==='mech';
+  let doll=`<div class="panel"><div class="panel-h"><h3>${esc(mech.name)} · Weapon Hardpoints</h3><span style="flex:1"></span><span class="status">${ed?(armed?'tap a hardpoint to mount':'tap a weapon, then a slot'):'view only'}</span></div>
+    <div class="panel-b"><div class="doll"><div>${L.map(x=>mechWSlot(mech,x,ed)).join('')}</div><div class="dollfig">${FIG_MECH}</div><div>${R.map(x=>mechWSlot(mech,x,ed)).join('')}</div></div>
+    <div style="margin-top:2px">${mechWSlot(mech,{k:'chest',l:'Chest Mount'},ed)}</div></div></div>`;
+  let equip=`<div class="panel" style="margin-top:14px"><div class="panel-h"><h3>Standard Ship Equipment</h3><span style="flex:1"></span><span class="status">swap freely — affects ship stats</span></div>
+    <div class="panel-b"><div class="eqgrid">${MECH_ESLOTS.map(x=>mechESlot(mech,x,ed)).join('')}</div></div></div>`;
+  let meter=`<div class="meter" style="margin-top:14px"><div class="lab"><span>Extra Modifications</span><span class="mono">${used} / ${cap}</span>${ed?`<button class="addbtn" onclick="editSlots()">set cap</button>`:''}</div>
+    <div class="bar" style="margin-top:8px"><i style="width:${Math.min(100,100*used/Math.max(cap,used||1))}%;background:${over?'var(--danger)':'var(--mech)'}"></i></div>
+    ${over?`<div class="warnchip">⚠ ${over} modification(s) over capacity — ${signed(-over)} to mech attacks &amp; saves</div>`:`<div class="warnchip okchip">✓ ${cap-used} extra-mod slot(s) free · weapons &amp; standard equipment don't count</div>`}
+    <div style="font-size:10.5px;color:var(--ink-faint);margin-top:8px;line-height:1.45">${esc(S.settings.mechOverloadRule||mech.overloadRule||'')}${isDM()?` <button class="addbtn" style="margin-top:6px" onclick="openRules()">edit rule</button>`:''}</div></div>`;
+  return doll+equip+meter;
+}
+function mechWSlot(mech,s,ed){
+  const armed=ed&&S.pick&&S.pick.ctx==='mech'&&S.pick.kind==='w'&&mechWAccepts(S.pick.id,s);
+  if(s.k==='handR'){ const th=(mech.weapons||[]).find(x=>x.slot==='hands'); if(th) return `<div class="slot filled" data-slot="handR"><div class="sl">${s.l}</div><div class="empty2" style="color:var(--accent)">↤ ${esc(th.name)} (2H)</div></div>`; }
+  let w=(mech.weapons||[]).find(x=>x.slot===s.k);
+  if(!w && s.k==='handL') w=(mech.weapons||[]).find(x=>x.slot==='hands');
+  return `<div class="slot ${w?'filled':''} ${armed?'armed':''}" data-slot="${s.k}" ${ed?`onclick="slotClick('mech','${s.k}')"`:''} ondragover="slotOver(event)" ondragleave="slotLeave(event)" ondrop="mechSlotDrop(event,'${s.k}')">
+    <div class="sl">${s.l}${w&&isTwoHanded(w)?' · 2H':''}</div>
+    ${w?`<div class="si"><span>${esc(w.name)}</span>${ed?`<button class="rbtn ghost" onclick="event.stopPropagation();mechUnslot('w','${w.id}')">✕</button>`:''}</div>`:`<div class="empty2">${ed?'tap to mount':'empty'}</div>`}</div>`;
+}
+function mechESlot(mech,s,ed){
+  const md=(mech.mods||[]).find(x=>x.slot===s.k); const armed=ed&&S.pick&&S.pick.ctx==='mech'&&S.pick.kind==='m'&&mechEAccepts(S.pick.id,s);
+  return `<div class="slot ${md?'filled':''} ${armed?'armed':''}" data-slot="${s.k}" ${ed?`onclick="slotClick('mech','${s.k}')"`:''} ondragover="slotOver(event)" ondragleave="slotLeave(event)" ondrop="mechSlotDrop(event,'${s.k}')">
+    <div class="sl">${s.l}</div>
+    ${md?`<div class="si"><span>${esc(md.name)}</span>${ed?`<button class="rbtn ghost" onclick="event.stopPropagation();mechUnslot('m','${md.id}')">✕</button>`:''}</div>${md.effects&&md.effects.length?`<div class="empty2" style="font-style:normal;color:var(--accent)">${esc(fmtEffects(md.effects))}</div>`:''}`:`<div class="empty2">${ed?'tap to install':'empty'}</div>`}</div>`;
+}
+/* ---------- right: mech parts list ---------- */
+function colMechList(c,mech){
+  const ed=canEdit(c.id);
+  let h=`<div class="panel"><div class="panel-h"><h3>Weapons</h3><span class="mono" style="margin-left:6px;color:var(--ink-faint)">${(mech.weapons||[]).length}</span><span style="flex:1"></span>${ed?`<button class="addbtn" onclick="openCatalog('mech-weapon')">＋ Add</button>`:''}</div><div class="panel-b" style="padding:8px 12px;max-height:240px;overflow:auto">`;
+  h+=(mech.weapons||[]).length?(mech.weapons||[]).map(w=>`<div class="itemrow invitem ${(S.pick&&S.pick.id===w.id)?'sel':''}" ${ed?`onpointerdown="pDown(event,'mech','w','${w.id}')"`:''}><span class="ico">⚔</span><div class="info"><div class="n">${esc(w.name)}${isTwoHanded(w)?' <small style="color:var(--warn)">2H</small>':''}${w.slot?` <small style="color:var(--accent)">[${esc(w.slot)}]</small>`:''}</div><div class="d">${esc((w.damage||[]).map(d=>d.formula+' '+(d.type||'')).join(', ')||w.properties||'')}</div></div>${ed?`<button class="rbtn ghost" title="edit stat effects" onclick="event.stopPropagation();editEffects('weapon','${w.id}')">fx${(w.effects&&w.effects.length)?'·'+w.effects.length:''}</button><button class="rbtn ghost catchip" title="mount point — click to change" onclick="event.stopPropagation();setWeaponMount('${w.id}')">${esc(weaponMount(w))}</button><button class="rbtn dngr" onclick="event.stopPropagation();removeWeapon('${w.id}')">✕</button>`:''}</div>`).join(''):`<div class="empty" style="padding:8px">None. Tap ＋ Add.</div>`;
+  h+=`</div></div>`;
+  h+=`<div class="panel" style="margin-top:14px"><div class="panel-h"><h3>Ship Parts &amp; Mods</h3><span class="mono" style="margin-left:6px;color:var(--ink-faint)">${(mech.mods||[]).length}</span><span style="flex:1"></span>${ed?`<button class="addbtn" onclick="openCatalog('mech')">＋ Add</button>`:''}</div><div class="panel-b" style="padding:8px 12px;max-height:320px;overflow:auto">`;
+  h+=(mech.mods||[]).length?(mech.mods||[]).map(m=>{ const asMod=m.slot==='mod'; const inSlot=m.slot&&!asMod;
+     return `<div class="itemrow invitem ${(S.pick&&S.pick.id===m.id)?'sel':''}" ${ed?`onpointerdown="pDown(event,'mech','m','${m.id}')"`:''}><span class="ico">⬡</span><div class="info"><div class="n">${esc(m.name)}${(m.grade!=null&&typeof m.grade!=="object")?` G${m.grade}`:''}${inSlot?` <small style="color:var(--accent)">[${esc(m.slot)}]</small>`:asMod?' <small style="color:var(--mech)">[extra mod]</small>':''}</div><div class="d">${esc(m.system||m.desc||'')}</div></div>${ed?`<button class="rbtn ghost" title="edit stat effects" onclick="event.stopPropagation();editEffects('mod','${m.id}')">fx${(m.effects&&m.effects.length)?'·'+m.effects.length:''}</button><button class="rbtn ghost catchip" title="equipment type — click to change" onclick="event.stopPropagation();setModCat('${m.id}')">${esc(modEquipType(m))}</button><button class="rbtn ghost" onclick="event.stopPropagation();toggleModById('${m.id}')" title="install as extra modification (counts toward overload)">${asMod?'mod✓':'+mod'}</button><button class="rbtn dngr" onclick="event.stopPropagation();removeModById('${m.id}')">✕</button>`:''}</div>`; }).join(''):`<div class="empty" style="padding:8px">None. Tap ＋ Add.</div>`;
+  h+=`</div></div>`;
+  h+=`<div class="panel" style="margin-top:14px"><div class="panel-h"><h3>Augments</h3><span class="mono" style="margin-left:6px;color:var(--ink-faint)">${(mech.augments||[]).length}</span><span style="flex:1"></span>${ed?`<button class="addbtn" onclick="openCatalog('maugment')">＋ Add</button>`:''}</div><div class="panel-b" style="padding:8px 12px">`;
+  h+=(mech.augments||[]).length?(mech.augments||[]).map(a=>`<div class="bonusrow"><span>✦ ${esc(a.name)}${a.abilityCard?' <small style="color:var(--warn)">◆card</small>':''}${a.effects&&a.effects.length?` <small style="color:var(--accent)">${esc(fmtEffects(a.effects))}</small>`:''}</span>${ed?`<button class="rbtn ghost" title="edit stat effects" onclick="editEffects('augment','${a.id}')">fx${(a.effects&&a.effects.length)?'·'+a.effects.length:''}</button><button class="rbtn dngr" onclick="removeAugment('${a.id}')">✕</button>`:''}</div>`).join(''):`<div class="empty" style="padding:8px">No mech augments. Add chits (ability cards) or implants here.</div>`;
+  h+=`</div></div>`;
+  return h;
+}
+function removeAugment(id){ const c=cur(); if(!canEdit(c.id))return warnEdit(); const m=curMech(); m.augments=(m.augments||[]).filter(x=>x.id!==id); saveMech(m); renderMain(); }
+function dragMech(ev,kind,id){ DRAGID=id;DRAGKIND=kind; ev.dataTransfer.setData('text/plain',id); ev.target.classList.add('dragging'); }
+function mechSlotDrop(ev,slot){ ev.preventDefault(); ev.currentTarget.classList.remove('drop'); if(DRAGID&&DRAGKIND){ S.pick={ctx:'mech',kind:DRAGKIND,id:DRAGID}; DRAGID=null;DRAGKIND=null; placeMechSlot(slot); } }
+function mechUnslot(kind,id){ const c=cur(); if(!canEdit(c.id))return warnEdit(); const m=curMech(); if(kind==='w'){const w=(m.weapons||[]).find(x=>x.id===id);if(w)w.slot=null;}else{const md=(m.mods||[]).find(x=>x.id===id);if(md)md.slot=null;} saveMech(m); renderMain(); }
+function removeWeapon(id){ const c=cur(); if(!canEdit(c.id))return warnEdit(); const m=curMech(); m.weapons=(m.weapons||[]).filter(x=>x.id!==id); saveMech(m); renderMain(); }
+function toggleModById(id){ const c=cur(); if(!canEdit(c.id))return warnEdit(); const m=curMech(); const md=(m.mods||[]).find(x=>x.id===id); if(md){ md.slot = md.slot==='mod'?null:'mod'; saveMech(m); renderMain(); } }
+function removeModById(id){ const c=cur(); if(!canEdit(c.id))return warnEdit(); const m=curMech(); m.mods=(m.mods||[]).filter(x=>x.id!==id); saveMech(m); renderMain(); }
+function setMechHP(){ const m=curMech(); const c=cur(); if(!canEdit(c.id))return warnEdit(); const v=prompt('Set Hull (0-'+m.hp.max+'):',m.hp.value); if(v!=null){ m.hp.value=Math.max(0,Math.min(m.hp.max,parseInt(v)||0)); saveMech(m); renderMain(); } }
+function setMechShield(){ const m=curMech(); const c=cur(); if(!canEdit(c.id))return warnEdit(); m.shields=m.shields||{value:0,max:0}; const v=prompt('Set Shields (0-'+m.shields.max+'):',m.shields.value); if(v!=null){ m.shields.value=Math.max(0,Math.min(m.shields.max,parseInt(v)||0)); saveMech(m); renderMain(); } }
+function editSlots(){ const m=curMech(); const c=cur(); if(!canEdit(c.id))return warnEdit(); askNum('Extra-modification capacity (beyond standard slots)', m.modSlots?.capacity??4, v=>{ if(v==null)return; m.modSlots={capacity:Math.max(0,Math.round(v))}; saveMech(m); renderMain(); }); }
+
+/* ============================ Workshop (create items) ============================ */
+const FORGE={type:'weapon-melee',name:'',cost:0,size:'',damage:'',damageType:'',properties:'',desc:'',activation:'',rollAbility:'',abilityCard:false,dest:'me',toLib:true,effects:[]};
+const FORGE_TYPES=[
+  {v:'weapon-melee',l:'Melee Weapon',dom:'char'},{v:'weapon-ranged',l:'Ranged Weapon',dom:'char'},
+  {v:'armor',l:'Armor / Shield',dom:'char'},{v:'equipment',l:'Gear / Equipment',dom:'char'},
+  {v:'cybernetic',l:'Cybernetic Augment',dom:'char'},{v:'techpower',l:'Tech Power / Ability',dom:'char'},
+  {v:'ship-weapon',l:'Mech Weapon',dom:'mech'},{v:'ship-modification',l:'Mech Modification',dom:'mech'},
+];
+function colForgeHelp(){
+  return `<div class="panel"><div class="panel-h"><h3>How it works</h3></div><div class="panel-b" style="font-size:12px;color:var(--ink-mid);line-height:1.6">
+    <p style="margin:0 0 10px"><b style="color:var(--ink)">Type</b> decides where it lands — personal gear &amp; augments go on the pilot; mech weapons &amp; mods go on the mech.</p>
+    <p style="margin:0 0 10px"><b style="color:var(--ink)">Effects</b> auto-apply when the item is equipped/installed and feed the ability scores &amp; Secondary Bonuses (e.g. <span class="mono" style="color:var(--accent)">+2 Strength</span>).</p>
+    <p style="margin:0 0 10px"><b style="color:var(--ink)">Ability card</b> makes it appear in your Hand on the dashboard with a roll button — set a damage formula (e.g. <span class="mono">2d6</span>) and/or a governing ability.</p>
+    <p style="margin:0"><b style="color:var(--ink)">Shared library</b> keeps a copy everyone can add from later.</p>
+  </div></div>`;
+}
+function viewForge(c,mech){
+  if(!canEdit(c.id)) return `<div class="empty">Only the pilot (or DM) can create items here. Switch identity or sign in as DM.</div>`;
+  return `<div id="forgeWrap">${forgeInner(c,mech)}</div>`;
+}
+function forgeInner(c,mech){
+  const t=FORGE.type; const isMech=t==='ship-weapon'||t==='ship-modification';
+  const showDmg=/weapon/.test(t)||t==='techpower';
+  const destOpts = isMech
+    ? `<option value="mech" ${FORGE.dest==='mech'?'selected':''}>${mech?esc(mech.name):'this mech'}</option>`
+    : `<option value="me" ${FORGE.dest==='me'?'selected':''}>${esc(c.name)} (this pilot)</option>`;
+  return `<div class="panel"><div class="panel-h"><h3>Workshop — Fabricate Item</h3><span style="flex:1"></span><span class="status">${esc(c.name)}${mech?' / '+esc(mech.name):''}</span></div>
+   <div class="panel-b">
+    <div class="row2">
+      <label class="fld"><span>Item type</span><select onchange="fset('type',this.value);fset('cat','');refreshForge()">${FORGE_TYPES.map(x=>`<option value="${x.v}" ${t===x.v?'selected':''}>${x.l}</option>`).join('')}</select></label>
+      <label class="fld"><span>Name</span><input value="${esc(FORGE.name)}" oninput="fset('name',this.value)" placeholder="e.g. Ion Lance Mk II"></label>
+    </div>
+    <div class="row2">
+      <label class="fld"><span>Cost (cr)</span><input type="number" value="${FORGE.cost}" oninput="fset('cost',this.value)"></label>
+      <label class="fld"><span>${isMech?'Grade':'Weight (lb)'}</span><input type="number" value="${esc(FORGE.size)}" oninput="fset('size',this.value)" placeholder="optional"></label>
+    </div>
+    ${showDmg?`<div class="row2"><label class="fld"><span>Damage formula</span><input value="${esc(FORGE.damage)}" oninput="fset('damage',this.value)" placeholder="e.g. 2d6 or 1d8+mod"></label>
+      <label class="fld"><span>Damage type</span><input value="${esc(FORGE.damageType)}" oninput="fset('damageType',this.value)" placeholder="Energy, Kinetic, Ion…"></label></div>`:''}
+    <label class="fld"><span>Properties / tags</span><input value="${esc(FORGE.properties)}" oninput="fset('properties',this.value)" placeholder="Finesse, Reach, Reload 8…"></label>
+    ${(t!=='techpower'&&t!=='cybernetic')?`<label class="fld"><span>${t==='ship-weapon'?'Mount point (which hardpoint it fits)':t==='ship-modification'?'Equipment type (which slot it fills)':'Equip slot category (which body slot it fits)'}</span><select onchange="fset('cat',this.value)">${(t==='ship-weapon'?MECH_MOUNTS:t==='ship-modification'?MECH_ECATS:CHAR_CATS).map(x=>`<option value="${x}" ${((FORGE.cat||defaultCat(t))===x)?'selected':''}>${x}</option>`).join('')}</select></label>`:''}
+    <label class="fld"><span>Description</span><textarea oninput="fset('desc',this.value)" placeholder="What it is and what it does.">${esc(FORGE.desc)}</textarea></label>
+
+    <div class="sechead"><h3>Effects (auto-applied when equipped)</h3><div class="ln"></div><button class="addbtn" onclick="addEffect()">+ Effect</button></div>
+    <div id="effList">${FORGE.effects.map((e,i)=>effectRow(e,i)).join('')||'<div class="empty" style="padding:8px 0">No stat effects. Add one to modify ability scores, AC, HP, saves, etc.</div>'}</div>
+
+    <div class="sechead"><h3>Ability card</h3><div class="ln"></div></div>
+    <label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-mid);margin-bottom:10px"><input type="checkbox" ${FORGE.abilityCard?'checked':''} onchange="fset('abilityCard',this.checked);refreshForge()" style="width:auto"> Create an ability card in the Hand (rollable on the dashboard)</label>
+    ${FORGE.abilityCard?`<div class="row2">
+      <label class="fld"><span>Activation</span><input value="${esc(FORGE.activation)}" oninput="fset('activation',this.value)" placeholder="Action, Bonus Action…"></label>
+      <label class="fld"><span>Roll uses ability</span><select onchange="fset('rollAbility',this.value)"><option value="">— none / uses damage —</option>${ABIL.map(k=>`<option value="${k}" ${FORGE.rollAbility===k?'selected':''}>${k.toUpperCase()}</option>`).join('')}</select></label>
+    </div>
+    <div class="row2" style="grid-template-columns:1fr 1fr 1fr">
+      <label class="fld"><span>Tech-point cost</span><input type="number" value="${esc(FORGE.tpCost||'')}" oninput="fset('tpCost',this.value)" placeholder="auto-spent"></label>
+      <label class="fld"><span>Self HP on use</span><input type="number" value="${esc(FORGE.hpDelta||'')}" oninput="fset('hpDelta',this.value)" placeholder="+heal / -cost"></label>
+      <label class="fld"><span>Shield on use</span><input type="number" value="${esc(FORGE.shieldDelta||'')}" oninput="fset('shieldDelta',this.value)" placeholder="+/-"></label>
+    </div>`:''}
+
+    <div class="sechead"><h3>Destination</h3><div class="ln"></div></div>
+    <div class="row2">
+      <label class="fld"><span>Add to</span><select onchange="fset('dest',this.value)">${destOpts}<option value="none" ${FORGE.dest==='none'?'selected':''}>Library only</option></select></label>
+      <label class="fld" style="display:flex;align-items:flex-end"><label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-mid)"><input type="checkbox" ${FORGE.toLib?'checked':''} onchange="fset('toLib',this.checked)" style="width:auto"> Save to shared party library</label></label>
+    </div>
+    <button class="btn" style="width:100%;margin-top:8px" onclick="fabricate()">Fabricate ${isMech?'Mech Part':'Item'}</button>
+   </div></div>`;
+}
+function effectRow(e,i){
+  return `<div class="effrow"><select onchange="FORGE.effects[${i}].target=this.value">${EFFECT_TARGETS.map(x=>`<option value="${x.v}" ${e.target===x.v?'selected':''}>${x.l}</option>`).join('')}</select>
+    <input type="number" value="${e.value}" oninput="FORGE.effects[${i}].value=this.value" placeholder="±"><button class="rbtn dngr" onclick="removeEffect(${i})">✕</button></div>`;
+}
+function fset(k,v){ FORGE[k]=v; }
+function refreshForge(){ const w=$('#forgeWrap'); if(w){ const c=cur(); w.innerHTML=forgeInner(c,curMech()); } }
+function addEffect(){ FORGE.effects.push({target:'str',value:1}); const l=$('#effList'); if(l)l.innerHTML=FORGE.effects.map((e,i)=>effectRow(e,i)).join(''); }
+function removeEffect(i){ FORGE.effects.splice(i,1); const l=$('#effList'); if(l)l.innerHTML=FORGE.effects.map((e,i)=>effectRow(e,i)).join('')||'<div class="empty" style="padding:8px 0">No stat effects.</div>'; }
+function fabricate(){
+  const c=cur(); if(!canEdit(c.id))return warnEdit();
+  if(!FORGE.name.trim()){ toast('Name required',''); return; }
+  const t=FORGE.type, isMech=t==='ship-weapon'||t==='ship-modification';
+  const effects=FORGE.effects.filter(e=>parseFloat(e.value)).map(e=>({target:e.target,value:parseFloat(e.value)}));
+  const id=FORGE.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,40)+'-'+uid().slice(0,4);
+  const dmgArr=FORGE.damage.trim()?[{formula:FORGE.damage.trim(),type:FORGE.damageType.trim()}]:[];
+  const base={id,name:FORGE.name.trim(),cost:parseFloat(FORGE.cost)||0,description:FORGE.desc.trim()||null,properties:FORGE.properties.trim()||null,
+    effects, abilityCard:FORGE.abilityCard, activation:FORGE.activation.trim()||null, rollAbility:FORGE.rollAbility||null, slotType:(!isMech?(FORGE.cat||defaultCat(t)):null), mount:(t==='ship-weapon'?(FORGE.cat||'hand'):null), equipType:(t==='ship-modification'?(FORGE.cat||'mod'):null),
+    tpCost:(FORGE.abilityCard&&parseFloat(FORGE.tpCost))?parseFloat(FORGE.tpCost):null, hpDelta:(FORGE.abilityCard&&parseFloat(FORGE.hpDelta))?parseFloat(FORGE.hpDelta):null, shieldDelta:(FORGE.abilityCard&&parseFloat(FORGE.shieldDelta))?parseFloat(FORGE.shieldDelta):null,
+    damage:FORGE.damage.trim()||null, damageType:FORGE.damageType.trim()||null, source:'HOMEBREW', category:t, domain:isMech?'mech':'character',
+    grade:isMech&&FORGE.size?parseFloat(FORGE.size):null, weight:!isMech&&FORGE.size?parseFloat(FORGE.size):null};
+  // route to sheet
+  if(FORGE.dest!=='none'){
+    if(t==='cybernetic'){ c.cybernetics=c.cybernetics||[]; c.cybernetics.push({name:base.name,subtype:'',desc:base.description||'',effects,abilityCard:FORGE.abilityCard,activation:base.activation,rollAbility:base.rollAbility,damage:base.damage,tpCost:base.tpCost,hpDelta:base.hpDelta,shieldDelta:base.shieldDelta}); saveChar(c); }
+    else if(t==='techpower'){ c.powers=c.powers||[]; c.powers.push({name:base.name,level:null,school:'tec',actionType:'',activation:base.activation||'',damage:dmgArr,save:'',desc:base.description||'',tpCost:base.tpCost}); saveChar(c); }
+    else if(isMech){ const m=curMech(); if(m){ if(t==='ship-weapon'){ m.weapons=m.weapons||[]; m.weapons.push({id,name:base.name,damage:dmgArr,properties:base.properties||'',desc:base.description||'',mount:base.mount||'hand',effects,abilityCard:FORGE.abilityCard,activation:base.activation,rollAbility:base.rollAbility}); } else { m.mods=m.mods||[]; m.mods.push({id,name:base.name,grade:base.grade,equipType:base.equipType||'mod',system:base.properties||'',desc:base.description||'',effects,abilityCard:FORGE.abilityCard,activation:base.activation}); if(m.modSlots)m.modSlots.used=(m.mods||[]).filter(x=>x.equipped!==false).length; } saveMech(m); } }
+    else { c.inventory=c.inventory||[]; c.inventory.push({id,name:base.name,type:(t==='weapon-melee'||t==='weapon-ranged')?'weapon':(t==='armor'||t==='equipment')?'equipment':'loot',slotType:base.slotType,qty:1,weight:base.weight||0,equipped:false,damage:dmgArr,properties:base.properties||'',actionType:t==='weapon-melee'?'mwak':'rwak',attackAbility:t==='weapon-melee'?'str':'dex',effects,abilityCard:FORGE.abilityCard,activation:base.activation,rollAbility:base.rollAbility,damageType:base.damageType,desc:base.description||'',tpCost:base.tpCost,hpDelta:base.hpDelta,shieldDelta:base.shieldDelta}); saveChar(c); }
+  }
+  // shared library
+  if(FORGE.toLib && socket) socket.emit('write',{auth:authPayload(),collection:'library',id:base.id,data:base});
+  toast('Fabricated',base.name+(FORGE.dest!=='none'?' — added to sheet':' — saved to library'));
+  FORGE.name='';FORGE.damage='';FORGE.desc='';FORGE.properties='';FORGE.effects=[];FORGE.abilityCard=false;FORGE.activation='';FORGE.rollAbility='';FORGE.cat='';FORGE.tpCost='';FORGE.hpDelta='';FORGE.shieldDelta='';
+  renderMain();
+}
+function setItemCat(id){ const c=cur(); if(!canEdit(c.id))return warnEdit(); const i=(c.inventory||[]).find(x=>x.id===id); if(!i)return; askChoice('Equip category for '+i.name, CHAR_CATS, itemSlotType(i), vv=>{ i.slotType=vv; if(i.slot){ const sd=CHAR_SLOTS.find(x=>x.k===i.slot); if(sd&&vv!=='any'&&!itemFootprintTypes(i).includes(sd.t)){ i.equipped=false; i.slot=null; i.slots=null; } } saveChar(c); renderMain(); }); }
+function setModCat(id){ const c=cur(); if(!canEdit(c.id))return warnEdit(); const m=curMech(); const md=(m.mods||[]).find(x=>x.id===id); if(!md)return; askChoice('Equipment type for '+md.name, MECH_ECATS, modEquipType(md), vv=>{ md.equipType=vv; if(md.slot&&md.slot!=='mod'){ const sd=MECH_ESLOTS.find(x=>x.k===md.slot); if(sd&&vv!==sd.t){ md.slot=null; } } saveMech(m); renderMain(); }); }
+function setWeaponMount(id){ const c=cur(); if(!canEdit(c.id))return warnEdit(); const m=curMech(); const w=(m.weapons||[]).find(x=>x.id===id); if(!w)return; askChoice('Mount point for '+w.name, MECH_MOUNTS, weaponMount(w), vv=>{ w.mount=vv; if(w.slot&&!isTwoHanded(w)){ const sd=MECH_WSLOTS.find(x=>x.k===w.slot); if(sd&&vv!=='any'&&vv!==sd.t){ w.slot=null; } } saveMech(m); renderMain(); }); }
+
+/* ============================ modals ============================ */
+function modal(html){ $('#modalRoot').innerHTML=`<div class="scrim" onclick="if(event.target===this)closeModal()">${html}</div>`; }
+function closeModal(){ $('#modalRoot').innerHTML=''; }
+
+function openIdentity(){
+  const chars=Object.values(S.chars).sort((a,b)=>a.name.localeCompare(b.name));
+  let h=`<div class="modal"><div class="modal-h"><h3>Who's at this terminal?</h3><button class="x" onclick="closeModal()">×</button></div>
+    <div class="modal-b"><p style="color:var(--ink-mid);font-size:12.5px;margin:0 0 14px">Pick your pilot to edit your own sheet, or sign in as DM for full control. Saved to this browser.</p>
+    <div style="display:flex;flex-direction:column;gap:8px">`;
+  chars.forEach(c=>{ h+=`<button class="itemrow" style="width:100%" onclick="setIdentity('${c.id}')">
+     <span class="avatar" style="background:${c.avatarColor}">${esc(initials(c.name))}</span>
+     <div class="info"><div class="n">${esc(c.name)}</div><div class="d">${esc(c.class||'')} · pilot of ${esc((Object.values(S.mechs).find(m=>m.id===c.mechRef)||{}).name||'—')}</div></div>
+     ${S.identity===c.id?'<span class="you">CURRENT</span>':''}</button>`; });
+  h+=`<button class="itemrow" style="width:100%;border-color:var(--mech-dim)" onclick="setIdentity('dm')">
+     <span class="avatar" style="background:var(--mech)">DM</span>
+     <div class="info"><div class="n">Dungeon Master</div><div class="d">Admin — edit every pilot, mech &amp; house rule</div></div>
+     ${S.identity==='dm'?'<span class="you">CURRENT</span>':''}</button>`;
+  h+=`</div></div></div>`;
+  modal(h);
+}
+function setIdentity(id){
+  if(id==='dm'){ promptDM(); return; }
+  S.identity=id; localStorage.setItem('mm_identity',id); localStorage.removeItem('mm_dmtoken');
+  S.auth.dmToken=undefined; S.auth.pilotId=id; S.sel=id;
+  closeModal(); renderAll(); toast('Identity set',S.chars[id]?.name);
+}
+function promptDM(){
+  modal(`<div class="modal" style="width:min(400px,94vw)"><div class="modal-h"><h3>DM Sign-In</h3><button class="x" onclick="openIdentity()">×</button></div>
+   <div class="modal-b"><p style="color:var(--ink-mid);font-size:12.5px;margin:0 0 12px">Enter the DM password to unlock full edit access to every pilot, mech &amp; house rule.</p>
+   <div id="dm_err"></div>
+   <label class="fld"><span>DM password</span><input id="dm_pw" type="password" onkeydown="if(event.key==='Enter')doDM()"></label>
+   <button class="btn" style="width:100%" onclick="doDM()">Unlock</button></div></div>`);
+  setTimeout(()=>{const i=$('#dm_pw');if(i)i.focus();},40);
+}
+async function doDM(){
+  const pw=$('#dm_pw').value;
+  const r=await fetch('/api/dm-login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pw})}).then(r=>r.json()).catch(()=>({ok:false}));
+  if(!r.ok){ $('#dm_err').innerHTML='<div class="warnchip" style="margin-bottom:10px">⚠ Wrong password</div>'; return; }
+  S.identity='dm'; S.auth.dmToken=r.dmToken; S.auth.pilotId=undefined;
+  localStorage.setItem('mm_identity','dm'); localStorage.setItem('mm_dmtoken',r.dmToken);
+  closeModal(); renderAll(); toast('DM access granted','Full control unlocked');
+}
+
+function openRules(){
+  if(!isDM()) return;
+  const s=S.settings;
+  modal(`<div class="modal"><div class="modal-h"><h3>House Rules</h3><button class="x" onclick="closeModal()">×</button></div>
+   <div class="modal-b">
+    <label class="fld"><span>Mech overload penalty rule</span><textarea id="r_mech">${esc(s.mechOverloadRule||'Each modification installed beyond the mech\'s slot capacity imposes a cumulative −1 penalty to the mech\'s attack rolls and saving throws.')}</textarea></label>
+    <label class="fld"><span>Cybernetic overload note (fixed: limit = proficiency bonus, −1/excess to checks &amp; saves)</span>
+      <input id="r_cyber" value="${esc(s.cyberNote||'Limit equals proficiency bonus; each excess augment: −1 to ability checks & saving throws.')}"></label>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
+      <button class="btn sec" onclick="closeModal()">Cancel</button><button class="btn" onclick="saveRules()">Save Rules</button></div>
+   </div></div>`);
+}
+function saveRules(){ S.settings.mechOverloadRule=$('#r_mech').value; S.settings.cyberNote=$('#r_cyber').value; saveSettings(); closeModal(); renderMain(); toast('House rules updated',''); }
+
+/* ---------- catalog browser ---------- */
+const CAT_FILTERS={
+  'char':['weapon-ranged','weapon-melee','armor','shield','equipment','gear','consumable','ammunition','explosive'],
+  'techpower':['techpower'],
+  'cybernetic':['cybernetic'],
+  'augment':['cybernetic','techpower'],
+  'maugment':['cybernetic','techpower'],
+  'mech':['ship-modification','ship-component','ship-shield'],
+  'mech-weapon':['ship-weapon','weapon-ranged','weapon-melee'],
+};
+let CATX={scope:'char',q:'',cat:'all'};
+function openCatalog(scope){
+  const c=cur(); if(!canEdit(c.id)) return warnEdit();
+  CATX={scope,q:'',cat:'all'};
+  renderCatalog();
+}
+function renderCatalog(){
+  const scope=CATX.scope; const allowed=CAT_FILTERS[scope]||[];
+  const custom=Object.values(S.library).filter(i=>allowed.includes(i.category));
+  const base=S.catalog.filter(i=>allowed.includes(i.category));
+  let pool=[...custom,...base];
+  if(CATX.cat!=='all') pool=pool.filter(i=>i.category===CATX.cat);
+  if(CATX.q){ const q=CATX.q.toLowerCase(); pool=pool.filter(i=>(i.name||'').toLowerCase().includes(q)||(i.description||'').toLowerCase().includes(q)); }
+  pool=pool.slice(0,300);
+  const cats=[...new Set(allowed.filter(a=>[...custom,...base].some(i=>i.category===a)))];
+  const title={char:'Add Personal Gear',techpower:'Add Tech Power',cybernetic:'Add Cybernetic Augment',augment:'Add Augment or Ability (chits)',maugment:'Add Mech Augment (chits &amp; implants)',mech:'Add Mech Part','mech-weapon':'Mount Mech Weapon'}[scope]||'Catalog';
+  let h=`<div class="modal wide"><div class="modal-h"><h3>${title}</h3><span class="status" style="margin-left:6px">${S.catalogReady?S.catalog.length.toLocaleString()+' items':'catalog loading…'}</span><span style="flex:1"></span><button class="btn sec" onclick="openCreate('${scope}')">✎ Create Custom</button><button class="x" onclick="closeModal()">×</button></div>
+   <div class="modal-b">
+    <div class="catsearch"><input id="catq" placeholder="Search ${pool.length?'':'— '}by name or text…" value="${esc(CATX.q)}" oninput="CATX.q=this.value;renderCatalogList()"></div>
+    <div class="chipbar" id="catchips"><button class="fchip ${CATX.cat==='all'?'on':''}" onclick="CATX.cat='all';renderCatalog()">All</button>${cats.map(ct=>`<button class="fchip ${CATX.cat===ct?'on':''}" onclick="CATX.cat='${ct}';renderCatalog()">${esc(catLabel(ct))}</button>`).join('')}</div>
+    <div class="catlist" id="catlist">${catRows(pool)}</div>
+   </div></div>`;
+  modal(h);
+  setTimeout(()=>{const q=$('#catq');if(q){q.focus();q.setSelectionRange(q.value.length,q.value.length);}},30);
+}
+function renderCatalogList(){
+  const scope=CATX.scope; const allowed=CAT_FILTERS[scope]||[];
+  let pool=[...Object.values(S.library).filter(i=>allowed.includes(i.category)),...S.catalog.filter(i=>allowed.includes(i.category))];
+  if(CATX.cat!=='all') pool=pool.filter(i=>i.category===CATX.cat);
+  if(CATX.q){ const q=CATX.q.toLowerCase(); pool=pool.filter(i=>(i.name||'').toLowerCase().includes(q)||(i.description||'').toLowerCase().includes(q)); }
+  $('#catlist').innerHTML=catRows(pool.slice(0,300));
+}
+function catLabel(c){ return ({'weapon-ranged':'Ranged','weapon-melee':'Melee','ship-modification':'Modifications','ship-weapon':'Ship Weapons','techpower':'Tech Powers','cybernetic':'Cybernetics','armor':'Armor','equipment':'Equipment'})[c]||c; }
+function catRows(pool){
+  if(!pool.length) return `<div class="empty">No matches. Try “Create Custom”.</div>`;
+  return pool.map((i,ix)=>{ const meta=[catLabel(i.category), i.damage||'', i.cost?('◈'+i.cost):'', i.grade!=null?('G'+i.grade):'', i.properties||''].filter(Boolean).join(' · ');
+    window.__cat=window.__cat||{}; const key=(i.id||'x')+'_'+ix; window.__cat[key]=i;
+    return `<div class="catrow"><div class="info"><div class="n">${esc(i.name)}</div><div class="m">${esc(meta.slice(0,90))}</div></div>
+      <span class="src">${esc(i.source||'')}</span>
+      <button class="rbtn" onclick='addFromCatalog("${key}")'>Add</button></div>`; }).join('');
+}
+function chitToPower(i){ const d=String(i.description||'');
+  const dm=d.match(/(\d+d\d+(?:\s*\+\s*mod)?)\s*([A-Za-z]+)?/);
+  const tp=(d.match(/(\d+)\s*Tech\s*Point/i)||d.match(/spend\s*(\d+)/i));
+  const act=(d.match(/\b(bonus action|reaction|action|minute|hour)\b/i)||[])[1]||'';
+  const heal=/heal/i.test(d);
+  return { name:i.name, level:i.level||null, school:'tec', activation:act, save:'',
+    damage: dm?[{formula:dm[1].replace(/\s/g,''), type: heal?'healing':((dm[2]||'').toLowerCase()==='healing'?'healing':(dm[2]||''))}]:[],
+    tpCost: tp?parseInt(tp[1]):(i.resourceCost||null), desc:i.description||'' }; }
+function addFromCatalog(key){
+  const i=window.__cat[key]; if(!i) return; const scope=CATX.scope; const c=cur(); if(!canEdit(c.id))return warnEdit();
+  const cost=Math.max(0,Math.round(i.cost||0));
+  if(cost>(c.credits||0)){ toast('Insufficient credits','Need ◈'+cost.toLocaleString()+' · have ◈'+(c.credits||0).toLocaleString()); return; }
+  const asPower=()=>{ c.powers=c.powers||[]; c.powers.push(chitToPower(i)); saveChar(c); toast('Ability card added',i.name); };
+  const asCyber=()=>{ c.cybernetics=c.cybernetics||[]; c.cybernetics.push({name:i.name,subtype:i.subtype||i.rarity||'',desc:i.description||'',effects:[]}); saveChar(c); toast('Augment installed',i.name); };
+  if(scope==='augment'){ if(i.category==='techpower') asPower(); else asCyber(); }
+  else if(scope==='cybernetic'){ asCyber(); }
+  else if(scope==='techpower'){ asPower(); }
+  else if(scope==='maugment'){ const m=curMech(); m.augments=m.augments||[]; if(i.category==='techpower'){ const pw=chitToPower(i); m.augments.push({id:(i.id||uid())+'-'+uid().slice(0,3),name:pw.name,desc:pw.desc,effects:[],abilityCard:true,activation:pw.activation,damage:pw.damage,tpCost:pw.tpCost,rollAbility:null}); } else { m.augments.push({id:(i.id||uid())+'-'+uid().slice(0,3),name:i.name,desc:i.description||'',effects:[],abilityCard:false}); } saveMech(m); toast('Mech augment added',i.name); }
+  else if(scope==='mech'){ const m=curMech(); m.mods=m.mods||[]; m.mods.push({id:(i.id||uid())+'-'+uid().slice(0,3),name:i.name,grade:i.grade??null,system:i.subtype||'',desc:i.description||'',equipped:true}); if(m.modSlots)m.modSlots.used=(m.mods||[]).filter(x=>x.equipped!==false).length; saveMech(m); toast('Part installed',i.name); }
+  else if(scope==='mech-weapon'){ const m=curMech(); m.weapons=m.weapons||[]; m.weapons.push({id:(i.id||uid())+'-'+uid().slice(0,3),name:i.name,damage:i.damage?[{formula:String(i.damage).replace(/[^0-9d+ ]/g,'').trim()||'1d6',type:i.damageType||''}]:[],properties:i.properties||'',desc:i.description||'',equipped:true}); saveMech(m); toast('Weapon mounted',i.name); }
+  else { c.inventory=c.inventory||[]; c.inventory.push({id:(i.id||uid())+'-'+uid().slice(0,3),name:i.name,type:catToItemType(i.category),qty:1,weight:i.weight||0,equipped:false,
+      damage:i.damage?[{formula:String(i.damage).replace(/[^0-9d+ ]/g,'').trim()||'',type:i.damageType||''}]:[],properties:i.properties||'',actionType:i.category==='weapon-melee'?'mwak':'rwak',attackAbility:i.category==='weapon-melee'?'str':'dex',desc:i.description||''}); saveChar(c); toast('Added to inventory',i.name); }
+  if(cost>0){ c.credits=Math.max(0,(c.credits||0)-cost); saveChar(c); toast('Purchased −◈'+cost.toLocaleString(),'◈'+c.credits.toLocaleString()+' credits left'); }
+  renderMain();
+}
+function catToItemType(c){ return ({'weapon-ranged':'weapon','weapon-melee':'weapon','armor':'equipment','equipment':'equipment','consumable':'consumable'})[c]||'loot'; }
+
+/* ---------- create custom (also adds to shared library) ---------- */
+function openCreate(scope){
+  const isMech=scope==='mech'||scope==='mech-weapon';
+  modal(`<div class="modal"><div class="modal-h"><h3>Create Custom ${isMech?'Mech Part':'Item'}</h3><button class="x" onclick="renderCatalog()">×</button></div>
+   <div class="modal-b">
+    <label class="fld"><span>Name</span><input id="c_name" placeholder="e.g. Ion Lance Mk II"></label>
+    <div class="row2">
+      <label class="fld"><span>Category</span><select id="c_cat">${(CAT_FILTERS[scope]||[]).map(x=>`<option value="${x}">${catLabel(x)}</option>`).join('')}</select></label>
+      <label class="fld"><span>Cost (cr)</span><input id="c_cost" type="number" value="0"></label>
+    </div>
+    <div class="row2">
+      <label class="fld"><span>Damage (e.g. 2d6)</span><input id="c_dmg" placeholder="optional"></label>
+      <label class="fld"><span>${isMech?'Grade':'Weight (lb)'}</span><input id="c_x" type="number" placeholder="optional"></label>
+    </div>
+    <label class="fld"><span>Properties / tags</span><input id="c_props" placeholder="e.g. Finesse, Reach"></label>
+    <label class="fld"><span>Description</span><textarea id="c_desc"></textarea></label>
+    <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-mid)"><input type="checkbox" id="c_lib" checked style="width:auto"> Also save to shared party library (everyone can use it)</label>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button class="btn sec" onclick="renderCatalog()">Back</button><button class="btn" onclick="saveCreate('${scope}')">Create &amp; Add</button></div>
+   </div></div>`);
+}
+async function saveCreate(scope){
+  const name=$('#c_name').value.trim(); if(!name)return;
+  const cat=$('#c_cat').value, cost=parseFloat($('#c_cost').value)||0, dmg=$('#c_dmg').value.trim(),
+    x=$('#c_x').value, props=$('#c_props').value.trim(), desc=$('#c_desc').value.trim(), toLib=$('#c_lib').checked;
+  const isMech=scope==='mech'||scope==='mech-weapon';
+  const item={id:name.toLowerCase().replace(/[^a-z0-9]+/g,'-')+'-'+uid().slice(0,4),name,category:cat,domain:isMech?'mech':'character',source:'HOMEBREW',cost,
+    damage:dmg||null, properties:props||null, description:desc||null, grade:isMech&&x?parseFloat(x):null, weight:!isMech&&x?parseFloat(x):null};
+  S.library[item.id]=item;
+  if(toLib && socket){ socket.emit('write',{auth:authPayload(),collection:'library',id:item.id,data:item}); }
+  // add straight to the character/mech too
+  window.__cat=window.__cat||{}; window.__cat['new']=item; CATX.scope=scope; addFromCatalog('new');
+  renderCatalog();
+}
+
+/* ============================ roll feed ============================ */
+function toggleFeed(v){ const d=$('#feedDrawer'); const open=v==null?!d.classList.contains('open'):v; d.classList.toggle('open',open);
+  if(open){ S.seenRolls=(S.rolls[0]?.t)||Date.now(); localStorage.setItem('mm_seenrolls',S.seenRolls); updateBadge(); } }
+$('#feedBtn').onclick=()=>toggleFeed();
+function renderFeed(){
+  const list=$('#feedList');
+  list.innerHTML=(S.rolls||[]).map(r=>{ const c=r.crit>0?'crit':r.crit<0?'fail':'';
+    return `<div class="rollitem"><div class="rc ${c}">${esc(r.total)}</div>
+      <div style="flex:1;min-width:0"><div class="who">${esc(r.who)}</div><div class="what">${esc(r.label)}</div><div class="brk">${esc(r.brk||'')}</div></div>
+      <div class="tm">${timeAgo(r.t)}</div></div>`; }).join('')||'<div class="empty">No rolls yet. Click any ability, save, or weapon.</div>';
+  updateBadge();
+}
+function updateBadge(){ const b=$('#feedBadge'); const n=(S.rolls||[]).filter(r=>r.t>S.seenRolls).length;
+  if(n>0 && !$('#feedDrawer').classList.contains('open')){ b.textContent=n>9?'9+':n; b.classList.remove('hidden'); } else b.classList.add('hidden'); }
+function timeAgo(t){ const s=Math.floor((Date.now()-t)/1000); if(s<60)return s+'s'; if(s<3600)return Math.floor(s/60)+'m'; return Math.floor(s/3600)+'h'; }
+
+/* ---------- adv toggle ---------- */
+$('#advTog').querySelectorAll('button').forEach(b=>b.onclick=()=>{ S.adv=b.dataset.adv; $('#advTog').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); if(S.tab==='dash')renderMain(); });
+
+/* ---------- toast (non-roll) ---------- */
+function toast(title,sub){ const t=$('#toast'); t.className=''; t.innerHTML=`<div><div class="rn">${esc(title)}</div><div class="lab">${esc(sub||'')}</div></div>`;
+  requestAnimationFrame(()=>t.classList.add('show')); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'),2200); }
+
+/* ---------- launch ---------- */
+boot();
+</script>

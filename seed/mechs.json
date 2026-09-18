@@ -1,0 +1,1410 @@
+[
+ {
+  "id": "chroniko",
+  "name": "Chroniko",
+  "pilot": "Vanilla",
+  "size": "Small Starship",
+  "portrait": null,
+  "abilities": {
+   "str": {
+    "label": "STR",
+    "score": 14,
+    "mod": 2
+   },
+   "dex": {
+    "label": "DEX",
+    "score": 15,
+    "mod": 2
+   },
+   "con": {
+    "label": "CON",
+    "score": 14,
+    "mod": 2
+   },
+   "int": {
+    "label": "INT",
+    "score": 10,
+    "mod": 0
+   },
+   "wis": {
+    "label": "WIS",
+    "score": 14,
+    "mod": 2
+   },
+   "cha": {
+    "label": "CHA",
+    "score": 10,
+    "mod": 0
+   }
+  },
+  "hp": {
+   "value": 1,
+   "max": 27
+  },
+  "shields": {
+   "value": 0,
+   "max": 37
+  },
+  "ac": 13,
+  "speed": 30,
+  "fuel": 9,
+  "modSlots": {
+   "capacity": 6,
+   "used": 19
+  },
+  "mods": [
+   {
+    "id": "flare-pods-smFC",
+    "name": "Flare Pods",
+    "grade": 0,
+    "system": "Engineering",
+    "equipped": true,
+    "desc": "Your ship is a equipped with a series of counter-measure flares. When your ship is forced to make a Dexterity saving throw, a crew member can use their reaction to release a flare. When they do so, your ship has advantage on the triggering saving throw. The crew member can choose to use this feature after the roll is made, but before the GM says whether the roll succeeds or fails. If they already have advantage on the saving throw, they can instead reroll one of the dice once. This feature can be used a number of times equal to your ship's tier (a minimum of once). All expended uses are regain"
+   },
+   {
+    "id": "astromech-socket-lrVQ",
+    "name": "Astromech Socket",
+    "grade": null,
+    "system": "Operation",
+    "equipped": true,
+    "desc": "This system adds space for a single Small or Tiny droid crew member and allows that crew member to take the Patch action as a bonus action on their turn. Additionally, this crew member can use a bonus action to make an Intelligence (Astrogation) check."
+   },
+   {
+    "id": "comms-package-premium-R2Bb",
+    "name": "Comms Package, Premium",
+    "grade": null,
+    "system": "Operation",
+    "equipped": true,
+    "desc": "This modification augments the native communications on your ship. Crew members can now communicate in real time with any planets, space stations, and starships in the same sector as you as long as they are similarly equipped."
+   },
+   {
+    "id": "hyperdrive-slot-SdTR",
+    "name": "Hyperdrive Slot",
+    "grade": 0,
+    "system": "Operation",
+    "equipped": true,
+    "desc": "This modification adds a hyperdrive slot on your ship and includes a class 15 hyperdrive."
+   },
+   {
+    "id": "scanner-premium-oYqP",
+    "name": "Scanner, Premium",
+    "grade": 0,
+    "system": "Operation",
+    "equipped": true,
+    "desc": "This system augments the native radar scanner on your ship. Your ship gains blindsight out to 1,000 feet. Additionally, your ship is proficiently equipped for Intelligence (Probe) and Wisdom (Scan) checks."
+   },
+   {
+    "id": "deflection-plating-mark-i-X2dJ",
+    "name": "Deflection Plating, Mark I",
+    "grade": 1,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "You upgrade your ship's armor plating, granting your ship a +1 bonus to AC."
+   },
+   {
+    "id": "inertial-dampeners-xx0n",
+    "name": "Inertial Dampeners",
+    "grade": 0,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "This system lessens the transfer of external impacts into the ship's interior. When you are forced to make a Concentration check due to damage, impacts, or explosions exterior to the ship, you have advantage. Additionally, when you take the Evade action, skill checks and attack rolls made by your ship or anyone on it do not suffer from disadvantage from the evasion. Once this feature has been used, it can't be used again until the ship recharges."
+   },
+   {
+    "id": "reactor-mark-i-maOL",
+    "name": "Reactor, Mark I",
+    "grade": 1,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "You improve your ship's reactor. Your ship's Strength score increases by 1. As normal, you can't increase your ship's Strength score above the maximum for your size with this system."
+   },
+   {
+    "id": "thrusters-mark-i-f6ud",
+    "name": "Thrusters, Mark I",
+    "grade": 1,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "You improve your ship's thrusters. Your ship's Dexterity score increases by 1. As normal, you can't increase your ship's Dexterity score above the maximum for your size with this system."
+   },
+   {
+    "id": "expanded-payload-UES3",
+    "name": "Expanded Payload",
+    "grade": 0,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "The reload value of the chosen weapon increases by half."
+   },
+   {
+    "id": "fire-linked-mounting-k2RD",
+    "name": "Fire-Linked Mounting",
+    "grade": 0,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "You install a slave circuit in your ship to improve automation. You reduce the minimum crew requirement by half."
+   },
+   {
+    "id": "fire-linked-weapon-reinforcement-5CXq",
+    "name": "Fire-Linked Weapon Reinforcement",
+    "grade": 0,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "You install a slave circuit in your ship to improve automation. You reduce the minimum crew requirement by half."
+   },
+   {
+    "id": "fixed-hardpoint-LJDB",
+    "name": "Fixed Hardpoint",
+    "grade": 0,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "A fixed hardpoint is used to mount a primary, secondary, tertiary, or quaternary weapon. A weapon mounted on a fixed hardpoint has a limited firing arc, as described in chapter 9 and can be fired from any crew station."
+   },
+   {
+    "id": "gauss-rounds-YbTT",
+    "name": "Gauss Rounds",
+    "grade": 0,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "When you roll a 1 or 2 on a damage die with the chosen weapon, you can reroll the die and must use the new roll, even if the new roll is a 1 or a 2."
+   },
+   {
+    "id": "s-foils-nuQx",
+    "name": "S-Foils",
+    "grade": 1,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "Your primary weapons are mounted to Strike Foils giving your ship variable operational capacities. As a bonus action, a crew member can switch between two modes: Locked: Your ship's speed increases by 50 feet and your primary weapons suffer a -2 penalty to attack rolls. Unlocked: Your ship's primary weapons gain a +1 bonus to attack rolls."
+   },
+   {
+    "id": "fixed-hardpoint-2DCn",
+    "name": "Fixed Hardpoint",
+    "grade": 0,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "A fixed hardpoint is used to mount a primary, secondary, tertiary, or quaternary weapon. A weapon mounted on a fixed hardpoint has a limited firing arc, as described in chapter 9 and can be fired from any crew station."
+   },
+   {
+    "id": "fixed-hardpoint-l8xR",
+    "name": "Fixed Hardpoint",
+    "grade": 0,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "A fixed hardpoint is used to mount a primary, secondary, tertiary, or quaternary weapon. A weapon mounted on a fixed hardpoint has a limited firing arc, as described in chapter 9 and can be fired from any crew station."
+   },
+   {
+    "id": "gauss-rounds-g9tX",
+    "name": "Gauss Rounds",
+    "grade": 0,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "When you roll a 1 or 2 on a damage die with the chosen weapon, you can reroll the die and must use the new roll, even if the new roll is a 1 or a 2."
+   },
+   {
+    "id": "droid-brain-mk-iii-6I8P",
+    "name": "Droid Brain, Mk III",
+    "grade": 3,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "You greatly improve your ship's droid brain. Your droid brain's proficiency bonus increases to 4. Additionally, it gains a rank in a Deployment of your choice."
+   }
+  ],
+  "weapons": [
+   {
+    "id": "tekkaman-knife-RVwk",
+    "name": "Tekkaman Knife",
+    "damage": [
+     {
+      "formula": "1d6 + mod",
+      "type": ""
+     }
+    ],
+    "properties": "con, ovr, pow",
+    "desc": "Power (range 1200/4800), constitution 15, overheat 2",
+    "equipped": true
+   },
+   {
+    "id": "wrist-blaster-5NH3",
+    "name": "Wrist Blaster",
+    "damage": [
+     {
+      "formula": "3d4 + mod",
+      "type": "energy"
+     }
+    ],
+    "properties": "rap, rel, str, vic",
+    "desc": "Rapid 8 When you would make a ranged weapon attack with a weapon with this property, you can instead unload on a single target, consuming ammunition equal to the rapid number. The target must make a Dexterity saving throw (DC = 8 + your bonus to attacks with the weapon). On a failed save, roll the weapon's damage dice twice and add them together, adding relevant modifiers as normal and subjecting the target to any additional effects that would occur on a hit. If you would have advantage on your attack roll, the creature instead has disadvantage on their saving throw, and if you would have disa",
+    "equipped": true
+   },
+   {
+    "id": "falcon-strike-rocket-spear-WjSy",
+    "name": "Falcon Strike (Rocket Spear)",
+    "damage": [
+     {
+      "formula": "3d6 + mod",
+      "type": "kinetic"
+     }
+    ],
+    "properties": "ver, rch",
+    "desc": "Versatile (2d4) A weapon with this property can be used with one or two hands. A damage value in parentheses appears with the property-the damage when the weapon is used with two hands to make a melee attack. Ability: Falcon Strike (60/80) (can be used once per combat) On a successful ranged throw, move with the spear to within 5\" of the enemy. The opponent rolls a DC 18 Con save, if failed they apply +3d6 kinetic damage and are stunned. If succeed on CON save receive half damage and no stun effect.",
+    "equipped": true
+   },
+   {
+    "id": "flame-jet-implant-3kup",
+    "name": "Flame Jet Implant",
+    "damage": [],
+    "properties": "mlt",
+    "desc": "Arm-mounted flamethrower emits a short-range fire cone. DEX Save (3d6 Fire) (5 uses) (4 Mech Equipment Score)",
+    "equipped": true
+   }
+  ],
+  "features": [
+   {
+    "name": "Attack Run",
+    "desc": "When you move at least 150 feet towards a target, you may declare an Attack Run as an action. You must have a clear path towards your target, and nothing should hinder your path (such as difficult terrain or obstacles). If you finish this movement within range of your target, you may follow it with one of these options: Fire . You may make a ship weapon attack from a forward-facing limited arc without suffering the normal disadvantage. If you attack with a tertiary or quaternary weapon, the attack deals additional damage equal to the distance of your attack run divided by 50, up to your ship's"
+   },
+   {
+    "name": "Boost Engines",
+    "desc": "You can attempt to boost your speed. When you take the Boost Engines action, you make a DC 10 Strength (Boost) check. On a success you increase your speed by 50 until the end of your ship's next turn."
+   },
+   {
+    "name": "Boost Shields",
+    "desc": "You can attempt to boost your shields. When you take the Boost Shields action, you make a DC 10 Strength (Boost) check. On a success, you roll a shield die, without expending it, and gain temporary shield points equal to the result that last until the start of your ship's next turn."
+   },
+   {
+    "name": "Boost Weapons",
+    "desc": "You can attempt to boost your weapon output. When you take the Boost Weapons action, the next time this turn your ship deals damage, you make a DC 10 Strength (Boost) check. On a success, you have advantage on the damage roll."
+   },
+   {
+    "name": "Cast a Power",
+    "desc": "As normal, you can cast force or tech powers. You cannot target a hostile creature with a power unless you are aware of their presence and location. The Cast a Power action can be taken multiple times on a ship's turn."
+   },
+   {
+    "name": "Conceal",
+    "desc": "When you take the Conceal action, you make a Dexterity (Hide) check in an attempt to conceal your ship, following the rules in chapter 7 for hiding. If you succeed, you gain certain benefits, as described in the \"Unseen Attackers and Targets\" section later in this chapter."
+   },
+   {
+    "name": "Direct",
+    "desc": "When you take the Direct action, the creature gains advantage on the next ability check it makes to perform the task you are helping with, provided that it makes the check before the start of your next turn. Alternatively, you can direct a friendly creature that can hear you in attacking another target. If your ally attacks the target before the start of your next turn, the first attack roll is made with advantage. The Direct action can be taken multiple times on a ship's turn."
+   },
+   {
+    "name": "Dogfight",
+    "desc": "When you engage a single enemy, you duck and weave, vying for a good shot while avoiding theirs. You choose a target and make an opposed Dexterity (Maneuvering) check. On a success, you cause the next attack made against your ship by the target to suffer from disadvantage, but you grant the next attack made against your ship by a different target advantage. Additionally, you can perform a primary or tertiary weapon attack from a forward facing limited firing arc against that ship without suffering the normal disadvantage."
+   },
+   {
+    "name": "Evade",
+    "desc": "When you take the Evade action, you focus entirely on avoiding attacks. Until the start of your next turn, any attack made against you has disadvantage if you can see the attacker on your instruments, and you make Dexterity Saving Throws with advantage. This action affects your entire ship: any ability check or attack made by your ship or anyone on it has disadvantage until the end of your ship's next turn. The effects of Evade end if you are Incapacitated or if your speed drops to 0."
+   },
+   {
+    "name": "Fire",
+    "desc": "The most common action to take in combat is the Fire action. With this action, you can make an attack (or attacks) with one ship weapon. See the \"Making an Attack\" section for the rules that govern attacks. The Fire action may be taken multiple times on a ship's turn, but normally only once per weapon. A crew member Firing from the helm has disadvantage on attack rolls with primary and secondary weapons."
+   },
+   {
+    "name": "Fly",
+    "desc": "When you take the Fly action, you gain extra Movement for the current turn. The increase equals your speed, after applying any modifiers. With a speed of 300 feet, for example, your ship can move up to 600 feet on its turn if you Fly. Any increase or decrease to your speed changes this additional Movement by the same amount. If your ship's speed of 300 feet is reduced to 150 feet, for instance, your ship can move up to 300 feet this turn if you Fly. This action affects your ship's ability to stay on target: any ability check or attack made by your ship or anyone on it has disadvantage until th"
+   },
+   {
+    "name": "Harass",
+    "desc": "You can harass an enemy and lock them into a series of close-combat maneuvers in order to prevent their escape. When you take the harass action, make an opposed Dexterity (Maneuvering) check against a target within one size category of you and within normal range of at least one of your forward facing primary weapons. This weapon cannot be Fired this turn. On a success, if the target voluntarily leaves it's square before the beginning of your next turn, it takes damage as though it suffered a critical hit with the primary weapon used to harass."
+   },
+   {
+    "name": "Interfere",
+    "desc": "You can attempt to interfere with another creature within 1,000 feet, in the attempt of a task. When you take the Interfere action, you make a Charisma (Interfere) check contested by the target's Wisdom (Scan) check. If you succeed, the subject has disadvantage on the next ability check or attack roll it makes before the start of your next turn. The Interfere action can be taken multiple times on a ship's turn."
+   },
+   {
+    "name": "Patch",
+    "desc": "You can attempt to patch up damage a ship has taken, using one of its Hull Dice. When you take the Patch action, you make a Constitution (Patch) check (DC = 10 or half the ship's missing hull points, whichever number is higher). On a failure, you roll the Hull Die twice and take the lesser amount. On a success you roll the Hull Die normally. The Patch action can be taken multiple times on a ship's turn."
+   },
+   {
+    "name": "Ram",
+    "desc": "You can attempt to ram another ship while flying through its space. When you take the ram action, you make a Strength (Ram) check opposed by the target's Dexterity (Maneuvering) check. On a failed check the ramming action fails. On a success, both you and the target ship take kinetic damage equal to two of your ship's Hull Dice + your ship's Strength modifier. If your ship has shield points remaining, your ship instead takes half this damage."
+   },
+   {
+    "name": "Ready",
+    "desc": "Sometimes you want to get the jump on a foe or wait for a particular circumstance before you act. To do so, you can take the Ready action on your turn so that you can act later in the round using your reaction. First, you decide what perceivable circumstance will trigger your reaction. Then, you choose the action you will take in response to that trigger. For instance, \"When the enemy appears, I'll fire my railgun at it.\" When the trigger occurs, you can either take your reaction right after the trigger finishes or ignore the trigger. Remember that you can take only one reaction per round."
+   },
+   {
+    "name": "Regenerate Shields",
+    "desc": "You can attempt to regenerate your shields faster, using one of its Shield Dice. When you take the Regenerate Shields action, you make a Strength (Boost) check (DC = 10 or half the ship's missing shield points, whichever number is higher). On a failure, you roll the Shield Die twice and take the lesser amount. On a success you roll the Shield Die normally. The Regenerate Shields action can only be taken once each ship turn."
+   },
+   {
+    "name": "Search",
+    "desc": "When you take the Search action, you devote your attention to finding something. Depending on the nature of your search, the DM might have you make a Wisdom (Scan) check or an Intelligence (Probe) check."
+   },
+   {
+    "name": "Use an Object",
+    "desc": "When an object requires your action for its use, you take the Use an Object action. This action is also useful when you want to interact with more than one object on your turn. The Use an Object action can be taken multiple times on a ship's turn."
+   },
+   {
+    "name": "Pinpoint Strike",
+    "desc": "Also at 1st tier, your starship gains the ability to slip underneath the shields of an enemy ship. When your ship occupies the same square occupied by a target ship and the crew member at the helm makes an attack roll, as a reaction, they can, before rolling the attack, roll a Pinpoint Strike die, which is a 1d4, and add it to the attack roll. If the attack requires a saving throw instead, you may subtract the Pinpoint Strike die from the target's save result. On a hit or a failed save, the attack deals normal damage that bypasses any shields and directly hits the hull of the target ship. This"
+   },
+   {
+    "name": "Role: Strike Fighter",
+    "desc": "At 2nd tier, you adopt a particular style of design for your ship. Attack Fighter Your ship gains a +1 bonus to the attack rolls and save DCs of its ship weapons."
+   },
+   {
+    "name": "Retro Thrusters",
+    "desc": "Also at 2nd tier, when an attacker that a crew member can see deals damage to your ship with a weapon, they can use their reaction to immediately move the ship up to 50 feet in a direction of their choice, halving the damage your ship takes. The orientation of the ship does not change. Once this feature has been used, it can't be used again until the ship recharges."
+   },
+   {
+    "name": "Role Spec: Strike Mech",
+    "desc": "At 2nd tier, you adopt a particular style of design for your ship. Attack Fighter Your ship gains a +1 bonus to the attack rolls and save DCs of its ship weapons."
+   },
+   {
+    "name": "Rapid Strike Mod",
+    "desc": "Allows two strikes when attacking with a blade."
+   }
+  ],
+  "overloadRule": "Each modification installed beyond the mech's slot capacity imposes a cumulative -1 penalty to the mech's attack rolls and saving throws. (DM-adjustable)"
+ },
+ {
+  "id": "eddie",
+  "name": "Eddie",
+  "pilot": "Dez",
+  "size": "Small Starship",
+  "portrait": null,
+  "abilities": {
+   "str": {
+    "label": "STR",
+    "score": 14,
+    "mod": 2
+   },
+   "dex": {
+    "label": "DEX",
+    "score": 15,
+    "mod": 2
+   },
+   "con": {
+    "label": "CON",
+    "score": 14,
+    "mod": 2
+   },
+   "int": {
+    "label": "INT",
+    "score": 10,
+    "mod": 0
+   },
+   "wis": {
+    "label": "WIS",
+    "score": 14,
+    "mod": 2
+   },
+   "cha": {
+    "label": "CHA",
+    "score": 10,
+    "mod": 0
+   }
+  },
+  "hp": {
+   "value": 1,
+   "max": 27
+  },
+  "shields": {
+   "value": 0,
+   "max": 37
+  },
+  "ac": 13,
+  "speed": 30,
+  "fuel": 10,
+  "modSlots": {
+   "capacity": 6,
+   "used": 18
+  },
+  "mods": [
+   {
+    "id": "flare-pods-smFC",
+    "name": "Flare Pods",
+    "grade": 0,
+    "system": "Engineering",
+    "equipped": true,
+    "desc": "Your ship is a equipped with a series of counter-measure flares. When your ship is forced to make a Dexterity saving throw, a crew member can use their reaction to release a flare. When they do so, your ship has advantage on the triggering saving throw. The crew member can choose to use this feature after the roll is made, but before the GM says whether the roll succeeds or fails. If they already have advantage on the saving throw, they can instead reroll one of the dice once. This feature can be used a number of times equal to your ship's tier (a minimum of once). All expended uses are regain"
+   },
+   {
+    "id": "astromech-socket-lrVQ",
+    "name": "Astromech Socket",
+    "grade": null,
+    "system": "Operation",
+    "equipped": true,
+    "desc": "This system adds space for a single Small or Tiny droid crew member and allows that crew member to take the Patch action as a bonus action on their turn. Additionally, this crew member can use a bonus action to make an Intelligence (Astrogation) check."
+   },
+   {
+    "id": "comms-package-premium-R2Bb",
+    "name": "Comms Package, Premium",
+    "grade": null,
+    "system": "Operation",
+    "equipped": true,
+    "desc": "This modification augments the native communications on your ship. Crew members can now communicate in real time with any planets, space stations, and starships in the same sector as you as long as they are similarly equipped."
+   },
+   {
+    "id": "hyperdrive-slot-SdTR",
+    "name": "Hyperdrive Slot",
+    "grade": 0,
+    "system": "Operation",
+    "equipped": true,
+    "desc": "This modification adds a hyperdrive slot on your ship and includes a class 15 hyperdrive."
+   },
+   {
+    "id": "scanner-premium-oYqP",
+    "name": "Scanner, Premium",
+    "grade": 0,
+    "system": "Operation",
+    "equipped": true,
+    "desc": "This system augments the native radar scanner on your ship. Your ship gains blindsight out to 1,000 feet. Additionally, your ship is proficiently equipped for Intelligence (Probe) and Wisdom (Scan) checks."
+   },
+   {
+    "id": "deflection-plating-mark-i-X2dJ",
+    "name": "Deflection Plating, Mark I",
+    "grade": 1,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "You upgrade your ship's armor plating, granting your ship a +1 bonus to AC."
+   },
+   {
+    "id": "inertial-dampeners-xx0n",
+    "name": "Inertial Dampeners",
+    "grade": 0,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "This system lessens the transfer of external impacts into the ship's interior. When you are forced to make a Concentration check due to damage, impacts, or explosions exterior to the ship, you have advantage. Additionally, when you take the Evade action, skill checks and attack rolls made by your ship or anyone on it do not suffer from disadvantage from the evasion. Once this feature has been used, it can't be used again until the ship recharges."
+   },
+   {
+    "id": "reactor-mark-i-maOL",
+    "name": "Reactor, Mark I",
+    "grade": 1,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "You improve your ship's reactor. Your ship's Strength score increases by 1. As normal, you can't increase your ship's Strength score above the maximum for your size with this system."
+   },
+   {
+    "id": "thrusters-mark-i-f6ud",
+    "name": "Thrusters, Mark I",
+    "grade": 1,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "You improve your ship's thrusters. Your ship's Dexterity score increases by 1. As normal, you can't increase your ship's Dexterity score above the maximum for your size with this system."
+   },
+   {
+    "id": "expanded-payload-UES3",
+    "name": "Expanded Payload",
+    "grade": 0,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "The reload value of the chosen weapon increases by half."
+   },
+   {
+    "id": "fire-linked-weapon-reinforcement-5CXq",
+    "name": "Fire-Linked Weapon Reinforcement",
+    "grade": 0,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "You install a slave circuit in your ship to improve automation. You reduce the minimum crew requirement by half."
+   },
+   {
+    "id": "fixed-hardpoint-LJDB",
+    "name": "Fixed Hardpoint",
+    "grade": 0,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "A fixed hardpoint is used to mount a primary, secondary, tertiary, or quaternary weapon. A weapon mounted on a fixed hardpoint has a limited firing arc, as described in chapter 9 and can be fired from any crew station."
+   },
+   {
+    "id": "gauss-rounds-YbTT",
+    "name": "Gauss Rounds",
+    "grade": 0,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "When you roll a 1 or 2 on a damage die with the chosen weapon, you can reroll the die and must use the new roll, even if the new roll is a 1 or a 2."
+   },
+   {
+    "id": "s-foils-nuQx",
+    "name": "S-Foils",
+    "grade": 1,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "Your primary weapons are mounted to Strike Foils giving your ship variable operational capacities. As a bonus action, a crew member can switch between two modes: Locked: Your ship's speed increases by 50 feet and your primary weapons suffer a -2 penalty to attack rolls. Unlocked: Your ship's primary weapons gain a +1 bonus to attack rolls."
+   },
+   {
+    "id": "fixed-hardpoint-2DCn",
+    "name": "Fixed Hardpoint",
+    "grade": 0,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "A fixed hardpoint is used to mount a primary, secondary, tertiary, or quaternary weapon. A weapon mounted on a fixed hardpoint has a limited firing arc, as described in chapter 9 and can be fired from any crew station."
+   },
+   {
+    "id": "fixed-hardpoint-l8xR",
+    "name": "Fixed Hardpoint",
+    "grade": 0,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "A fixed hardpoint is used to mount a primary, secondary, tertiary, or quaternary weapon. A weapon mounted on a fixed hardpoint has a limited firing arc, as described in chapter 9 and can be fired from any crew station."
+   },
+   {
+    "id": "gauss-rounds-g9tX",
+    "name": "Gauss Rounds",
+    "grade": 0,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "When you roll a 1 or 2 on a damage die with the chosen weapon, you can reroll the die and must use the new roll, even if the new roll is a 1 or a 2."
+   },
+   {
+    "id": "droid-brain-mk-iii-6I8P",
+    "name": "Droid Brain, Mk III",
+    "grade": 3,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "You greatly improve your ship's droid brain. Your droid brain's proficiency bonus increases to 4. Additionally, it gains a rank in a Deployment of your choice."
+   },
+   {
+    "id": "ai-tj-martin-2qdY",
+    "name": "AI: TJ Martin",
+    "grade": 0,
+    "system": "Engineering",
+    "equipped": false,
+    "desc": ""
+   }
+  ],
+  "weapons": [
+   {
+    "id": "tekkaman-knife-RVwk",
+    "name": "Tekkaman Knife",
+    "damage": [
+     {
+      "formula": "1d6 + mod",
+      "type": ""
+     }
+    ],
+    "properties": "con, ovr, pow",
+    "desc": "Power (range 1200/4800), constitution 15, overheat 2",
+    "equipped": true
+   },
+   {
+    "id": "wrist-blaster-KODe",
+    "name": "Wrist Blaster",
+    "damage": [
+     {
+      "formula": "3d4 + mod",
+      "type": "energy"
+     }
+    ],
+    "properties": "rap, rel, str, vic",
+    "desc": "Rapid 8 When you would make a ranged weapon attack with a weapon with this property, you can instead unload on a single target, consuming ammunition equal to the rapid number. The target must make a Dexterity saving throw (DC = 8 + your bonus to attacks with the weapon). On a failed save, roll the weapon's damage dice twice and add them together, adding relevant modifiers as normal and subjecting the target to any additional effects that would occur on a hit. If you would have advantage on your attack roll, the creature instead has disadvantage on their saving throw, and if you would have disa",
+    "equipped": true
+   },
+   {
+    "id": "cognitive-overload-bzKG",
+    "name": "Cognitive Overload",
+    "damage": [],
+    "properties": "ran",
+    "desc": "Overwhelms target's neural circuits.WIS Save: Prone & Incapacitated (Must be mechanical target or have mechanical augments) (4 Mech Equipment Cost)",
+    "equipped": true
+   }
+  ],
+  "features": [
+   {
+    "name": "Attack Run",
+    "desc": "When you move at least 150 feet towards a target, you may declare an Attack Run as an action. You must have a clear path towards your target, and nothing should hinder your path (such as difficult terrain or obstacles). If you finish this movement within range of your target, you may follow it with one of these options: Fire . You may make a ship weapon attack from a forward-facing limited arc without suffering the normal disadvantage. If you attack with a tertiary or quaternary weapon, the attack deals additional damage equal to the distance of your attack run divided by 50, up to your ship's"
+   },
+   {
+    "name": "Boost Engines",
+    "desc": "You can attempt to boost your speed. When you take the Boost Engines action, you make a DC 10 Strength (Boost) check. On a success you increase your speed by 50 until the end of your ship's next turn."
+   },
+   {
+    "name": "Boost Shields",
+    "desc": "You can attempt to boost your shields. When you take the Boost Shields action, you make a DC 10 Strength (Boost) check. On a success, you roll a shield die, without expending it, and gain temporary shield points equal to the result that last until the start of your ship's next turn."
+   },
+   {
+    "name": "Boost Weapons",
+    "desc": "You can attempt to boost your weapon output. When you take the Boost Weapons action, the next time this turn your ship deals damage, you make a DC 10 Strength (Boost) check. On a success, you have advantage on the damage roll."
+   },
+   {
+    "name": "Cast a Power",
+    "desc": "As normal, you can cast force or tech powers. You cannot target a hostile creature with a power unless you are aware of their presence and location. The Cast a Power action can be taken multiple times on a ship's turn."
+   },
+   {
+    "name": "Conceal",
+    "desc": "When you take the Conceal action, you make a Dexterity (Hide) check in an attempt to conceal your ship, following the rules in chapter 7 for hiding. If you succeed, you gain certain benefits, as described in the \"Unseen Attackers and Targets\" section later in this chapter."
+   },
+   {
+    "name": "Direct",
+    "desc": "When you take the Direct action, the creature gains advantage on the next ability check it makes to perform the task you are helping with, provided that it makes the check before the start of your next turn. Alternatively, you can direct a friendly creature that can hear you in attacking another target. If your ally attacks the target before the start of your next turn, the first attack roll is made with advantage. The Direct action can be taken multiple times on a ship's turn."
+   },
+   {
+    "name": "Dogfight",
+    "desc": "When you engage a single enemy, you duck and weave, vying for a good shot while avoiding theirs. You choose a target and make an opposed Dexterity (Maneuvering) check. On a success, you cause the next attack made against your ship by the target to suffer from disadvantage, but you grant the next attack made against your ship by a different target advantage. Additionally, you can perform a primary or tertiary weapon attack from a forward facing limited firing arc against that ship without suffering the normal disadvantage."
+   },
+   {
+    "name": "Evade",
+    "desc": "When you take the Evade action, you focus entirely on avoiding attacks. Until the start of your next turn, any attack made against you has disadvantage if you can see the attacker on your instruments, and you make Dexterity Saving Throws with advantage. This action affects your entire ship: any ability check or attack made by your ship or anyone on it has disadvantage until the end of your ship's next turn. The effects of Evade end if you are Incapacitated or if your speed drops to 0."
+   },
+   {
+    "name": "Fire",
+    "desc": "The most common action to take in combat is the Fire action. With this action, you can make an attack (or attacks) with one ship weapon. See the \"Making an Attack\" section for the rules that govern attacks. The Fire action may be taken multiple times on a ship's turn, but normally only once per weapon. A crew member Firing from the helm has disadvantage on attack rolls with primary and secondary weapons."
+   },
+   {
+    "name": "Fly",
+    "desc": "When you take the Fly action, you gain extra Movement for the current turn. The increase equals your speed, after applying any modifiers. With a speed of 300 feet, for example, your ship can move up to 600 feet on its turn if you Fly. Any increase or decrease to your speed changes this additional Movement by the same amount. If your ship's speed of 300 feet is reduced to 150 feet, for instance, your ship can move up to 300 feet this turn if you Fly. This action affects your ship's ability to stay on target: any ability check or attack made by your ship or anyone on it has disadvantage until th"
+   },
+   {
+    "name": "Harass",
+    "desc": "You can harass an enemy and lock them into a series of close-combat maneuvers in order to prevent their escape. When you take the harass action, make an opposed Dexterity (Maneuvering) check against a target within one size category of you and within normal range of at least one of your forward facing primary weapons. This weapon cannot be Fired this turn. On a success, if the target voluntarily leaves it's square before the beginning of your next turn, it takes damage as though it suffered a critical hit with the primary weapon used to harass."
+   },
+   {
+    "name": "Interfere",
+    "desc": "You can attempt to interfere with another creature within 1,000 feet, in the attempt of a task. When you take the Interfere action, you make a Charisma (Interfere) check contested by the target's Wisdom (Scan) check. If you succeed, the subject has disadvantage on the next ability check or attack roll it makes before the start of your next turn. The Interfere action can be taken multiple times on a ship's turn."
+   },
+   {
+    "name": "Patch",
+    "desc": "You can attempt to patch up damage a ship has taken, using one of its Hull Dice. When you take the Patch action, you make a Constitution (Patch) check (DC = 10 or half the ship's missing hull points, whichever number is higher). On a failure, you roll the Hull Die twice and take the lesser amount. On a success you roll the Hull Die normally. The Patch action can be taken multiple times on a ship's turn."
+   },
+   {
+    "name": "Ram",
+    "desc": "You can attempt to ram another ship while flying through its space. When you take the ram action, you make a Strength (Ram) check opposed by the target's Dexterity (Maneuvering) check. On a failed check the ramming action fails. On a success, both you and the target ship take kinetic damage equal to two of your ship's Hull Dice + your ship's Strength modifier. If your ship has shield points remaining, your ship instead takes half this damage."
+   },
+   {
+    "name": "Ready",
+    "desc": "Sometimes you want to get the jump on a foe or wait for a particular circumstance before you act. To do so, you can take the Ready action on your turn so that you can act later in the round using your reaction. First, you decide what perceivable circumstance will trigger your reaction. Then, you choose the action you will take in response to that trigger. For instance, \"When the enemy appears, I'll fire my railgun at it.\" When the trigger occurs, you can either take your reaction right after the trigger finishes or ignore the trigger. Remember that you can take only one reaction per round."
+   },
+   {
+    "name": "Regenerate Shields",
+    "desc": "You can attempt to regenerate your shields faster, using one of its Shield Dice. When you take the Regenerate Shields action, you make a Strength (Boost) check (DC = 10 or half the ship's missing shield points, whichever number is higher). On a failure, you roll the Shield Die twice and take the lesser amount. On a success you roll the Shield Die normally. The Regenerate Shields action can only be taken once each ship turn."
+   },
+   {
+    "name": "Search",
+    "desc": "When you take the Search action, you devote your attention to finding something. Depending on the nature of your search, the DM might have you make a Wisdom (Scan) check or an Intelligence (Probe) check."
+   },
+   {
+    "name": "Use an Object",
+    "desc": "When an object requires your action for its use, you take the Use an Object action. This action is also useful when you want to interact with more than one object on your turn. The Use an Object action can be taken multiple times on a ship's turn."
+   },
+   {
+    "name": "Pinpoint Strike",
+    "desc": "Also at 1st tier, your starship gains the ability to slip underneath the shields of an enemy ship. When your ship occupies the same square occupied by a target ship and the crew member at the helm makes an attack roll, as a reaction, they can, before rolling the attack, roll a Pinpoint Strike die, which is a 1d4, and add it to the attack roll. If the attack requires a saving throw instead, you may subtract the Pinpoint Strike die from the target's save result. On a hit or a failed save, the attack deals normal damage that bypasses any shields and directly hits the hull of the target ship. This"
+   },
+   {
+    "name": "Role: Strike Fighter",
+    "desc": "At 2nd tier, you adopt a particular style of design for your ship. Attack Fighter Your ship gains a +1 bonus to the attack rolls and save DCs of its ship weapons."
+   },
+   {
+    "name": "Retro Thrusters",
+    "desc": "Also at 2nd tier, when an attacker that a crew member can see deals damage to your ship with a weapon, they can use their reaction to immediately move the ship up to 50 feet in a direction of their choice, halving the damage your ship takes. The orientation of the ship does not change. Once this feature has been used, it can't be used again until the ship recharges."
+   },
+   {
+    "name": "Role Spec: Strike Mech",
+    "desc": "At 2nd tier, you adopt a particular style of design for your ship. Attack Fighter Your ship gains a +1 bonus to the attack rolls and save DCs of its ship weapons."
+   }
+  ],
+  "overloadRule": "Each modification installed beyond the mech's slot capacity imposes a cumulative -1 penalty to the mech's attack rolls and saving throws. (DM-adjustable)"
+ },
+ {
+  "id": "harrison-01-mech",
+  "name": "Harrison 01 Mech",
+  "pilot": "Kirby",
+  "size": "Small Starship",
+  "portrait": null,
+  "abilities": {
+   "str": {
+    "label": "STR",
+    "score": 14,
+    "mod": 2
+   },
+   "dex": {
+    "label": "DEX",
+    "score": 15,
+    "mod": 2
+   },
+   "con": {
+    "label": "CON",
+    "score": 14,
+    "mod": 2
+   },
+   "int": {
+    "label": "INT",
+    "score": 10,
+    "mod": 0
+   },
+   "wis": {
+    "label": "WIS",
+    "score": 14,
+    "mod": 2
+   },
+   "cha": {
+    "label": "CHA",
+    "score": 10,
+    "mod": 0
+   }
+  },
+  "hp": {
+   "value": 5,
+   "max": 27
+  },
+  "shields": {
+   "value": 0,
+   "max": 37
+  },
+  "ac": 13,
+  "speed": 30,
+  "fuel": 8,
+  "modSlots": {
+   "capacity": 6,
+   "used": 19
+  },
+  "mods": [
+   {
+    "id": "flare-pods-smFC",
+    "name": "Flare Pods",
+    "grade": 0,
+    "system": "Engineering",
+    "equipped": true,
+    "desc": "Your ship is a equipped with a series of counter-measure flares. When your ship is forced to make a Dexterity saving throw, a crew member can use their reaction to release a flare. When they do so, your ship has advantage on the triggering saving throw. The crew member can choose to use this feature after the roll is made, but before the GM says whether the roll succeeds or fails. If they already have advantage on the saving throw, they can instead reroll one of the dice once. This feature can be used a number of times equal to your ship's tier (a minimum of once). All expended uses are regain"
+   },
+   {
+    "id": "astromech-socket-lrVQ",
+    "name": "Astromech Socket",
+    "grade": null,
+    "system": "Operation",
+    "equipped": true,
+    "desc": "This system adds space for a single Small or Tiny droid crew member and allows that crew member to take the Patch action as a bonus action on their turn. Additionally, this crew member can use a bonus action to make an Intelligence (Astrogation) check."
+   },
+   {
+    "id": "comms-package-premium-R2Bb",
+    "name": "Comms Package, Premium",
+    "grade": null,
+    "system": "Operation",
+    "equipped": true,
+    "desc": "This modification augments the native communications on your ship. Crew members can now communicate in real time with any planets, space stations, and starships in the same sector as you as long as they are similarly equipped."
+   },
+   {
+    "id": "hyperdrive-slot-SdTR",
+    "name": "Hyperdrive Slot",
+    "grade": 0,
+    "system": "Operation",
+    "equipped": true,
+    "desc": "This modification adds a hyperdrive slot on your ship and includes a class 15 hyperdrive."
+   },
+   {
+    "id": "scanner-premium-oYqP",
+    "name": "Scanner, Premium",
+    "grade": 0,
+    "system": "Operation",
+    "equipped": true,
+    "desc": "This system augments the native radar scanner on your ship. Your ship gains blindsight out to 1,000 feet. Additionally, your ship is proficiently equipped for Intelligence (Probe) and Wisdom (Scan) checks."
+   },
+   {
+    "id": "deflection-plating-mark-i-X2dJ",
+    "name": "Deflection Plating, Mark I",
+    "grade": 1,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "You upgrade your ship's armor plating, granting your ship a +1 bonus to AC."
+   },
+   {
+    "id": "inertial-dampeners-xx0n",
+    "name": "Inertial Dampeners",
+    "grade": 0,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "This system lessens the transfer of external impacts into the ship's interior. When you are forced to make a Concentration check due to damage, impacts, or explosions exterior to the ship, you have advantage. Additionally, when you take the Evade action, skill checks and attack rolls made by your ship or anyone on it do not suffer from disadvantage from the evasion. Once this feature has been used, it can't be used again until the ship recharges."
+   },
+   {
+    "id": "reactor-mark-i-maOL",
+    "name": "Reactor, Mark I",
+    "grade": 1,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "You improve your ship's reactor. Your ship's Strength score increases by 1. As normal, you can't increase your ship's Strength score above the maximum for your size with this system."
+   },
+   {
+    "id": "thrusters-mark-i-f6ud",
+    "name": "Thrusters, Mark I",
+    "grade": 1,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "You improve your ship's thrusters. Your ship's Dexterity score increases by 1. As normal, you can't increase your ship's Dexterity score above the maximum for your size with this system."
+   },
+   {
+    "id": "expanded-payload-UES3",
+    "name": "Expanded Payload",
+    "grade": 0,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "The reload value of the chosen weapon increases by half."
+   },
+   {
+    "id": "fire-linked-mounting-k2RD",
+    "name": "Fire-Linked Mounting",
+    "grade": 0,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "You install a slave circuit in your ship to improve automation. You reduce the minimum crew requirement by half."
+   },
+   {
+    "id": "fire-linked-weapon-reinforcement-5CXq",
+    "name": "Fire-Linked Weapon Reinforcement",
+    "grade": 0,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "You install a slave circuit in your ship to improve automation. You reduce the minimum crew requirement by half."
+   },
+   {
+    "id": "fixed-hardpoint-LJDB",
+    "name": "Fixed Hardpoint",
+    "grade": 0,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "A fixed hardpoint is used to mount a primary, secondary, tertiary, or quaternary weapon. A weapon mounted on a fixed hardpoint has a limited firing arc, as described in chapter 9 and can be fired from any crew station."
+   },
+   {
+    "id": "gauss-rounds-YbTT",
+    "name": "Gauss Rounds",
+    "grade": 0,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "When you roll a 1 or 2 on a damage die with the chosen weapon, you can reroll the die and must use the new roll, even if the new roll is a 1 or a 2."
+   },
+   {
+    "id": "s-foils-nuQx",
+    "name": "S-Foils",
+    "grade": 1,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "Your primary weapons are mounted to Strike Foils giving your ship variable operational capacities. As a bonus action, a crew member can switch between two modes: Locked: Your ship's speed increases by 50 feet and your primary weapons suffer a -2 penalty to attack rolls. Unlocked: Your ship's primary weapons gain a +1 bonus to attack rolls."
+   },
+   {
+    "id": "fixed-hardpoint-2DCn",
+    "name": "Fixed Hardpoint",
+    "grade": 0,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "A fixed hardpoint is used to mount a primary, secondary, tertiary, or quaternary weapon. A weapon mounted on a fixed hardpoint has a limited firing arc, as described in chapter 9 and can be fired from any crew station."
+   },
+   {
+    "id": "fixed-hardpoint-l8xR",
+    "name": "Fixed Hardpoint",
+    "grade": 0,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "A fixed hardpoint is used to mount a primary, secondary, tertiary, or quaternary weapon. A weapon mounted on a fixed hardpoint has a limited firing arc, as described in chapter 9 and can be fired from any crew station."
+   },
+   {
+    "id": "gauss-rounds-g9tX",
+    "name": "Gauss Rounds",
+    "grade": 0,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "When you roll a 1 or 2 on a damage die with the chosen weapon, you can reroll the die and must use the new roll, even if the new roll is a 1 or a 2."
+   },
+   {
+    "id": "droid-brain-mk-iii-6I8P",
+    "name": "Droid Brain, Mk III",
+    "grade": 3,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "You greatly improve your ship's droid brain. Your droid brain's proficiency bonus increases to 4. Additionally, it gains a rank in a Deployment of your choice."
+   }
+  ],
+  "weapons": [
+   {
+    "id": "tekkaman-knife-RVwk",
+    "name": "Tekkaman Knife",
+    "damage": [
+     {
+      "formula": "1d6 + mod",
+      "type": ""
+     }
+    ],
+    "properties": "con, ovr, pow",
+    "desc": "Power (range 1200/4800), constitution 15, overheat 2",
+    "equipped": true
+   },
+   {
+    "id": "sword-of-the-defender-A9xE",
+    "name": "Sword of the Defender",
+    "damage": [
+     {
+      "formula": "2d6 + mod",
+      "type": "kinetic"
+     }
+    ],
+    "properties": "dex, two, spc",
+    "desc": "Dexterity 11 A weapon with this property requires more skill to control. While wielding it, you have disadvantage on attack rolls unless you meet the Dexterity requirement. Two-handed A weapon with this property requires two hands to use. Sword of the Defender (charge 2) (Range: 20ft) Sword of the defender can be used to intercept an attack about to hit your ally, roll a D4 on a 3 or 4 immediately riposte for D12 worth of damage.",
+    "equipped": true
+   },
+   {
+    "id": "wrist-blaster-ez3u",
+    "name": "Wrist Blaster",
+    "damage": [
+     {
+      "formula": "3d4 + mod",
+      "type": "energy"
+     }
+    ],
+    "properties": "rap, rel, str, vic",
+    "desc": "Rapid 8 When you would make a ranged weapon attack with a weapon with this property, you can instead unload on a single target, consuming ammunition equal to the rapid number. The target must make a Dexterity saving throw (DC = 8 + your bonus to attacks with the weapon). On a failed save, roll the weapon's damage dice twice and add them together, adding relevant modifiers as normal and subjecting the target to any additional effects that would occur on a hit. If you would have advantage on your attack roll, the creature instead has disadvantage on their saving throw, and if you would have disa",
+    "equipped": true
+   }
+  ],
+  "features": [
+   {
+    "name": "Attack Run",
+    "desc": "When you move at least 150 feet towards a target, you may declare an Attack Run as an action. You must have a clear path towards your target, and nothing should hinder your path (such as difficult terrain or obstacles). If you finish this movement within range of your target, you may follow it with one of these options: Fire . You may make a ship weapon attack from a forward-facing limited arc without suffering the normal disadvantage. If you attack with a tertiary or quaternary weapon, the attack deals additional damage equal to the distance of your attack run divided by 50, up to your ship's"
+   },
+   {
+    "name": "Boost Engines",
+    "desc": "You can attempt to boost your speed. When you take the Boost Engines action, you make a DC 10 Strength (Boost) check. On a success you increase your speed by 50 until the end of your ship's next turn."
+   },
+   {
+    "name": "Boost Shields",
+    "desc": "You can attempt to boost your shields. When you take the Boost Shields action, you make a DC 10 Strength (Boost) check. On a success, you roll a shield die, without expending it, and gain temporary shield points equal to the result that last until the start of your ship's next turn."
+   },
+   {
+    "name": "Boost Weapons",
+    "desc": "You can attempt to boost your weapon output. When you take the Boost Weapons action, the next time this turn your ship deals damage, you make a DC 10 Strength (Boost) check. On a success, you have advantage on the damage roll."
+   },
+   {
+    "name": "Cast a Power",
+    "desc": "As normal, you can cast force or tech powers. You cannot target a hostile creature with a power unless you are aware of their presence and location. The Cast a Power action can be taken multiple times on a ship's turn."
+   },
+   {
+    "name": "Conceal",
+    "desc": "When you take the Conceal action, you make a Dexterity (Hide) check in an attempt to conceal your ship, following the rules in chapter 7 for hiding. If you succeed, you gain certain benefits, as described in the \"Unseen Attackers and Targets\" section later in this chapter."
+   },
+   {
+    "name": "Direct",
+    "desc": "When you take the Direct action, the creature gains advantage on the next ability check it makes to perform the task you are helping with, provided that it makes the check before the start of your next turn. Alternatively, you can direct a friendly creature that can hear you in attacking another target. If your ally attacks the target before the start of your next turn, the first attack roll is made with advantage. The Direct action can be taken multiple times on a ship's turn."
+   },
+   {
+    "name": "Dogfight",
+    "desc": "When you engage a single enemy, you duck and weave, vying for a good shot while avoiding theirs. You choose a target and make an opposed Dexterity (Maneuvering) check. On a success, you cause the next attack made against your ship by the target to suffer from disadvantage, but you grant the next attack made against your ship by a different target advantage. Additionally, you can perform a primary or tertiary weapon attack from a forward facing limited firing arc against that ship without suffering the normal disadvantage."
+   },
+   {
+    "name": "Evade",
+    "desc": "When you take the Evade action, you focus entirely on avoiding attacks. Until the start of your next turn, any attack made against you has disadvantage if you can see the attacker on your instruments, and you make Dexterity Saving Throws with advantage. This action affects your entire ship: any ability check or attack made by your ship or anyone on it has disadvantage until the end of your ship's next turn. The effects of Evade end if you are Incapacitated or if your speed drops to 0."
+   },
+   {
+    "name": "Fire",
+    "desc": "The most common action to take in combat is the Fire action. With this action, you can make an attack (or attacks) with one ship weapon. See the \"Making an Attack\" section for the rules that govern attacks. The Fire action may be taken multiple times on a ship's turn, but normally only once per weapon. A crew member Firing from the helm has disadvantage on attack rolls with primary and secondary weapons."
+   },
+   {
+    "name": "Fly",
+    "desc": "When you take the Fly action, you gain extra Movement for the current turn. The increase equals your speed, after applying any modifiers. With a speed of 300 feet, for example, your ship can move up to 600 feet on its turn if you Fly. Any increase or decrease to your speed changes this additional Movement by the same amount. If your ship's speed of 300 feet is reduced to 150 feet, for instance, your ship can move up to 300 feet this turn if you Fly. This action affects your ship's ability to stay on target: any ability check or attack made by your ship or anyone on it has disadvantage until th"
+   },
+   {
+    "name": "Harass",
+    "desc": "You can harass an enemy and lock them into a series of close-combat maneuvers in order to prevent their escape. When you take the harass action, make an opposed Dexterity (Maneuvering) check against a target within one size category of you and within normal range of at least one of your forward facing primary weapons. This weapon cannot be Fired this turn. On a success, if the target voluntarily leaves it's square before the beginning of your next turn, it takes damage as though it suffered a critical hit with the primary weapon used to harass."
+   },
+   {
+    "name": "Interfere",
+    "desc": "You can attempt to interfere with another creature within 1,000 feet, in the attempt of a task. When you take the Interfere action, you make a Charisma (Interfere) check contested by the target's Wisdom (Scan) check. If you succeed, the subject has disadvantage on the next ability check or attack roll it makes before the start of your next turn. The Interfere action can be taken multiple times on a ship's turn."
+   },
+   {
+    "name": "Patch",
+    "desc": "You can attempt to patch up damage a ship has taken, using one of its Hull Dice. When you take the Patch action, you make a Constitution (Patch) check (DC = 10 or half the ship's missing hull points, whichever number is higher). On a failure, you roll the Hull Die twice and take the lesser amount. On a success you roll the Hull Die normally. The Patch action can be taken multiple times on a ship's turn."
+   },
+   {
+    "name": "Ram",
+    "desc": "You can attempt to ram another ship while flying through its space. When you take the ram action, you make a Strength (Ram) check opposed by the target's Dexterity (Maneuvering) check. On a failed check the ramming action fails. On a success, both you and the target ship take kinetic damage equal to two of your ship's Hull Dice + your ship's Strength modifier. If your ship has shield points remaining, your ship instead takes half this damage."
+   },
+   {
+    "name": "Ready",
+    "desc": "Sometimes you want to get the jump on a foe or wait for a particular circumstance before you act. To do so, you can take the Ready action on your turn so that you can act later in the round using your reaction. First, you decide what perceivable circumstance will trigger your reaction. Then, you choose the action you will take in response to that trigger. For instance, \"When the enemy appears, I'll fire my railgun at it.\" When the trigger occurs, you can either take your reaction right after the trigger finishes or ignore the trigger. Remember that you can take only one reaction per round."
+   },
+   {
+    "name": "Regenerate Shields",
+    "desc": "You can attempt to regenerate your shields faster, using one of its Shield Dice. When you take the Regenerate Shields action, you make a Strength (Boost) check (DC = 10 or half the ship's missing shield points, whichever number is higher). On a failure, you roll the Shield Die twice and take the lesser amount. On a success you roll the Shield Die normally. The Regenerate Shields action can only be taken once each ship turn."
+   },
+   {
+    "name": "Search",
+    "desc": "When you take the Search action, you devote your attention to finding something. Depending on the nature of your search, the DM might have you make a Wisdom (Scan) check or an Intelligence (Probe) check."
+   },
+   {
+    "name": "Use an Object",
+    "desc": "When an object requires your action for its use, you take the Use an Object action. This action is also useful when you want to interact with more than one object on your turn. The Use an Object action can be taken multiple times on a ship's turn."
+   },
+   {
+    "name": "Pinpoint Strike",
+    "desc": "Also at 1st tier, your starship gains the ability to slip underneath the shields of an enemy ship. When your ship occupies the same square occupied by a target ship and the crew member at the helm makes an attack roll, as a reaction, they can, before rolling the attack, roll a Pinpoint Strike die, which is a 1d4, and add it to the attack roll. If the attack requires a saving throw instead, you may subtract the Pinpoint Strike die from the target's save result. On a hit or a failed save, the attack deals normal damage that bypasses any shields and directly hits the hull of the target ship. This"
+   },
+   {
+    "name": "Role: Strike Fighter",
+    "desc": "At 2nd tier, you adopt a particular style of design for your ship. Attack Fighter Your ship gains a +1 bonus to the attack rolls and save DCs of its ship weapons."
+   },
+   {
+    "name": "Retro Thrusters",
+    "desc": "Also at 2nd tier, when an attacker that a crew member can see deals damage to your ship with a weapon, they can use their reaction to immediately move the ship up to 50 feet in a direction of their choice, halving the damage your ship takes. The orientation of the ship does not change. Once this feature has been used, it can't be used again until the ship recharges."
+   },
+   {
+    "name": "Role Spec: Strike Mech",
+    "desc": "At 2nd tier, you adopt a particular style of design for your ship. Attack Fighter Your ship gains a +1 bonus to the attack rolls and save DCs of its ship weapons."
+   },
+   {
+    "name": "New Pilot Action",
+    "desc": ""
+   },
+   {
+    "name": "Rapid Strike Mod",
+    "desc": "Allows two strikes when attacking with a blade."
+   }
+  ],
+  "overloadRule": "Each modification installed beyond the mech's slot capacity imposes a cumulative -1 penalty to the mech's attack rolls and saving throws. (DM-adjustable)"
+ },
+ {
+  "id": "sweetpea-go-lightly",
+  "name": "Sweetpea Go Lightly",
+  "pilot": "Sparks",
+  "size": "Small Starship",
+  "portrait": null,
+  "abilities": {
+   "str": {
+    "label": "STR",
+    "score": 14,
+    "mod": 2
+   },
+   "dex": {
+    "label": "DEX",
+    "score": 15,
+    "mod": 2
+   },
+   "con": {
+    "label": "CON",
+    "score": 14,
+    "mod": 2
+   },
+   "int": {
+    "label": "INT",
+    "score": 10,
+    "mod": 0
+   },
+   "wis": {
+    "label": "WIS",
+    "score": 14,
+    "mod": 2
+   },
+   "cha": {
+    "label": "CHA",
+    "score": 10,
+    "mod": 0
+   }
+  },
+  "hp": {
+   "value": 1,
+   "max": 27
+  },
+  "shields": {
+   "value": 0,
+   "max": 37
+  },
+  "ac": 13,
+  "speed": 30,
+  "fuel": 9,
+  "modSlots": {
+   "capacity": 6,
+   "used": 19
+  },
+  "mods": [
+   {
+    "id": "flare-pods-smFC",
+    "name": "Flare Pods",
+    "grade": 0,
+    "system": "Engineering",
+    "equipped": true,
+    "desc": "Your ship is a equipped with a series of counter-measure flares. When your ship is forced to make a Dexterity saving throw, a crew member can use their reaction to release a flare. When they do so, your ship has advantage on the triggering saving throw. The crew member can choose to use this feature after the roll is made, but before the GM says whether the roll succeeds or fails. If they already have advantage on the saving throw, they can instead reroll one of the dice once. This feature can be used a number of times equal to your ship's tier (a minimum of once). All expended uses are regain"
+   },
+   {
+    "id": "astromech-socket-lrVQ",
+    "name": "Astromech Socket",
+    "grade": null,
+    "system": "Operation",
+    "equipped": true,
+    "desc": "This system adds space for a single Small or Tiny droid crew member and allows that crew member to take the Patch action as a bonus action on their turn. Additionally, this crew member can use a bonus action to make an Intelligence (Astrogation) check."
+   },
+   {
+    "id": "comms-package-premium-R2Bb",
+    "name": "Comms Package, Premium",
+    "grade": null,
+    "system": "Operation",
+    "equipped": true,
+    "desc": "This modification augments the native communications on your ship. Crew members can now communicate in real time with any planets, space stations, and starships in the same sector as you as long as they are similarly equipped."
+   },
+   {
+    "id": "hyperdrive-slot-SdTR",
+    "name": "Hyperdrive Slot",
+    "grade": 0,
+    "system": "Operation",
+    "equipped": true,
+    "desc": "This modification adds a hyperdrive slot on your ship and includes a class 15 hyperdrive."
+   },
+   {
+    "id": "scanner-premium-oYqP",
+    "name": "Scanner, Premium",
+    "grade": 0,
+    "system": "Operation",
+    "equipped": true,
+    "desc": "This system augments the native radar scanner on your ship. Your ship gains blindsight out to 1,000 feet. Additionally, your ship is proficiently equipped for Intelligence (Probe) and Wisdom (Scan) checks."
+   },
+   {
+    "id": "deflection-plating-mark-i-X2dJ",
+    "name": "Deflection Plating, Mark I",
+    "grade": 1,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "You upgrade your ship's armor plating, granting your ship a +1 bonus to AC."
+   },
+   {
+    "id": "inertial-dampeners-xx0n",
+    "name": "Inertial Dampeners",
+    "grade": 0,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "This system lessens the transfer of external impacts into the ship's interior. When you are forced to make a Concentration check due to damage, impacts, or explosions exterior to the ship, you have advantage. Additionally, when you take the Evade action, skill checks and attack rolls made by your ship or anyone on it do not suffer from disadvantage from the evasion. Once this feature has been used, it can't be used again until the ship recharges."
+   },
+   {
+    "id": "reactor-mark-i-maOL",
+    "name": "Reactor, Mark I",
+    "grade": 1,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "You improve your ship's reactor. Your ship's Strength score increases by 1. As normal, you can't increase your ship's Strength score above the maximum for your size with this system."
+   },
+   {
+    "id": "thrusters-mark-i-f6ud",
+    "name": "Thrusters, Mark I",
+    "grade": 1,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "You improve your ship's thrusters. Your ship's Dexterity score increases by 1. As normal, you can't increase your ship's Dexterity score above the maximum for your size with this system."
+   },
+   {
+    "id": "expanded-payload-UES3",
+    "name": "Expanded Payload",
+    "grade": 0,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "The reload value of the chosen weapon increases by half."
+   },
+   {
+    "id": "fire-linked-mounting-k2RD",
+    "name": "Fire-Linked Mounting",
+    "grade": 0,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "You install a slave circuit in your ship to improve automation. You reduce the minimum crew requirement by half."
+   },
+   {
+    "id": "fire-linked-weapon-reinforcement-5CXq",
+    "name": "Fire-Linked Weapon Reinforcement",
+    "grade": 0,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "You install a slave circuit in your ship to improve automation. You reduce the minimum crew requirement by half."
+   },
+   {
+    "id": "fixed-hardpoint-LJDB",
+    "name": "Fixed Hardpoint",
+    "grade": 0,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "A fixed hardpoint is used to mount a primary, secondary, tertiary, or quaternary weapon. A weapon mounted on a fixed hardpoint has a limited firing arc, as described in chapter 9 and can be fired from any crew station."
+   },
+   {
+    "id": "gauss-rounds-YbTT",
+    "name": "Gauss Rounds",
+    "grade": 0,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "When you roll a 1 or 2 on a damage die with the chosen weapon, you can reroll the die and must use the new roll, even if the new roll is a 1 or a 2."
+   },
+   {
+    "id": "s-foils-nuQx",
+    "name": "S-Foils",
+    "grade": 1,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "Your primary weapons are mounted to Strike Foils giving your ship variable operational capacities. As a bonus action, a crew member can switch between two modes: Locked: Your ship's speed increases by 50 feet and your primary weapons suffer a -2 penalty to attack rolls. Unlocked: Your ship's primary weapons gain a +1 bonus to attack rolls."
+   },
+   {
+    "id": "fixed-hardpoint-2DCn",
+    "name": "Fixed Hardpoint",
+    "grade": 0,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "A fixed hardpoint is used to mount a primary, secondary, tertiary, or quaternary weapon. A weapon mounted on a fixed hardpoint has a limited firing arc, as described in chapter 9 and can be fired from any crew station."
+   },
+   {
+    "id": "fixed-hardpoint-l8xR",
+    "name": "Fixed Hardpoint",
+    "grade": 0,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "A fixed hardpoint is used to mount a primary, secondary, tertiary, or quaternary weapon. A weapon mounted on a fixed hardpoint has a limited firing arc, as described in chapter 9 and can be fired from any crew station."
+   },
+   {
+    "id": "gauss-rounds-g9tX",
+    "name": "Gauss Rounds",
+    "grade": 0,
+    "system": "Weapon",
+    "equipped": true,
+    "desc": "When you roll a 1 or 2 on a damage die with the chosen weapon, you can reroll the die and must use the new roll, even if the new roll is a 1 or a 2."
+   },
+   {
+    "id": "droid-brain-mk-iii-6I8P",
+    "name": "Droid Brain, Mk III",
+    "grade": 3,
+    "system": "Universal",
+    "equipped": true,
+    "desc": "You greatly improve your ship's droid brain. Your droid brain's proficiency bonus increases to 4. Additionally, it gains a rank in a Deployment of your choice."
+   }
+  ],
+  "weapons": [
+   {
+    "id": "tekkaman-knife-RVwk",
+    "name": "Tekkaman Knife",
+    "damage": [
+     {
+      "formula": "1d6 + mod",
+      "type": ""
+     }
+    ],
+    "properties": "con, ovr, pow",
+    "desc": "Power (range 1200/4800), constitution 15, overheat 2",
+    "equipped": true
+   },
+   {
+    "id": "harpoon-wrist-attachment-ULfZ",
+    "name": "Harpoon Wrist Attachment",
+    "damage": [
+     {
+      "formula": "2d6 + mod",
+      "type": "kinetic"
+     }
+    ],
+    "properties": "str",
+    "desc": "Harpoon DC 15 to bring the enemy 10 ft towards you and reduce their movement by 50% Wire (range 40/80) A weapon that can be used to make a ranged attack has this property. The range lists two numbers. The first is the weapon's normal range in feet, and the second indicates the weapon's long range. When attacking a target beyond normal range, you have disadvantage on the attack roll. You can't attack a target beyond the weapon's long range. Strength 11 A weapon with this property has a heavy kickback. While wielding it, you have disadvantage on attack rolls unless you meet the Strength requirem",
+    "equipped": true
+   },
+   {
+    "id": "grim-carbine-Yj4t",
+    "name": "Grim Carbine",
+    "damage": [
+     {
+      "formula": "1d6 + mod",
+      "type": "energy"
+     }
+    ],
+    "properties": "rel, two",
+    "desc": "Power cell (range 700/2800) Cell Weapons with this property are fueled by power cells, which must be loaded in order to fire the weapon. A power cell fuels a number of attacks equal to the weapon's reload number. Reload 16 A number of shots equal to the reload number can be made with a weapon with this property. A character must then reload it using an action or a bonus action (their choice). You must have one free hand to reload. Two-handed A weapon with this property requires two hands to use. scope This weapon has a long-range scope that grants the wielder advantage on Perception checks mad",
+    "equipped": true
+   },
+   {
+    "id": "wrist-blaster-HlY9",
+    "name": "Wrist Blaster",
+    "damage": [
+     {
+      "formula": "3d4 + mod",
+      "type": "energy"
+     }
+    ],
+    "properties": "rap, rel, str, vic",
+    "desc": "Rapid 8 When you would make a ranged weapon attack with a weapon with this property, you can instead unload on a single target, consuming ammunition equal to the rapid number. The target must make a Dexterity saving throw (DC = 8 + your bonus to attacks with the weapon). On a failed save, roll the weapon's damage dice twice and add them together, adding relevant modifiers as normal and subjecting the target to any additional effects that would occur on a hit. If you would have advantage on your attack roll, the creature instead has disadvantage on their saving throw, and if you would have disa",
+    "equipped": true
+   }
+  ],
+  "features": [
+   {
+    "name": "Attack Run",
+    "desc": "When you move at least 150 feet towards a target, you may declare an Attack Run as an action. You must have a clear path towards your target, and nothing should hinder your path (such as difficult terrain or obstacles). If you finish this movement within range of your target, you may follow it with one of these options: Fire . You may make a ship weapon attack from a forward-facing limited arc without suffering the normal disadvantage. If you attack with a tertiary or quaternary weapon, the attack deals additional damage equal to the distance of your attack run divided by 50, up to your ship's"
+   },
+   {
+    "name": "Boost Engines",
+    "desc": "You can attempt to boost your speed. When you take the Boost Engines action, you make a DC 10 Strength (Boost) check. On a success you increase your speed by 50 until the end of your ship's next turn."
+   },
+   {
+    "name": "Boost Shields",
+    "desc": "You can attempt to boost your shields. When you take the Boost Shields action, you make a DC 10 Strength (Boost) check. On a success, you roll a shield die, without expending it, and gain temporary shield points equal to the result that last until the start of your ship's next turn."
+   },
+   {
+    "name": "Boost Weapons",
+    "desc": "You can attempt to boost your weapon output. When you take the Boost Weapons action, the next time this turn your ship deals damage, you make a DC 10 Strength (Boost) check. On a success, you have advantage on the damage roll."
+   },
+   {
+    "name": "Cast a Power",
+    "desc": "As normal, you can cast force or tech powers. You cannot target a hostile creature with a power unless you are aware of their presence and location. The Cast a Power action can be taken multiple times on a ship's turn."
+   },
+   {
+    "name": "Conceal",
+    "desc": "When you take the Conceal action, you make a Dexterity (Hide) check in an attempt to conceal your ship, following the rules in chapter 7 for hiding. If you succeed, you gain certain benefits, as described in the \"Unseen Attackers and Targets\" section later in this chapter."
+   },
+   {
+    "name": "Direct",
+    "desc": "When you take the Direct action, the creature gains advantage on the next ability check it makes to perform the task you are helping with, provided that it makes the check before the start of your next turn. Alternatively, you can direct a friendly creature that can hear you in attacking another target. If your ally attacks the target before the start of your next turn, the first attack roll is made with advantage. The Direct action can be taken multiple times on a ship's turn."
+   },
+   {
+    "name": "Dogfight",
+    "desc": "When you engage a single enemy, you duck and weave, vying for a good shot while avoiding theirs. You choose a target and make an opposed Dexterity (Maneuvering) check. On a success, you cause the next attack made against your ship by the target to suffer from disadvantage, but you grant the next attack made against your ship by a different target advantage. Additionally, you can perform a primary or tertiary weapon attack from a forward facing limited firing arc against that ship without suffering the normal disadvantage."
+   },
+   {
+    "name": "Evade",
+    "desc": "When you take the Evade action, you focus entirely on avoiding attacks. Until the start of your next turn, any attack made against you has disadvantage if you can see the attacker on your instruments, and you make Dexterity Saving Throws with advantage. This action affects your entire ship: any ability check or attack made by your ship or anyone on it has disadvantage until the end of your ship's next turn. The effects of Evade end if you are Incapacitated or if your speed drops to 0."
+   },
+   {
+    "name": "Fire",
+    "desc": "The most common action to take in combat is the Fire action. With this action, you can make an attack (or attacks) with one ship weapon. See the \"Making an Attack\" section for the rules that govern attacks. The Fire action may be taken multiple times on a ship's turn, but normally only once per weapon. A crew member Firing from the helm has disadvantage on attack rolls with primary and secondary weapons."
+   },
+   {
+    "name": "Fly",
+    "desc": "When you take the Fly action, you gain extra Movement for the current turn. The increase equals your speed, after applying any modifiers. With a speed of 300 feet, for example, your ship can move up to 600 feet on its turn if you Fly. Any increase or decrease to your speed changes this additional Movement by the same amount. If your ship's speed of 300 feet is reduced to 150 feet, for instance, your ship can move up to 300 feet this turn if you Fly. This action affects your ship's ability to stay on target: any ability check or attack made by your ship or anyone on it has disadvantage until th"
+   },
+   {
+    "name": "Harass",
+    "desc": "You can harass an enemy and lock them into a series of close-combat maneuvers in order to prevent their escape. When you take the harass action, make an opposed Dexterity (Maneuvering) check against a target within one size category of you and within normal range of at least one of your forward facing primary weapons. This weapon cannot be Fired this turn. On a success, if the target voluntarily leaves it's square before the beginning of your next turn, it takes damage as though it suffered a critical hit with the primary weapon used to harass."
+   },
+   {
+    "name": "Interfere",
+    "desc": "You can attempt to interfere with another creature within 1,000 feet, in the attempt of a task. When you take the Interfere action, you make a Charisma (Interfere) check contested by the target's Wisdom (Scan) check. If you succeed, the subject has disadvantage on the next ability check or attack roll it makes before the start of your next turn. The Interfere action can be taken multiple times on a ship's turn."
+   },
+   {
+    "name": "Patch",
+    "desc": "You can attempt to patch up damage a ship has taken, using one of its Hull Dice. When you take the Patch action, you make a Constitution (Patch) check (DC = 10 or half the ship's missing hull points, whichever number is higher). On a failure, you roll the Hull Die twice and take the lesser amount. On a success you roll the Hull Die normally. The Patch action can be taken multiple times on a ship's turn."
+   },
+   {
+    "name": "Ram",
+    "desc": "You can attempt to ram another ship while flying through its space. When you take the ram action, you make a Strength (Ram) check opposed by the target's Dexterity (Maneuvering) check. On a failed check the ramming action fails. On a success, both you and the target ship take kinetic damage equal to two of your ship's Hull Dice + your ship's Strength modifier. If your ship has shield points remaining, your ship instead takes half this damage."
+   },
+   {
+    "name": "Ready",
+    "desc": "Sometimes you want to get the jump on a foe or wait for a particular circumstance before you act. To do so, you can take the Ready action on your turn so that you can act later in the round using your reaction. First, you decide what perceivable circumstance will trigger your reaction. Then, you choose the action you will take in response to that trigger. For instance, \"When the enemy appears, I'll fire my railgun at it.\" When the trigger occurs, you can either take your reaction right after the trigger finishes or ignore the trigger. Remember that you can take only one reaction per round."
+   },
+   {
+    "name": "Regenerate Shields",
+    "desc": "You can attempt to regenerate your shields faster, using one of its Shield Dice. When you take the Regenerate Shields action, you make a Strength (Boost) check (DC = 10 or half the ship's missing shield points, whichever number is higher). On a failure, you roll the Shield Die twice and take the lesser amount. On a success you roll the Shield Die normally. The Regenerate Shields action can only be taken once each ship turn."
+   },
+   {
+    "name": "Search",
+    "desc": "When you take the Search action, you devote your attention to finding something. Depending on the nature of your search, the DM might have you make a Wisdom (Scan) check or an Intelligence (Probe) check."
+   },
+   {
+    "name": "Use an Object",
+    "desc": "When an object requires your action for its use, you take the Use an Object action. This action is also useful when you want to interact with more than one object on your turn. The Use an Object action can be taken multiple times on a ship's turn."
+   },
+   {
+    "name": "Pinpoint Strike",
+    "desc": "Also at 1st tier, your starship gains the ability to slip underneath the shields of an enemy ship. When your ship occupies the same square occupied by a target ship and the crew member at the helm makes an attack roll, as a reaction, they can, before rolling the attack, roll a Pinpoint Strike die, which is a 1d4, and add it to the attack roll. If the attack requires a saving throw instead, you may subtract the Pinpoint Strike die from the target's save result. On a hit or a failed save, the attack deals normal damage that bypasses any shields and directly hits the hull of the target ship. This"
+   },
+   {
+    "name": "Role: Strike Fighter",
+    "desc": "At 2nd tier, you adopt a particular style of design for your ship. Attack Fighter Your ship gains a +1 bonus to the attack rolls and save DCs of its ship weapons."
+   },
+   {
+    "name": "Retro Thrusters",
+    "desc": "Also at 2nd tier, when an attacker that a crew member can see deals damage to your ship with a weapon, they can use their reaction to immediately move the ship up to 50 feet in a direction of their choice, halving the damage your ship takes. The orientation of the ship does not change. Once this feature has been used, it can't be used again until the ship recharges."
+   },
+   {
+    "name": "Role Spec: Strike Mech",
+    "desc": "At 2nd tier, you adopt a particular style of design for your ship. Attack Fighter Your ship gains a +1 bonus to the attack rolls and save DCs of its ship weapons."
+   },
+   {
+    "name": "Rapid Strike Mod",
+    "desc": "Allows two strikes when attacking with a blade."
+   }
+  ],
+  "overloadRule": "Each modification installed beyond the mech's slot capacity imposes a cumulative -1 penalty to the mech's attack rolls and saving throws. (DM-adjustable)"
+ }
+]

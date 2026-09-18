@@ -1,0 +1,1801 @@
+[
+ {
+  "id": "charlie-spark",
+  "name": "Charlie \"Spark\"",
+  "level": 5,
+  "proficiencyBonus": 3,
+  "species": "Human",
+  "background": "Spacer",
+  "class": "Engineer",
+  "archetype": "Astrotech Engineering (Companion)",
+  "avatarColor": "#f2c14e",
+  "portrait": null,
+  "abilities": {
+   "str": {
+    "label": "STR",
+    "full": "Strength",
+    "score": 15,
+    "mod": 2,
+    "saveProf": false,
+    "save": 2
+   },
+   "dex": {
+    "label": "DEX",
+    "full": "Dexterity",
+    "score": 12,
+    "mod": 1,
+    "saveProf": false,
+    "save": 1
+   },
+   "con": {
+    "label": "CON",
+    "full": "Constitution",
+    "score": 15,
+    "mod": 2,
+    "saveProf": true,
+    "save": 5
+   },
+   "int": {
+    "label": "INT",
+    "full": "Intelligence",
+    "score": 17,
+    "mod": 3,
+    "saveProf": true,
+    "save": 6
+   },
+   "wis": {
+    "label": "WIS",
+    "full": "Wisdom",
+    "score": 12,
+    "mod": 1,
+    "saveProf": false,
+    "save": 1
+   },
+   "cha": {
+    "label": "CHA",
+    "full": "Charisma",
+    "score": 10,
+    "mod": 0,
+    "saveProf": false,
+    "save": 0
+   }
+  },
+  "skills": {
+   "acr": {
+    "label": "Acrobatics",
+    "ability": "dex",
+    "rank": 1,
+    "mod": 4
+   },
+   "ani": {
+    "label": "Animal Handling",
+    "ability": "wis",
+    "rank": 0,
+    "mod": 1
+   },
+   "ath": {
+    "label": "Athletics",
+    "ability": "str",
+    "rank": 0,
+    "mod": 2
+   },
+   "dec": {
+    "label": "Deception",
+    "ability": "cha",
+    "rank": 0,
+    "mod": 0
+   },
+   "ins": {
+    "label": "Insight",
+    "ability": "wis",
+    "rank": 0,
+    "mod": 1
+   },
+   "itm": {
+    "label": "Intimidation",
+    "ability": "cha",
+    "rank": 0,
+    "mod": 0
+   },
+   "inv": {
+    "label": "Investigation",
+    "ability": "int",
+    "rank": 1,
+    "mod": 6
+   },
+   "lor": {
+    "label": "Lore",
+    "ability": "int",
+    "rank": 0,
+    "mod": 3
+   },
+   "med": {
+    "label": "Medicine",
+    "ability": "wis",
+    "rank": 0,
+    "mod": 1
+   },
+   "nat": {
+    "label": "Nature",
+    "ability": "int",
+    "rank": 0,
+    "mod": 3
+   },
+   "pil": {
+    "label": "Piloting",
+    "ability": "dex",
+    "rank": 1,
+    "mod": 4
+   },
+   "prc": {
+    "label": "Perception",
+    "ability": "wis",
+    "rank": 0,
+    "mod": 1
+   },
+   "prf": {
+    "label": "Performance",
+    "ability": "cha",
+    "rank": 0,
+    "mod": 0
+   },
+   "per": {
+    "label": "Persuasion",
+    "ability": "cha",
+    "rank": 0,
+    "mod": 0
+   },
+   "slt": {
+    "label": "Sleight of Hand",
+    "ability": "dex",
+    "rank": 0,
+    "mod": 1
+   },
+   "ste": {
+    "label": "Stealth",
+    "ability": "dex",
+    "rank": 0,
+    "mod": 1
+   },
+   "sur": {
+    "label": "Survival",
+    "ability": "wis",
+    "rank": 0,
+    "mod": 1
+   },
+   "tec": {
+    "label": "Technology",
+    "ability": "int",
+    "rank": 1,
+    "mod": 6
+   }
+  },
+  "hp": {
+   "value": 24,
+   "max": 24,
+   "temp": 0
+  },
+  "tp": {
+   "value": 11,
+   "max": 11
+  },
+  "ac": 11,
+  "speed": 30,
+  "credits": 23557,
+  "initiative": 1,
+  "feats": [
+   {
+    "name": "Specialist",
+    "activation": "",
+    "desc": "You have focused training with a specific tool. Select one type of specialist's kit. You gain the following benefits: Increase an ability score of your choice by 1, to a maximum of 20. You gain proficiency with the chosen kit. If you are already proficient with it, you instead gain expertise with it. You can attempt ability checks with the chosen kit without the kit present, but you have disadvantage on the check when you do so. Whenever you make an ability check with the chosen kit and you don't have disadvantage on the check, you can treat a d20 roll of 9 or lower as a 10, as long as you spe"
+   },
+   {
+    "name": "Techcasting",
+    "activation": "",
+    "desc": "Engineer: 1st level During your training you have derived powers from schematics with the aid of your wristpad. See chapter 10 for the general rules of techcasting and chapter 12 for the tech powers list. Tech Powers Known You learn 6 tech powers of your choice, and you learn more at higher levels, as shown in the Tech Powers Known column of the engineer table. You may not learn a tech power of a level higher than your Max Power Level. Tech Points You have a number of tech points equal to your engineer level x 2, as shown in the Tech Points column of the engineer table, + your Intelligence mod"
+   },
+   {
+    "name": "Potent Aptitude",
+    "activation": "bonus",
+    "desc": "Engineer: 1st level Your technological experience lends you an uncommon insight that you can use to bolster your allies. To do so, you use a bonus action on your turn to choose one creature other than yourself within 60 feet of you who can hear you. That creature gains one Potent Aptitude die, a d4. This die changes as you gain engineer levels, as shown in the Potent Aptitude column of the engineer table. Once within the next 10 minutes, the creature can roll the die and add the number rolled to one ability check, attack roll, or saving throw it makes. Once the Potent Aptitude die is rolled, i"
+   },
+   {
+    "name": "Ability Score Increase",
+    "activation": "",
+    "desc": "One ability score of your choice increases by 2, and two other ability scores of your choice increase by 1. Alternatively, four ability scores of your choice each increase by 1."
+   },
+   {
+    "name": "Age",
+    "activation": "",
+    "desc": "Humans reach adulthood in their late teens and live less than a century."
+   },
+   {
+    "name": "Alignment",
+    "activation": "",
+    "desc": "Humans tend toward no particular alignment. The best and worst are found among them."
+   },
+   {
+    "name": "Size",
+    "activation": "",
+    "desc": "Humans vary widely in height and build, from barely 5 feet to well over 6 feet tall. Regardless of your position in that range, your size is Medium."
+   },
+   {
+    "name": "Speed",
+    "activation": "",
+    "desc": "Your base walking speed is 30 feet."
+   },
+   {
+    "name": "Defiant",
+    "activation": "special",
+    "desc": "Humans are known to be stubborn and often refuse to give up, even against the worst odds. When you or a creature you can see that can see and understand you makes an ability check, attack roll, or saving throw, you can roll a d4 and add it to their roll (no action required). Once you've used this feature, you must complete a short or long rest before you can use it again."
+   },
+   {
+    "name": "Human Versatility",
+    "activation": "",
+    "desc": "You gain proficiency in one skill, one tool, and one weapon of your choice."
+   },
+   {
+    "name": "Languages",
+    "activation": "",
+    "desc": "You can speak, read, and write Galactic Basic and one extra language of your choice. Humans typically learn the languages of other peoples they deal with, including obscure dialects. They are fond of sprinkling their speech with words borrowed from other tongues: trandoshan curses, twi'lek musical expressions, chiss military phrases, and so on."
+   },
+   {
+    "name": "Ace Pilot",
+    "activation": "",
+    "desc": "You're quite experienced both on land and in the air, be it from time in a navy, as a mercenary, or perhaps even piracy. You gain the following benefits: Increase your Intelligence score by 1, to a maximum of 20. You gain proficiency in the Piloting skill. If you are already proficient in it, you instead gain expertise in it. Whenever you make an Intelligence (Investigation) or Wisdom (Perception) check related to vehicles or ships, you are considered to have expertise in the Investigation or Perception skill."
+   },
+   {
+    "name": "Infuse Item",
+    "activation": "special",
+    "desc": "Engineer: 2nd level You gain the ability to temporarily enhance a weapon or armor. At the end of a long rest, you can touch one unenhanced object that is a suit of armor, a shield, or a simple or martial weapon. Until the end of your next long rest or until you die, the object becomes an enhanced item, granting a +1 bonus to AC if it's armor or a shield or a +1 bonus to attack and damage rolls if it's a weapon. Once you've used this feature, you can't use it again until you finish a long rest. This bonus increases to +2 at 10th level and +3 at 15th level."
+   },
+   {
+    "name": "Tool Expertise",
+    "activation": "",
+    "desc": "Engineer: 2nd level You gain expertise in any tool proficiencies you gain from this class."
+   },
+   {
+    "name": "Engineering Discipline",
+    "activation": "",
+    "desc": "Engineer: 3rd, 6th, 14th, and 18th level You begin to focus on a specific engineering discipline, which is detailed at the end of the class description."
+   }
+  ],
+  "powers": [
+   {
+    "name": "Enhance Droid",
+    "level": 2,
+    "school": "tec",
+    "actionType": "heal",
+    "activation": "action",
+    "damage": [
+     {
+      "formula": "2d6",
+      "type": "temphp"
+     }
+    ],
+    "save": "",
+    "desc": "You touch a droid or construct and upgrade one of its aspects. Choose one of the following effects; the target gains that effect until the power ends. Servomotor. The target has advantage on Strength checks, and its carrying capacity doubles. Motivator. The target has advantage on Dexterity checks. It also doesn't take damage from falling 20 feet or less if it isn't incapacitated. Power Core. The target has advantage on Constitution checks. It also gains 2d6 temporary hit points, which are lost when the power ends. Databanks. The target has advantage on Intelligence checks. Sensors. The target"
+   },
+   {
+    "name": "Hold Droid",
+    "level": 2,
+    "school": "tec",
+    "actionType": "save",
+    "activation": "action",
+    "damage": [],
+    "save": "con",
+    "desc": "You emit a paralyzing dart at a droid or construct that you can see within range. The target must succeed on a Constitution saving throw or be paralyzed for the duration. At the end of each of its turns, the target can make another Constitution saving throw. On a success, the power ends on the target. Overcharge Tech. When you cast this power using a tech slot of 3rd level or higher, you can target one additional droid or construct for each slot level above 2nd. The targets must be within 30 feet of each other when you target them."
+   },
+   {
+    "name": "Wire Tow",
+    "level": 2,
+    "school": "tec",
+    "actionType": "rpak",
+    "activation": "action",
+    "damage": [
+     {
+      "formula": "2d10",
+      "type": "kinetic"
+     }
+    ],
+    "save": "",
+    "desc": "You project a length of wire towards a foe to bring them within your grasp. Make a ranged tech attack against the target. On a hit, the target takes 2d10 kinetic damage, and you can pull it up to 25 feet closer to you. If you score a critical hit, the target is also knocked prone. If the target ends this movement within 5 feet of you and is no more than one size larger than you, the target is grappled by you for the duration. If a creature you grapple with this power uses its action to escape, it must succeed on a Strength (Athletics) or Dexterity (Acrobatics) check against your tech save DC t"
+   },
+   {
+    "name": "Delayed Detonator",
+    "level": 1,
+    "school": "tec",
+    "actionType": "save",
+    "activation": "action",
+    "damage": [
+     {
+      "formula": "1d8",
+      "type": "fire"
+     },
+     {
+      "formula": "1d8",
+      "type": "kinetic"
+     }
+    ],
+    "save": "dex",
+    "desc": "Choose a point you can see within range. You launch a detonator at that point, which remains there until the start of your next turn, when it explodes, ending the power. You can also use your reaction at any point during the power's duration to cause the detonator to explode early. When the detonator explodes, each creature within 5 feet of the point must make a Dexterity saving throw. A creature takes 1d8 fire damage and 1d8 kinetic damage on a failed save, or half as much damage on a successful one. Overcharge Tech. When you cast this power using a tech slot of 2nd level or higher, you can l"
+   },
+   {
+    "name": "Repair Droid",
+    "level": 1,
+    "school": "tec",
+    "actionType": "heal",
+    "activation": "action",
+    "damage": [
+     {
+      "formula": "1d8 + mod",
+      "type": "healing"
+     }
+    ],
+    "save": "",
+    "desc": "A droid or construct you touch regains a number of hit points equal to 1d8 + your techcasting ability modifier. Overcharge Tech. When you cast this power using a tech slot of 2nd level or higher, the healing increases by 1d8 for each slot level above 1st."
+   },
+   {
+    "name": "Analyze",
+    "level": 1,
+    "school": "tec",
+    "actionType": "other",
+    "activation": "minute",
+    "damage": [],
+    "save": "",
+    "desc": "You choose one object that you must touch throughout the casting of the power. If it is an enhanced or modified item, you learn its properties and how to use them, whether it requires attunement to use, and how many charges it has, if any. You learn whether any powers are affecting the item and what they are. If the item was created by a power, you learn which power created it. If you instead touch a creature throughout the casting, you learn what tech powers, if any, are currently affecting it."
+   },
+   {
+    "name": "Dismantle",
+    "level": 0,
+    "school": "tec",
+    "actionType": "mpak",
+    "activation": "none",
+    "damage": [
+     {
+      "formula": "1d6",
+      "type": "energy"
+     }
+    ],
+    "save": "",
+    "desc": "You break or tear an unenhanced structure or object you touch that is not being worn or carried by a creature other than you. The break or tear can be up to 1 foot in any dimension. When cast this in this way, this power has a casting time of 1 minute. Alternatively, you can touch a droid or construct when you cast this power. Make a melee tech attack against the target. On a hit, the target takes 1d6 energy damage. When cast in this way, this power has a casting time of 1 action. This power's damage increases by 1d6 when you reach 5th level (2d6), 11th level (3d6), and 17th level (4d6)."
+   },
+   {
+    "name": "Oil Slick",
+    "level": 1,
+    "school": "tec",
+    "actionType": "save",
+    "activation": "action",
+    "damage": [
+     {
+      "formula": "3d6",
+      "type": "fire"
+     }
+    ],
+    "save": "dex",
+    "desc": "You cover the ground in a 10-foot square within range in oil. For the duration, it is difficult terrain. When the oil appears, each creature standing in its area must succeed on a Dexterity saving throw or fall prone. A creature that enters the area or ends its turn there must also succeed on a Dexterity saving throw. The oil is flammable. Any 5 foot square of the oil exposed to fire burns away in one round. Each creature who enters the fire or starts it turn there must make a Dexterity saving throw, taking 3d6 fire damage on a failed save, or half as much on a successful one. The fire ignites"
+   },
+   {
+    "name": "Overload",
+    "level": 1,
+    "school": "tec",
+    "actionType": "save",
+    "activation": "action",
+    "damage": [
+     {
+      "formula": "2d6",
+      "type": "ion"
+     }
+    ],
+    "save": "dex",
+    "desc": "You expel a burst of power. Each creature in a 15-foot cube originating from you must make a Dexterity saving throw. On a failed save, a creature takes 2d6 ion damage and is pushed 10 feet away from you. On a successful save, the creature takes half as much damage and isn't pushed. Overcharge Tech. When you cast this power using a tech slot of 2nd level or higher, the damage increases by 1d6 for each slot level above 1st."
+   }
+  ],
+  "inventory": [
+   {
+    "id": "tinker-s-implements-K9sL",
+    "name": "Tinker's implements",
+    "type": "tool",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": ""
+   },
+   {
+    "id": "tool-basic-bMJW",
+    "name": "Tool (Basic)",
+    "type": "equipment",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": "Adventuring Gear Your level of proficiency in these tools increases by one step (to trained, from trained to proficient, from proficient to expertise, from expertise to mastery, from mastery to high mastery, or from high mastery to grand mastery)."
+   },
+   {
+    "id": "clothes-common-4wI6",
+    "name": "Clothes, common",
+    "type": "equipment",
+    "qty": 1,
+    "weight": 3,
+    "equipped": false,
+    "desc": ""
+   },
+   {
+    "id": "sunshades-lPF2",
+    "name": "Sunshades",
+    "type": "equipment",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": "These shades are worn over the eyes. While worn, you can no longer have disadvantage due to direct sunlight on attack rolls and on Wisdom (Perception) checks that rely on sight when you, the target of your attack, or whatever you are trying to perceive is in direct sunlight. However, while worn, you have disadvantage on attack rolls and on Wisdom (Perception) checks that rely on sight when you, the target of your attack, or whatever you are trying to perceive is in dim light."
+   },
+   {
+    "id": "commlink-GunX",
+    "name": "Commlink",
+    "type": "loot",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": "commlinks are simple handheld communication devices, fitted with microphones and receivers. Basic, personal commlinks have a range of up to 30 miles, but are reduced in dense, urban areas or areas of high level interference. The commlink lasts for 10 hours and can be recharged by connecting to a power source or by replacing the power cell."
+   },
+   {
+    "id": "power-cell-average-K4TI",
+    "name": "Power Cell (Average)",
+    "type": "consumable",
+    "qty": 1,
+    "weight": 1,
+    "equipped": false,
+    "desc": "Consumable (Ammunition) You have a +1 bonus to attack and damage rolls made with this enhanced power cell. This bonus is in addition to any bonuses granted by the weapon. Once the power cell is depleted, it no longer gives a bonus. Power cell Weapons with this property are fueled by power cells, which must be loaded in order to fire the weapon. A power cell fuels a number of attacks equal to the weapon's reload number."
+   },
+   {
+    "id": "credit-chip-bgMb",
+    "name": "Credit chip",
+    "type": "loot",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": "The credit chip is a small, flat card that features a security code and algorithm memory stripes. The chip can be preloaded with a specified number of credits, or it can draw directly from a specific account held by the user. The credit chip can be accessed with a pin, or by a DC 15 slicer's kit check."
+   },
+   {
+    "id": "mechanic-s-kit-ipRF",
+    "name": "Mechanic's kit",
+    "type": "tool",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": ""
+   },
+   {
+    "id": "mess-kit-TQns",
+    "name": "Mess kit",
+    "type": "loot",
+    "qty": 1,
+    "weight": 1,
+    "equipped": false,
+    "desc": "This box contains a cup and simple cutlery. The box clamps together, and one side can be used as a cooking pan and the other as a plate or shallow bowl."
+   },
+   {
+    "id": "flask-qhSb",
+    "name": "Flask",
+    "type": "backpack",
+    "qty": 1,
+    "weight": 1,
+    "equipped": false,
+    "desc": "A flask stores 1 pint of liquid."
+   },
+   {
+    "id": "light-slugpistol-qMXf",
+    "name": "Light slugpistol",
+    "type": "weapon",
+    "qty": 1,
+    "weight": 1,
+    "equipped": false,
+    "desc": "Light A weapon with this property is small and easy to handle, making it ideal for use when engaging in Double- or Two-Weapon Fighting. See the rules for Double- and Two-Weapon Fighting in chapter 9. Reload 8 A number of shots equal to the reload number can be made with a weapon with this property. A character must then reload it using an action or a bonus action (their choice). You must have one free hand to reload. Slug cartridge (range 35/140) A weapon that can be used to make a ranged attack has this property. The range lists two numbers. The first is the weapon's normal range in feet, and",
+    "damage": [
+     {
+      "formula": "1d4 + mod",
+      "type": "kinetic"
+     }
+    ],
+    "properties": "lgt, rel",
+    "actionType": "rwak",
+    "attackAbility": "dex"
+   },
+   {
+    "id": "astrotech-s-implements-IvRs",
+    "name": "Astrotech's implements",
+    "type": "tool",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": ""
+   },
+   {
+    "id": "advanced-proton-torpedo-ebsa",
+    "name": "Advanced Proton Torpedo",
+    "type": "consumable",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": "(Range 800/3200), explosive, keen 1 85 (170) lb 2d12 (4d12) energy"
+   },
+   {
+    "id": "mine-cryo-hF9U",
+    "name": "Mine, cryo",
+    "type": "consumable",
+    "qty": 1,
+    "weight": 2,
+    "equipped": false,
+    "desc": "Mines can be set to detonate when a creature comes within up to 15 feet of it or paired with a remote detonator. As an action, you can prime and set a mine on a surface you can reach, which arms at the start of your next turn. When detonated, each creature within 15 feet of it must make a DC 14 Constitution saving throw. A creature takes 2d6 cold damage on a failed save, or half as much as on a successful one. Additionally, on a failed save, a creature gains 1 slowed level for 1 minute. At the end of an affected creature's turn, it can repeat this save, ending the effect on a success."
+   }
+  ],
+  "cybernetics": [
+   {
+    "name": "Rapid Strike Mod",
+    "desc": ""
+   },
+   {
+    "name": "Energy Reserves",
+    "desc": ""
+   }
+  ],
+  "mechRef": "sweetpea-go-lightly",
+  "bio": ""
+ },
+ {
+  "id": "dez-meridien",
+  "name": "Dez Meridien",
+  "level": 5,
+  "proficiencyBonus": 3,
+  "species": "Human",
+  "background": "Criminal",
+  "class": "Operative",
+  "archetype": "Ruffian Practice",
+  "avatarColor": "#7ee0c4",
+  "portrait": null,
+  "abilities": {
+   "str": {
+    "label": "STR",
+    "full": "Strength",
+    "score": 12,
+    "mod": 1,
+    "saveProf": false,
+    "save": 1
+   },
+   "dex": {
+    "label": "DEX",
+    "full": "Dexterity",
+    "score": 16,
+    "mod": 3,
+    "saveProf": true,
+    "save": 6
+   },
+   "con": {
+    "label": "CON",
+    "full": "Constitution",
+    "score": 10,
+    "mod": 0,
+    "saveProf": false,
+    "save": 0
+   },
+   "int": {
+    "label": "INT",
+    "full": "Intelligence",
+    "score": 17,
+    "mod": 3,
+    "saveProf": true,
+    "save": 6
+   },
+   "wis": {
+    "label": "WIS",
+    "full": "Wisdom",
+    "score": 14,
+    "mod": 2,
+    "saveProf": false,
+    "save": 2
+   },
+   "cha": {
+    "label": "CHA",
+    "full": "Charisma",
+    "score": 12,
+    "mod": 1,
+    "saveProf": false,
+    "save": 1
+   }
+  },
+  "skills": {
+   "acr": {
+    "label": "Acrobatics",
+    "ability": "dex",
+    "rank": 0,
+    "mod": 3
+   },
+   "ani": {
+    "label": "Animal Handling",
+    "ability": "wis",
+    "rank": 0,
+    "mod": 2
+   },
+   "ath": {
+    "label": "Athletics",
+    "ability": "str",
+    "rank": 0,
+    "mod": 1
+   },
+   "dec": {
+    "label": "Deception",
+    "ability": "cha",
+    "rank": 1,
+    "mod": 4
+   },
+   "ins": {
+    "label": "Insight",
+    "ability": "wis",
+    "rank": 0,
+    "mod": 2
+   },
+   "itm": {
+    "label": "Intimidation",
+    "ability": "cha",
+    "rank": 0,
+    "mod": 1
+   },
+   "inv": {
+    "label": "Investigation",
+    "ability": "int",
+    "rank": 0,
+    "mod": 3
+   },
+   "lor": {
+    "label": "Lore",
+    "ability": "int",
+    "rank": 0,
+    "mod": 3
+   },
+   "med": {
+    "label": "Medicine",
+    "ability": "wis",
+    "rank": 0,
+    "mod": 2
+   },
+   "nat": {
+    "label": "Nature",
+    "ability": "int",
+    "rank": 0,
+    "mod": 3
+   },
+   "pil": {
+    "label": "Piloting",
+    "ability": "dex",
+    "rank": 0,
+    "mod": 3
+   },
+   "prc": {
+    "label": "Perception",
+    "ability": "wis",
+    "rank": 1,
+    "mod": 5
+   },
+   "prf": {
+    "label": "Performance",
+    "ability": "cha",
+    "rank": 0,
+    "mod": 1
+   },
+   "per": {
+    "label": "Persuasion",
+    "ability": "cha",
+    "rank": 1,
+    "mod": 4
+   },
+   "slt": {
+    "label": "Sleight of Hand",
+    "ability": "dex",
+    "rank": 1,
+    "mod": 6
+   },
+   "ste": {
+    "label": "Stealth",
+    "ability": "dex",
+    "rank": 0,
+    "mod": 3
+   },
+   "sur": {
+    "label": "Survival",
+    "ability": "wis",
+    "rank": 1,
+    "mod": 5
+   },
+   "tec": {
+    "label": "Technology",
+    "ability": "int",
+    "rank": 0,
+    "mod": 3
+   }
+  },
+  "hp": {
+   "value": 18,
+   "max": 18,
+   "temp": 0
+  },
+  "tp": {
+   "value": 0,
+   "max": 0
+  },
+  "ac": 13,
+  "speed": 30,
+  "credits": 24807,
+  "initiative": 3,
+  "feats": [
+   {
+    "name": "Stealthy",
+    "activation": "",
+    "desc": "You know how best to hide, gaining the following benefits: Increase your Dexterity score by 1, to a maximum of 20. You gain proficiency in the Stealth skill. If you are already proficient in it, you instead gain expertise in it. If you are hidden, you can move up to 10 feet in the open without revealing yourself if you end the move in a position where you're not clearly visible."
+   },
+   {
+    "name": "Expertise",
+    "activation": "",
+    "desc": "Operative: 1st and 6th level Choose two of your skill proficiencies, or one of skill proficiencies and one of your tool proficiencies, or two of your tool proficiencies. You gain expertise in those skills or tools. At 6th level, you can choose two more of your proficiencies (in skills or tools) to gain this benefit."
+   },
+   {
+    "name": "Sneak Attack",
+    "activation": "",
+    "desc": "Operative: 1st level You know how to strike subtly and exploit a foe's distraction. Once per turn, you can deal an extra 1d6 damage to one creature you hit with a weapon attack if you have advantage on the attack roll. This damage is the same as the weapon's damage, and the attack must use a finesse or a ranged weapon. You don't need advantage on the attack roll if another enemy of the target is within 5 feet of it, that enemy isn't incapacitated, and you don't have disadvantage on the attack roll. The amount of the extra damage increases as you gain levels in this class, as shown in the Sneak"
+   },
+   {
+    "name": "Cunning Action",
+    "activation": "bonus",
+    "desc": "Operative: 2nd level Your quick thinking and agility allow you to move and act quickly. You can take the Dash, Disengage, or Hide actions as a bonus action."
+   },
+   {
+    "name": "Operative Exploits",
+    "activation": "",
+    "desc": "Operative: 2nd level You've adopted two exploits, as detailed at the end of the class description. You adopt an additional exploit at 7th, 13th, and 17th level."
+   },
+   {
+    "name": "Learner's Exploit",
+    "activation": "",
+    "desc": "You gain proficiency in a skill and a tool, or two tools. You can select this exploit multiple times, each time choosing a new skill and a tool, or two new tools."
+   },
+   {
+    "name": "Weaponmaster's Exploit",
+    "activation": "",
+    "desc": "You gain proficiency in three blasters or vibroweapons that lack the heavy and strength properties. You can select this exploit multiple times. Each time you do so, you must choose different weapons."
+   },
+   {
+    "name": "Bad Feeling",
+    "activation": "special",
+    "desc": "Operative: 3rd level You have a wary eye, bordering on paranoia. When you roll for initiative, you can move up to your speed. This movement happens before the initiative order is determined. Once you've used this feature, you can't use it again until you finish a long rest."
+   },
+   {
+    "name": "Operative Practice",
+    "activation": "",
+    "desc": "Operative: 3rd, 9th, 13th, and 17th level You choose a practice that you emulate in the exercise of your operative abilities, which is detailed at the end of the class description. Your practice choice grants you features at 3rd level and then again at 9th, 13th, and 17th level."
+   },
+   {
+    "name": "Ability Score Increase",
+    "activation": "",
+    "desc": "One ability score of your choice increases by 2, and two other ability scores of your choice increase by 1. Alternatively, four ability scores of your choice each increase by 1."
+   },
+   {
+    "name": "Age",
+    "activation": "",
+    "desc": "Humans reach adulthood in their late teens and live less than a century."
+   },
+   {
+    "name": "Alignment",
+    "activation": "",
+    "desc": "Humans tend toward no particular alignment. The best and worst are found among them."
+   },
+   {
+    "name": "Size",
+    "activation": "",
+    "desc": "Humans vary widely in height and build, from barely 5 feet to well over 6 feet tall. Regardless of your position in that range, your size is Medium."
+   },
+   {
+    "name": "Speed",
+    "activation": "",
+    "desc": "Your base walking speed is 30 feet."
+   },
+   {
+    "name": "Defiant",
+    "activation": "special",
+    "desc": "Humans are known to be stubborn and often refuse to give up, even against the worst odds. When you or a creature you can see that can see and understand you makes an ability check, attack roll, or saving throw, you can roll a d4 and add it to their roll (no action required). Once you've used this feature, you must complete a short or long rest before you can use it again."
+   },
+   {
+    "name": "Human Versatility",
+    "activation": "",
+    "desc": "You gain proficiency in one skill, one tool, and one weapon of your choice."
+   },
+   {
+    "name": "Languages",
+    "activation": "",
+    "desc": "You can speak, read, and write Galactic Basic and one extra language of your choice. Humans typically learn the languages of other peoples they deal with, including obscure dialects. They are fond of sprinkling their speech with words borrowed from other tongues: trandoshan curses, twi'lek musical expressions, chiss military phrases, and so on."
+   },
+   {
+    "name": "Feigned Confidence",
+    "activation": "special",
+    "desc": "You've spent years pretending you know what you're doing, gaining the following benefits: Increase your Charisma score by 1, to a maximum of 20. When you would make an ability check with a skill or tool that doesn't add your proficiency bonus, you can first make a DC 15 Charisma (Deception) check. On a success, you can add your proficiency bonus to the initial ability check. You can use this feature a number of times equal to your proficiency bonus. You regain all expended uses when you finish a short or long rest."
+   },
+   {
+    "name": "Uncanny Dodge",
+    "activation": "reaction",
+    "desc": "Operative: 5th level When an attacker that you can see deals damage to you with an attack, you can use your reaction to halve the attack's damage against you."
+   },
+   {
+    "name": "Nimble Step",
+    "activation": "",
+    "desc": "Ruffian Practice: 3rd level You learn to fluidly strike and maneuver through combat. When you deal Sneak Attack damage to a creature, you may choose to forgo two of your Sneak Attack Dice in order to maneuver across the battlefield. Some of your fancy footworks require your target to make a saving throw to resist the debilitating strike's effects. The saving throw DC is calculated as follows: _ Nimble Step save DC = 8 + your proficiency bonus + your Dexterity modifier. _ Blade Defense You attempt to determine your target's next strike. Roll two Sneak Attack dice, and the target must make a Cha"
+   }
+  ],
+  "powers": [],
+  "inventory": [
+   {
+    "id": "clothes-common-31tL",
+    "name": "Clothes, common",
+    "type": "equipment",
+    "qty": 1,
+    "weight": 3,
+    "equipped": false,
+    "desc": ""
+   },
+   {
+    "id": "sunshades-JfDp",
+    "name": "Sunshades",
+    "type": "equipment",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": "These shades are worn over the eyes. While worn, you can no longer have disadvantage due to direct sunlight on attack rolls and on Wisdom (Perception) checks that rely on sight when you, the target of your attack, or whatever you are trying to perceive is in direct sunlight. However, while worn, you have disadvantage on attack rolls and on Wisdom (Perception) checks that rely on sight when you, the target of your attack, or whatever you are trying to perceive is in dim light."
+   },
+   {
+    "id": "chance-cubes-0zUZ",
+    "name": "Chance cubes",
+    "type": "tool",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": ""
+   },
+   {
+    "id": "mirror-Y8QB",
+    "name": "Mirror",
+    "type": "loot",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": ""
+   },
+   {
+    "id": "andris-mKyy",
+    "name": "Andris",
+    "type": "consumable",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": "Refined andris crystal, a spice mined most commonly on Sevarcos II, sharpens a creature's mind when smoked. As an action, you can apply this substance to a creature within 5 feet. For the next minute, the creature experiences a high that allows them to roll an additional d3 when making an ability check, attack roll, or saving throw using Wisdom. At the end of the high, the creature must succeed on a DC 14 Wisdom saving throw or experience a low that lasts 10 minutes, during which they must roll a d3 and subtract the result when making an ability check, attack roll, or saving throw using Wisdom"
+   },
+   {
+    "id": "commlink-7alR",
+    "name": "Commlink",
+    "type": "loot",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": "commlinks are simple handheld communication devices, fitted with microphones and receivers. Basic, personal commlinks have a range of up to 30 miles, but are reduced in dense, urban areas or areas of high level interference. The commlink lasts for 10 hours and can be recharged by connecting to a power source or by replacing the power cell."
+   },
+   {
+    "id": "credit-chip-vmpX",
+    "name": "Credit chip",
+    "type": "loot",
+    "qty": 300,
+    "weight": 0,
+    "equipped": false,
+    "desc": "The credit chip is a small, flat card that features a security code and algorithm memory stripes. The chip can be preloaded with a specified number of credits, or it can draw directly from a specific account held by the user. The credit chip can be accessed with a pin, or by a DC 15 slicer's kit check."
+   },
+   {
+    "id": "vibrodagger-79if",
+    "name": "Vibrodagger",
+    "type": "weapon",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": "Finesse When making an attack with a weapon with this property, you use your choice of your Strength or Dexterity modifier for the attack and damage rolls. You must use the same modifier for both rolls. Light A weapon with this property is small and easy to handle, making it ideal for use when engaging in Double- or Two-Weapon Fighting. See the rules for Double- and Two-Weapon Fighting in chapter 9. Thrown (range 20/60) A weapon that can be used to make a ranged attack has this property. The range lists two numbers. The first is the weapon's normal range in feet, and the second indicates the w",
+    "damage": [
+     {
+      "formula": "1d4 + mod",
+      "type": "kinetic"
+     }
+    ],
+    "properties": "fin, lgt",
+    "actionType": "mwak",
+    "attackAbility": "str"
+   },
+   {
+    "id": "light-slugpistol-X1zy",
+    "name": "Light slugpistol",
+    "type": "weapon",
+    "qty": 1,
+    "weight": 1,
+    "equipped": false,
+    "desc": "Light A weapon with this property is small and easy to handle, making it ideal for use when engaging in Double- or Two-Weapon Fighting. See the rules for Double- and Two-Weapon Fighting in chapter 9. Reload 8 A number of shots equal to the reload number can be made with a weapon with this property. A character must then reload it using an action or a bonus action (their choice). You must have one free hand to reload. Slug cartridge (range 35/140) A weapon that can be used to make a ranged attack has this property. The range lists two numbers. The first is the weapon's normal range in feet, and",
+    "damage": [
+     {
+      "formula": "1d4 + mod",
+      "type": "kinetic"
+     }
+    ],
+    "properties": "lgt, rel",
+    "actionType": "rwak",
+    "attackAbility": "dex"
+   }
+  ],
+  "cybernetics": [
+   {
+    "name": "Nano-Fiber Armor",
+    "desc": ""
+   },
+   {
+    "name": "Cognitive Overload",
+    "desc": ""
+   }
+  ],
+  "mechRef": "eddie",
+  "bio": "sabrina lu - nah good i think my gf jennette pretty solid"
+ },
+ {
+  "id": "kirby-khan",
+  "name": "Kirby Khan",
+  "level": 5,
+  "proficiencyBonus": 3,
+  "species": "Human",
+  "background": "Spacer",
+  "class": "Fighter",
+  "archetype": "Praetorian Specialist",
+  "avatarColor": "#e8705a",
+  "portrait": null,
+  "abilities": {
+   "str": {
+    "label": "STR",
+    "full": "Strength",
+    "score": 19,
+    "mod": 4,
+    "saveProf": true,
+    "save": 7
+   },
+   "dex": {
+    "label": "DEX",
+    "full": "Dexterity",
+    "score": 13,
+    "mod": 1,
+    "saveProf": false,
+    "save": 1
+   },
+   "con": {
+    "label": "CON",
+    "full": "Constitution",
+    "score": 20,
+    "mod": 5,
+    "saveProf": true,
+    "save": 8
+   },
+   "int": {
+    "label": "INT",
+    "full": "Intelligence",
+    "score": 9,
+    "mod": -1,
+    "saveProf": false,
+    "save": -1
+   },
+   "wis": {
+    "label": "WIS",
+    "full": "Wisdom",
+    "score": 16,
+    "mod": 3,
+    "saveProf": true,
+    "save": 6
+   },
+   "cha": {
+    "label": "CHA",
+    "full": "Charisma",
+    "score": 11,
+    "mod": 0,
+    "saveProf": false,
+    "save": 0
+   }
+  },
+  "skills": {
+   "acr": {
+    "label": "Acrobatics",
+    "ability": "dex",
+    "rank": 0,
+    "mod": 1
+   },
+   "ani": {
+    "label": "Animal Handling",
+    "ability": "wis",
+    "rank": 0,
+    "mod": 3
+   },
+   "ath": {
+    "label": "Athletics",
+    "ability": "str",
+    "rank": 1,
+    "mod": 7
+   },
+   "dec": {
+    "label": "Deception",
+    "ability": "cha",
+    "rank": 0,
+    "mod": 0
+   },
+   "ins": {
+    "label": "Insight",
+    "ability": "wis",
+    "rank": 0,
+    "mod": 3
+   },
+   "itm": {
+    "label": "Intimidation",
+    "ability": "cha",
+    "rank": 0,
+    "mod": 0
+   },
+   "inv": {
+    "label": "Investigation",
+    "ability": "int",
+    "rank": 1,
+    "mod": 2
+   },
+   "lor": {
+    "label": "Lore",
+    "ability": "int",
+    "rank": 0,
+    "mod": -1
+   },
+   "med": {
+    "label": "Medicine",
+    "ability": "wis",
+    "rank": 0,
+    "mod": 3
+   },
+   "nat": {
+    "label": "Nature",
+    "ability": "int",
+    "rank": 0,
+    "mod": -1
+   },
+   "pil": {
+    "label": "Piloting",
+    "ability": "dex",
+    "rank": 0,
+    "mod": 1
+   },
+   "prc": {
+    "label": "Perception",
+    "ability": "wis",
+    "rank": 1,
+    "mod": 6
+   },
+   "prf": {
+    "label": "Performance",
+    "ability": "cha",
+    "rank": 0,
+    "mod": 0
+   },
+   "per": {
+    "label": "Persuasion",
+    "ability": "cha",
+    "rank": 0,
+    "mod": 0
+   },
+   "slt": {
+    "label": "Sleight of Hand",
+    "ability": "dex",
+    "rank": 0,
+    "mod": 1
+   },
+   "ste": {
+    "label": "Stealth",
+    "ability": "dex",
+    "rank": 0,
+    "mod": 1
+   },
+   "sur": {
+    "label": "Survival",
+    "ability": "wis",
+    "rank": 0,
+    "mod": 3
+   },
+   "tec": {
+    "label": "Technology",
+    "ability": "int",
+    "rank": 0,
+    "mod": -1
+   }
+  },
+  "hp": {
+   "value": 56,
+   "max": 58,
+   "temp": 0
+  },
+  "tp": {
+   "value": 0,
+   "max": 0
+  },
+  "ac": 11,
+  "speed": 30,
+  "credits": 22757,
+  "initiative": 1,
+  "feats": [
+   {
+    "name": "Fighting Style",
+    "activation": "",
+    "desc": "You adopt a particular style of fighting as your specialty. Choose one of the fighting style options, detailed in Chapter 6 of the Player's Handbook. Counterstrike You are skilled at returning attacks at those who dare strike you. You gain the following benefits: When you would provoke an opportunity attack on your turn, you can use your bonus action to force the creature to make the opportunity attack, if it can. Creatures who make opportunity attacks against you provoke opportunity attacks from you."
+   },
+   {
+    "name": "Empathic",
+    "activation": "action",
+    "desc": "You possess keen insight into how other people think and feel. You gain the following benefits: Increase your Wisdom score by 1, to a maximum of 20. You gain proficiency in the Insight skill. If you are already proficient in it, you instead gain expertise in it. You can use your action to try to get uncanny insight about one humanoid you can see within 30 feet of you. Make a Wisdom (Insight) check contested by the target's Charisma (Deception) check. On a success, you have advantage on attack rolls and ability checks against the target until the end of your next turn."
+   },
+   {
+    "name": "Fighting Style",
+    "activation": "",
+    "desc": "Fighter: 1st level You adopt a particular style of fighting as your specialty. Choose one of the fighting style options, detailed in Chapter 6. Unarmed Style at the start of each of your turns, you can deal 1d4 bludgeoning damage to one creature grappled by you"
+   },
+   {
+    "name": "Second Wind",
+    "activation": "bonus",
+    "desc": "Fighter: 1st level You have a limited well of stamina that you can draw on to protect yourself from harm. On your turn, you can use a bonus action to regain hit points equal to 1d10 + your fighter level. Once you've used this feature, you must finish a short or long rest before you can use it again."
+   },
+   {
+    "name": "Action Surge",
+    "activation": "special",
+    "desc": "Fighter: 2nd level You can push yourself beyond your normal limits for a moment. On your turn, you can take one additional action on top of your regular action. Once you've used this feature, you must finish a short or long rest before you can use it again. Starting at 17th level, you can use it twice before a rest, but only once on the same turn."
+   },
+   {
+    "name": "Combat Superiority",
+    "activation": "special",
+    "desc": "Fighter: 2nd level, Level 5: 4 dice, d6, 4 maneuvers known You learn maneuvers that are fueled by special dice called superiority dice. See chapter 13 for the maneuvers list. Maneuvers Known You learn one maneuver of your choice, and you earn more at higher levels, as shown in the Maneuvers Known column of the fighter table. Many maneuvers enhance an attack in some way. You can use only one maneuver per attack, and you may only use each maneuver once per turn. Each time you learn new maneuvers, you can also replace one maneuver you know with a different one. Grapple Immediately after you hit a"
+   },
+   {
+    "name": "Fighter Strategies",
+    "activation": "",
+    "desc": "Fighter: 3rd level You've adopted a fighter strategy, as detailed at the end of the class description, and you adopt more at higher levels, as shown in the Strategies Known column of the fighter table."
+   },
+   {
+    "name": "Fighter Specialty",
+    "activation": "",
+    "desc": "Fighter: 3rd, 7th, 10th, 15th, and 18th level You choose a specialty that you strive to emulate in your combat styles and techniques, which is detailed at the end of the class description."
+   },
+   {
+    "name": "Mastery Strategist",
+    "activation": "",
+    "desc": "You've mastered a particular style of fighting. Choose one of the Fighting Mastery options, detailed in Chapter 6. Sentinel You've mastered techniques to take advantage of every drop in any enemy's guard; in tight spaces you are indomitable. You gain the following benefits: Creatures within your reach provoke opportunity attacks from you even if they take the Disengage action. When you take the Dodge action, once per round, you can take two reactions on the same turn, instead of only one. You can only take one reaction per trigger. You can use a bonus action to enter a defensive stance that la"
+   },
+   {
+    "name": "Ability Score Increase",
+    "activation": "",
+    "desc": "One ability score of your choice increases by 2, and two other ability scores of your choice increase by 1. Alternatively, four ability scores of your choice each increase by 1."
+   },
+   {
+    "name": "Age",
+    "activation": "",
+    "desc": "Humans reach adulthood in their late teens and live less than a century."
+   },
+   {
+    "name": "Alignment",
+    "activation": "",
+    "desc": "Humans tend toward no particular alignment. The best and worst are found among them."
+   },
+   {
+    "name": "Size",
+    "activation": "",
+    "desc": "Humans vary widely in height and build, from barely 5 feet to well over 6 feet tall. Regardless of your position in that range, your size is Medium."
+   },
+   {
+    "name": "Speed",
+    "activation": "",
+    "desc": "Your base walking speed is 30 feet."
+   },
+   {
+    "name": "Defiant",
+    "activation": "special",
+    "desc": "Humans are known to be stubborn and often refuse to give up, even against the worst odds. When you or a creature you can see that can see and understand you makes an ability check, attack roll, or saving throw, you can roll a d4 and add it to their roll (no action required). Once you've used this feature, you must complete a short or long rest before you can use it again."
+   },
+   {
+    "name": "Human Versatility",
+    "activation": "",
+    "desc": "You gain proficiency in one skill, one tool, and one weapon of your choice."
+   },
+   {
+    "name": "Languages",
+    "activation": "",
+    "desc": "You can speak, read, and write Galactic Basic and one extra language of your choice. Humans typically learn the languages of other peoples they deal with, including obscure dialects. They are fond of sprinkling their speech with words borrowed from other tongues: trandoshan curses, twi'lek musical expressions, chiss military phrases, and so on."
+   },
+   {
+    "name": "Empathic",
+    "activation": "action",
+    "desc": "You possess keen insight into how other people think and feel. You gain the following benefits: Increase your Wisdom score by 1, to a maximum of 20. You gain proficiency in the Insight skill. If you are already proficient in it, you instead gain expertise in it. You can use your action to try to get uncanny insight about one humanoid you can see within 30 feet of you. Make a Wisdom (Insight) check contested by the target's Charisma (Deception) check. On a success, you have advantage on attack rolls and ability checks against the target until the end of your next turn."
+   },
+   {
+    "name": "Extra Attack",
+    "activation": "",
+    "desc": "Fighter: 5th level You can attack twice, instead of once, whenever you take the Attack action on your turn."
+   }
+  ],
+  "powers": [],
+  "inventory": [
+   {
+    "id": "combat-suit-8gw7",
+    "name": "Combat suit",
+    "type": "equipment",
+    "qty": 1,
+    "weight": 10,
+    "equipped": false,
+    "desc": "Combat suits are seen all over the galaxy, and can be found for sale by almost any merchant who dealt in weapons and armor. Many such suits are used by military organizations, such as the Galactic Republic's military, as well as by mercenaries, criminals, bounty hunters and even some Jedi. The suit itself offers decent protection from most types of attacks while maintaining maximum flexibility and minimum weight. However this armor is only recommended for light skirmishes.",
+    "ac": 11
+   },
+   {
+    "id": "tool-basic-vfNT",
+    "name": "Tool (Basic)",
+    "type": "equipment",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": "Adventuring Gear Your level of proficiency in these tools increases by one step (to trained, from trained to proficient, from proficient to expertise, from expertise to mastery, from mastery to high mastery, or from high mastery to grand mastery)."
+   },
+   {
+    "id": "blaster-pistol-L5nH",
+    "name": "Blaster pistol",
+    "type": "weapon",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": "Power cell (range 50/200) Cell Weapons with this property are fueled by power cells, which must be loaded in order to fire the weapon. A power cell fuels a number of attacks equal to the weapon's reload number. Reload 16 A number of shots equal to the reload number can be made with a weapon with this property. A character must then reload it using an action or a bonus action (their choice). You must have one free hand to reload.",
+    "damage": [
+     {
+      "formula": "1d6 + mod",
+      "type": "energy"
+     }
+    ],
+    "properties": "rel",
+    "actionType": "rwak",
+    "attackAbility": "dex"
+   },
+   {
+    "id": "commlink-O4Oq",
+    "name": "Commlink",
+    "type": "loot",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": "commlinks are simple handheld communication devices, fitted with microphones and receivers. Basic, personal commlinks have a range of up to 30 miles, but are reduced in dense, urban areas or areas of high level interference. The commlink lasts for 10 hours and can be recharged by connecting to a power source or by replacing the power cell."
+   },
+   {
+    "id": "credit-chip-ooVm",
+    "name": "Credit chip",
+    "type": "loot",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": "The credit chip is a small, flat card that features a security code and algorithm memory stripes. The chip can be preloaded with a specified number of credits, or it can draw directly from a specific account held by the user. The credit chip can be accessed with a pin, or by a DC 15 slicer's kit check."
+   },
+   {
+    "id": "medpac-frJ2",
+    "name": "Medpac",
+    "type": "consumable",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": "A medpac is a quick-acting syringe filled with a concentrated dose of kolto. As an action, you can use this medpac to restore hit points to a beast or humanoid within 5 feet. The creature rolls one die equal to the size of their Hit Die and regains hit points equal to the amount rolled + their Constitution modifier (minimum of one hit point). If the creature has Hit Dice of different sizes, use whichever Hit Die size they have the most of."
+   },
+   {
+    "id": "tihaar-WxkK",
+    "name": "Tihaar",
+    "type": "consumable",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": "This colorless spirit, favored by Mandalorians, burns the mouth and throat when consumed. As an action, you can apply this substance to a creature within 5 feet. For the next minute, the creature experiences a high that allows them to roll an additional d3 when making an ability check or saving throw using Constitution, and at the start of each of the creature's turns it gains 2d3 temporary hit points. At the end of the high, the creature must succeed on a DC 14 Constitution saving throw or experience a low that lasts 10 minutes, during which they must roll a d3 and subtract the result when ma"
+   },
+   {
+    "id": "sword-of-the-defender-Tyo8",
+    "name": "Sword of the Defender",
+    "type": "weapon",
+    "qty": 1,
+    "weight": 0,
+    "equipped": true,
+    "desc": "Sword of the Defender (charge 2) (Range: 20ft) Sword of the defender can be used to intercept an attack about to hit your ally, roll a D4 on a 3 or 4 immediately riposte for D12 worth of damage.",
+    "damage": [],
+    "properties": "ver",
+    "actionType": "mwak",
+    "attackAbility": "str"
+   }
+  ],
+  "cybernetics": [
+   {
+    "name": "Rapid Strike Mod",
+    "desc": ""
+   },
+   {
+    "name": "Nanohealing Pulse",
+    "desc": ""
+   }
+  ],
+  "mechRef": "harrison-01-mech",
+  "bio": ""
+ },
+ {
+  "id": "vanilla-warp",
+  "name": "Vanilla Warp",
+  "level": 5,
+  "proficiencyBonus": 3,
+  "species": "Human",
+  "background": "Holonet Technician",
+  "class": "Engineer",
+  "archetype": "Cybertech Engineering",
+  "avatarColor": "#c9a7ff",
+  "portrait": null,
+  "abilities": {
+   "str": {
+    "label": "STR",
+    "full": "Strength",
+    "score": 13,
+    "mod": 1,
+    "saveProf": false,
+    "save": 1
+   },
+   "dex": {
+    "label": "DEX",
+    "full": "Dexterity",
+    "score": 17,
+    "mod": 3,
+    "saveProf": false,
+    "save": 3
+   },
+   "con": {
+    "label": "CON",
+    "full": "Constitution",
+    "score": 18,
+    "mod": 4,
+    "saveProf": true,
+    "save": 7
+   },
+   "int": {
+    "label": "INT",
+    "full": "Intelligence",
+    "score": 19,
+    "mod": 4,
+    "saveProf": true,
+    "save": 7
+   },
+   "wis": {
+    "label": "WIS",
+    "full": "Wisdom",
+    "score": 16,
+    "mod": 3,
+    "saveProf": false,
+    "save": 3
+   },
+   "cha": {
+    "label": "CHA",
+    "full": "Charisma",
+    "score": 9,
+    "mod": -1,
+    "saveProf": false,
+    "save": -1
+   }
+  },
+  "skills": {
+   "acr": {
+    "label": "Acrobatics",
+    "ability": "dex",
+    "rank": 0,
+    "mod": 3
+   },
+   "ani": {
+    "label": "Animal Handling",
+    "ability": "wis",
+    "rank": 0,
+    "mod": 3
+   },
+   "ath": {
+    "label": "Athletics",
+    "ability": "str",
+    "rank": 0,
+    "mod": 1
+   },
+   "dec": {
+    "label": "Deception",
+    "ability": "cha",
+    "rank": 0,
+    "mod": -1
+   },
+   "ins": {
+    "label": "Insight",
+    "ability": "wis",
+    "rank": 0,
+    "mod": 3
+   },
+   "itm": {
+    "label": "Intimidation",
+    "ability": "cha",
+    "rank": 1,
+    "mod": 2
+   },
+   "inv": {
+    "label": "Investigation",
+    "ability": "int",
+    "rank": 1,
+    "mod": 7
+   },
+   "lor": {
+    "label": "Lore",
+    "ability": "int",
+    "rank": 1,
+    "mod": 7
+   },
+   "med": {
+    "label": "Medicine",
+    "ability": "wis",
+    "rank": 0,
+    "mod": 3
+   },
+   "nat": {
+    "label": "Nature",
+    "ability": "int",
+    "rank": 0,
+    "mod": 4
+   },
+   "pil": {
+    "label": "Piloting",
+    "ability": "dex",
+    "rank": 1,
+    "mod": 6
+   },
+   "prc": {
+    "label": "Perception",
+    "ability": "wis",
+    "rank": 0,
+    "mod": 3
+   },
+   "prf": {
+    "label": "Performance",
+    "ability": "cha",
+    "rank": 0,
+    "mod": -1
+   },
+   "per": {
+    "label": "Persuasion",
+    "ability": "cha",
+    "rank": 0,
+    "mod": -1
+   },
+   "slt": {
+    "label": "Sleight of Hand",
+    "ability": "dex",
+    "rank": 0,
+    "mod": 3
+   },
+   "ste": {
+    "label": "Stealth",
+    "ability": "dex",
+    "rank": 0,
+    "mod": 3
+   },
+   "sur": {
+    "label": "Survival",
+    "ability": "wis",
+    "rank": 0,
+    "mod": 3
+   },
+   "tec": {
+    "label": "Technology",
+    "ability": "int",
+    "rank": 0,
+    "mod": 4
+   }
+  },
+  "hp": {
+   "value": 30,
+   "max": 30,
+   "temp": 0
+  },
+  "tp": {
+   "value": 12,
+   "max": 12
+  },
+  "ac": 13,
+  "speed": 30,
+  "credits": 23607,
+  "initiative": 3,
+  "feats": [
+   {
+    "name": "Surveillance Implant",
+    "activation": "",
+    "desc": "This augmentation replaces your face. This implant includes a headcomm with a scrambler that automatically encodes messages sent to a specified recipient commlink or receiver."
+   },
+   {
+    "name": "Techie",
+    "activation": "special",
+    "desc": "You master the theory and practice of technology, gaining the following benefits: Increase your Intelligence score by 1, to a maximum of 20. You gain proficiency in the Technology skill. If you are already proficient in it, you instead gain expertise in it. You learn the repair droid tech power. You can cast it once, using supplies scavenged around you, without the use of a wristpad and without spending tech points, and you regain the ability to do so when you finish a long rest."
+   },
+   {
+    "name": "Techcasting",
+    "activation": "",
+    "desc": "Engineer: 1st level During your training you have derived powers from schematics with the aid of your wristpad. See chapter 10 for the general rules of techcasting and chapter 12 for the tech powers list. Tech Powers Known You learn 6 tech powers of your choice, and you learn more at higher levels, as shown in the Tech Powers Known column of the engineer table. You may not learn a tech power of a level higher than your Max Power Level. Tech Points You have a number of tech points equal to your engineer level x 2, as shown in the Tech Points column of the engineer table, + your Intelligence mod"
+   },
+   {
+    "name": "Potent Aptitude",
+    "activation": "bonus",
+    "desc": "Engineer: 1st level Your technological experience lends you an uncommon insight that you can use to bolster your allies. To do so, you use a bonus action on your turn to choose one creature other than yourself within 60 feet of you who can hear you. That creature gains one Potent Aptitude die, a d4. This die changes as you gain engineer levels, as shown in the Potent Aptitude column of the engineer table. Once within the next 10 minutes, the creature can roll the die and add the number rolled to one ability check, attack roll, or saving throw it makes. Once the Potent Aptitude die is rolled, i"
+   },
+   {
+    "name": "Infuse Item",
+    "activation": "special",
+    "desc": "Engineer: 2nd level You gain the ability to temporarily enhance a weapon or armor. At the end of a long rest, you can touch one unenhanced object that is a suit of armor, a shield, or a simple or martial weapon. Until the end of your next long rest or until you die, the object becomes an enhanced item, granting a +1 bonus to AC if it's armor or a shield or a +1 bonus to attack and damage rolls if it's a weapon. Once you've used this feature, you can't use it again until you finish a long rest. This bonus increases to +2 at 10th level and +3 at 15th level."
+   },
+   {
+    "name": "Tool Expertise",
+    "activation": "",
+    "desc": "Engineer: 2nd level You gain expertise in any tool proficiencies you gain from this class."
+   },
+   {
+    "name": "Engineering Discipline",
+    "activation": "",
+    "desc": "Engineer: 3rd, 6th, 14th, and 18th level You begin to focus on a specific engineering discipline, which is detailed at the end of the class description."
+   },
+   {
+    "name": "Ability Score Increase",
+    "activation": "",
+    "desc": "One ability score of your choice increases by 2, and two other ability scores of your choice increase by 1. Alternatively, four ability scores of your choice each increase by 1."
+   },
+   {
+    "name": "Age",
+    "activation": "",
+    "desc": "Humans reach adulthood in their late teens and live less than a century."
+   },
+   {
+    "name": "Alignment",
+    "activation": "",
+    "desc": "Humans tend toward no particular alignment. The best and worst are found among them."
+   },
+   {
+    "name": "Size",
+    "activation": "",
+    "desc": "Humans vary widely in height and build, from barely 5 feet to well over 6 feet tall. Regardless of your position in that range, your size is Medium."
+   },
+   {
+    "name": "Speed",
+    "activation": "",
+    "desc": "Your base walking speed is 30 feet."
+   },
+   {
+    "name": "Defiant",
+    "activation": "special",
+    "desc": "Humans are known to be stubborn and often refuse to give up, even against the worst odds. When you or a creature you can see that can see and understand you makes an ability check, attack roll, or saving throw, you can roll a d4 and add it to their roll (no action required). Once you've used this feature, you must complete a short or long rest before you can use it again."
+   },
+   {
+    "name": "Human Versatility",
+    "activation": "",
+    "desc": "You gain proficiency in one skill, one tool, and one weapon of your choice."
+   },
+   {
+    "name": "Languages",
+    "activation": "",
+    "desc": "You can speak, read, and write Galactic Basic and one extra language of your choice. Humans typically learn the languages of other peoples they deal with, including obscure dialects. They are fond of sprinkling their speech with words borrowed from other tongues: trandoshan curses, twi'lek musical expressions, chiss military phrases, and so on."
+   },
+   {
+    "name": "Techie",
+    "activation": "special",
+    "desc": "You master the theory and practice of technology, gaining the following benefits: Increase your Intelligence score by 1, to a maximum of 20. You gain proficiency in the Technology skill. If you are already proficient in it, you instead gain expertise in it. You learn the repair droid tech power. You can cast it once, using supplies scavenged around you, without the use of a wristpad and without spending tech points, and you regain the ability to do so when you finish a long rest."
+   },
+   {
+    "name": "Arakyd Vector",
+    "activation": "",
+    "desc": "Prerequisite: 5th level You gain a +1 bonus to tech attack rolls. This bonus increases to +2 at 11th level and +3 at 17th level."
+   }
+  ],
+  "powers": [
+   {
+    "name": "Dismantle",
+    "level": 0,
+    "school": "tec",
+    "actionType": "mpak",
+    "activation": "none",
+    "damage": [
+     {
+      "formula": "1d6",
+      "type": "energy"
+     }
+    ],
+    "save": "",
+    "desc": "You break or tear an unenhanced structure or object you touch that is not being worn or carried by a creature other than you. The break or tear can be up to 1 foot in any dimension. When cast this in this way, this power has a casting time of 1 minute. Alternatively, you can touch a droid or construct when you cast this power. Make a melee tech attack against the target. On a hit, the target takes 1d6 energy damage. When cast in this way, this power has a casting time of 1 action. This power's damage increases by 1d6 when you reach 5th level (2d6), 11th level (3d6), and 17th level (4d6)."
+   },
+   {
+    "name": "Encrypted Message",
+    "level": 0,
+    "school": "tec",
+    "actionType": "other",
+    "activation": "action",
+    "damage": [],
+    "save": "",
+    "desc": "You point your finger toward a creature within range that possesses a commlink and whisper a message. The target (and only the target) hears the message and can send an encrypted reply that only you can hear. These messages cannot be intercepted or decrypted by unenhanced means. You can cast this power through solid objects if you are familiar with the target and know it is beyond the barrier. 1 foot of stone, 1 inch of common metal, a thin sheet of lead, or 3 feet of wood blocks the power. The power doesn't have to follow a straight line and can travel freely around corners or through opening"
+   },
+   {
+    "name": "Mending",
+    "level": 0,
+    "school": "tec",
+    "actionType": "other",
+    "activation": "minute",
+    "damage": [],
+    "save": "",
+    "desc": "This ability repairs a single break or tear in an object you touch, such as broken chain link, two halves of a broken key, a torn strap, or a leaking cup. As long as the break or tear is no larger than 1 foot in any dimension, you mend it, leaving no trace of the former damage. If you target a droid or construction with this feature, it can spend and roll one of its Hit Dice and regain that many hit points."
+   },
+   {
+    "name": "Minor Hologram",
+    "level": 0,
+    "school": "tec",
+    "actionType": "other",
+    "activation": "action",
+    "damage": [],
+    "save": "",
+    "desc": "This ability is a minor tech trick that creates one of the following effects within range. You create an instantaneous, harmless sensory effect, such as a shower of sparks, a puff of wind, faint musical notes, or an odd odor. You instantaneously light or snuff out a source of light. You instantaneously clean or soil an object no larger than 1 cubic foot. You chill, warm, or flavor up to 1 cubic foot of nonliving material for 1 hour. You make a color, a small mark, or a symbol appear on an object or a surface for 1 hour. You create a trinket or an illusory image that can fit in your hand and th"
+   },
+   {
+    "name": "Analyze",
+    "level": 1,
+    "school": "tec",
+    "actionType": "other",
+    "activation": "minute",
+    "damage": [],
+    "save": "",
+    "desc": "You choose one object that you must touch throughout the casting of the power. If it is an enhanced or modified item, you learn its properties and how to use them, whether it requires attunement to use, and how many charges it has, if any. You learn whether any powers are affecting the item and what they are. If the item was created by a power, you learn which power created it. If you instead touch a creature throughout the casting, you learn what tech powers, if any, are currently affecting it."
+   },
+   {
+    "name": "Execute Command",
+    "level": 1,
+    "school": "tec",
+    "actionType": "save",
+    "activation": "action",
+    "damage": [],
+    "save": "int",
+    "desc": "You dictate a one-word command to a droid or construct you can see within range. The target must succeed on an Intelligence saving throw or follow the command on its next turn. If the construct has the 'Piloted' trait, and has a pilot controlling it that is not incapacitated, it gains a bonus to the saving throw equal to the pilot's Intelligence modifier. Some typical commands and their effects follow. You might issue a command other than one described here. If you do so, the GM determines how the target behaves. If the target can't follow your command, the power ends. Approach. The target mov"
+   },
+   {
+    "name": "Tracker Droid Interface",
+    "level": 1,
+    "school": "tec",
+    "actionType": "other",
+    "activation": "hour",
+    "damage": [],
+    "save": "",
+    "desc": "You interface a tracker droid with your tech focus, creating a permanent link. Your tracker droid acts independently of you, but it always obeys your commands. In combat, it acts on your turn. While your tracker droid is within 100 feet of you, you can communicate with it via your tech focus. Additionally, as an action, you can see through your droid's vision and hear what it hears until the start of your next turn, gaining the benefits of any special senses that the droid has. During this time, you are deaf and blind with regard to your own senses. You can't maintain an interface between more"
+   },
+   {
+    "name": "Frequency Scan",
+    "level": 2,
+    "school": "tec",
+    "actionType": "save",
+    "activation": "action",
+    "damage": [],
+    "save": "wis",
+    "desc": "For the duration, you can detect electronic transmissions. When you cast the power and as your action on each turn until the power ends, you can focus on any one creature that you can see within 30 feet of you. If the creature you choose does not possess a commlink, or is not a droid or construct, the creature is unaffected. If the creature possesses a commlink or other communications device, you receive any transmissions it broadcasts or receives for the duration. Additionally, if the target is a droid or construct, you can read its \"thoughts.\" You initially learn the surface thoughts of the "
+   },
+   {
+    "name": "Short Circuit",
+    "level": 0,
+    "school": "tec",
+    "actionType": "rpak",
+    "activation": "action",
+    "damage": [
+     {
+      "formula": "1d8",
+      "type": "lightning"
+     }
+    ],
+    "save": "",
+    "desc": "You electrocute a creature within range. Make a ranged tech attack against the creature. On a hit, the target takes 1d8 lightning damage. If the target is a droid, construct, or has a tech focus, it has disadvantage on the first attack roll it makes against you until the end of your next turn. This power's damage increases by 1d8 when you reach 5th level (2d8), 11th level (3d8), and 17th level (4d8)."
+   }
+  ],
+  "inventory": [
+   {
+    "id": "clothes-common-QnjD",
+    "name": "Clothes, common",
+    "type": "equipment",
+    "qty": 1,
+    "weight": 3,
+    "equipped": false,
+    "desc": ""
+   },
+   {
+    "id": "datacard-if0W",
+    "name": "Datacard",
+    "type": "loot",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": "A datacard or data disk is a flat, hand-held device used in conjunction with a datapad to store information."
+   },
+   {
+    "id": "credit-chip-DpDO",
+    "name": "Credit chip",
+    "type": "loot",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": "The credit chip is a small, flat card that features a security code and algorithm memory stripes. The chip can be preloaded with a specified number of credits, or it can draw directly from a specific account held by the user. The credit chip can be accessed with a pin, or by a DC 15 slicer's kit check."
+   },
+   {
+    "id": "wristpad-42Kd",
+    "name": "Wristpad",
+    "type": "equipment",
+    "qty": 1,
+    "weight": 2,
+    "equipped": false,
+    "desc": "A wristpad is a harness with an integrated datapad and holoprojector interface that fits on the forearm and includes self-charging battery packs."
+   },
+   {
+    "id": "computer-spike-RJCG",
+    "name": "Computer spike",
+    "type": "consumable",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": "When you make an Intelligence (slicer's kit) check, you can use the spike (no action required) to reroll the check. You must use the new roll. You can wait until after you roll the d20 before deciding to use the spike, but you must decide before the GM says whether the check succeeds or fails."
+   },
+   {
+    "id": "cybertech-s-implements-Ncqt",
+    "name": "Cybertech's implements",
+    "type": "tool",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": ""
+   },
+   {
+    "id": "yaladai-vjMu",
+    "name": "Yaladai",
+    "type": "consumable",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": "Yaladai is a powerful stimulant that grants extreme clarity, improving relaxation and focus. As an action, you can apply this substance to a creature within 5 feet. For the next minute, the creature experiences a high that increases their current and maximum force points by 2d3. At the end of the high, the creature must succeed on a DC 14 Wisdom saving throw or experience a low that lasts 10 minutes, their current and maximum force points are reduced by 2d3. At the end of the low, the creature must make a DC 14 Constitution saving throw to resist addiction."
+   },
+   {
+    "id": "security-spike-Dv4v",
+    "name": "Security spike",
+    "type": "consumable",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": "When you make an Intelligence (security kit) check, you can use the spike (no action required) to reroll the check. You must use the new roll. You can wait until after you roll the d20 before deciding to use the spike, but you must decide before the GM says whether the check succeeds or fails."
+   },
+   {
+    "id": "new-weapon-N0KU",
+    "name": "New Weapon",
+    "type": "weapon",
+    "qty": 1,
+    "weight": 0,
+    "equipped": false,
+    "desc": "",
+    "damage": [],
+    "properties": "",
+    "actionType": null,
+    "attackAbility": "dex"
+   }
+  ],
+  "cybernetics": [
+   {
+    "name": "Flamejet Implant",
+    "desc": ""
+   },
+   {
+    "name": "Targeting Reflex Mod",
+    "desc": ""
+   }
+  ],
+  "mechRef": "chroniko",
+  "bio": ""
+ }
+]

@@ -1,0 +1,6 @@
+{
+ "id": "settings",
+ "mechOverloadRule": "Each modification installed beyond the mech's slot capacity imposes a cumulative -1 penalty to the mech's attack rolls and saving throws.",
+ "cyberNote": "Limit equals proficiency bonus; each excess augment: -1 to ability checks & saving throws.",
+ "party": "Mecha Mercs"
+}

@@ -1,0 +1,17 @@
+{
+  "name": "mecha-merc-web",
+  "version": "1.0.0",
+  "description": "Mecha Merc Terminal - homebrew SW5E cyberpunk pilot/mech dashboard with live sync",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "express": "^4.19.2",
+    "pg": "^8.12.0",
+    "socket.io": "^4.7.5"
+  }
+}
