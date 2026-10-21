@@ -1302,7 +1302,7 @@ function migrateShip(sh){ // v2: room sizes. Re-flow the grid, enlarge dorms + m
   const rooms=sh.cells.filter(c=>c&&c.span==null);
   rooms.forEach(c=>{ const cfg=SHIP_START_CFG[c.room]; if(cfg&&cfg.size&&!c.size){ c.size=cfg.size; (cfg.upgrades||[]).forEach(u=>{ if(!(c.upgrades||[]).includes(u)) c.upgrades=[...(c.upgrades||[]),u]; }); } });
   const cells=Array(SHIP_COLS*SHIP_ROWS).fill(null); rooms.forEach(c=>placeRoom(cells,c)); sh.cells=cells; sh.v=2; }
-function shipClean(sh){ sh.reports=(sh.reports||[]).slice(0,20); sh.log=(sh.log||[]).slice(0,40);
+function shipClean(sh){ sh.history=(sh.history||[]).slice(0,7); sh.reports=(sh.reports||[]).slice(0,20); sh.log=(sh.log||[]).slice(0,40);
   sh.vault=(sh.vault||[]).map(v=>({...v,item:v.item?{name:v.item.name,category:v.item.category,rarity:v.item.rarity||null,cost:v.item.cost||0,slotType:v.item.slotType||null,mount:v.item.mount||null,equipType:v.item.equipType||null,subtype:v.item.subtype||null,properties:v.item.properties||null,weight:v.item.weight||0,description:(v.item.description||'').slice(0,300)}:null}));
   return JSON.parse(JSON.stringify(sh)); }
 function saveShip(){ const sh=ship(); const clean=shipClean(sh); S.ship=clean; if(S.db){ S.db.doc('ship/eugene').set(clean).catch(e=>{ console.error('ship save failed',e); toast('Ship save failed',(e&&e.code)||'try again'); }); } else if(typeof socket!=='undefined'&&socket){ socket.emit('write',{auth:authPayload(),collection:'ship',id:'eugene',data:clean}); } }
@@ -1374,7 +1374,7 @@ function renderShip(){ const main=$('#main'); const sh=ship(); const k=shipCalc(
   const head=`<div class="shiphead"><div><div class="eyebrow">Communal Ship</div><h2 style="font-size:24px">${esc(sh.name)}</h2><div style="color:var(--ink-mid);font-size:12px">3 km city-ship · ~100,000 containers · ${k.rooms} districts · ${k.freeHolds} unconverted holds · anyone aboard can edit</div></div>
     <div class="shipctl"><div class="daybox"><span class="eyebrow">Day</span><b class="mono">${sh.day}</b></div>
       <div class="modeswitch" style="min-width:150px"><button class="${sh.flying?'on':''}" onclick="shipSet('flying',true)">Flying</button><button class="${!sh.flying?'on':''}" onclick="shipSet('flying',false)">Docked</button></div>
-      <button class="btn" onclick="shipAdvance(1)">Advance day ▸</button><button class="btn sec" onclick="shipAdvance(7)">+7 days</button></div></div>`;
+      <button class="btn sec" ${(sh.history||[]).length?'':'disabled'} onclick="shipBack()" title="Undo the last day (up to 7)">◂ Back a day</button><button class="btn" onclick="shipAdvance(1)">Advance day ▸</button><button class="btn sec" onclick="shipAdvance(7)">+7 days</button>${isDM()?'<button class="rbtn dngr" onclick="shipReset()">Reset to Day 1</button>':''}</div></div>`;
   const bank=`<div class="bankbar"><div><div class="eyebrow">Ship bank</div><div class="mono bankval" onclick="shipEditNum('bank','Ship bank (credits)')" title="Click to set">${cr(sh.bank)}</div></div>
     <div style="flex:1;font-size:12px;color:var(--ink-mid)">Daily net <b class="mono" style="color:${k.net>=0?'var(--good)':'var(--danger)'}">${k.net>=0?'+':''}${cr(k.net)}</b> · per 7-day cycle <b class="mono">${cr(k.net*7)}</b></div>
     <div class="debtbox"><div class="eyebrow">TCA Debt</div><div class="mono debtval" onclick="shipEditNum('debt','TCA Debt outstanding')" title="Click to set">${cr(sh.debt)}</div></div>
@@ -1660,7 +1660,7 @@ const RES_ROWS=[['credits','Credits',v=>cr(v)],['rations','Rations',v=>Math.roun
   ['renown','Renown',v=>Math.round(v).toLocaleString()],['heat','Heat',v=>Math.round(v).toLocaleString()],['containers','Containers',v=>Math.round(v).toLocaleString()],['debt','TCA Debt',v=>cr(v)]];
 function shipSnap(sh){ return {credits:sh.bank||0,rations:sh.stock.rations||0,components:sh.stock.components||0,data:sh.stock.data||0,renown:sh.renown||0,heat:sh.heat||0,containers:sh.containers||0,debt:sh.debt||0}; }
 function shipAdvance(n){ const sh=ship(); let tot=0;
-  for(let day=0;day<n;day++){ const k=shipCalc(); const start=shipSnap(sh);
+  for(let day=0;day<n;day++){ pushHist(sh); const k=shipCalc(); const start=shipSnap(sh);
     const R={}; RES_ROWS.forEach(([key])=>R[key]={start:start[key],gain:[],spend:[]});
     const add=(key,side,amt,why)=>{ if(amt) R[key][side].push({w:why,a:Math.round(amt)}); };
     // credits
@@ -1721,6 +1721,17 @@ function adjustRes(key,sign){ const sh=ship(); const row=STORE_ROWS.find(r=>r[0]
 function storesPanel(){ const sh=ship();
   return `<div class="panel" style="margin-bottom:14px"><div class="panel-h"><h3>Ship Stores</h3><span style="flex:1"></span><span class="status">add or use resources by hand — logged to today's report</span></div><div class="panel-b"><div class="stores">`+
     STORE_ROWS.map(([key,lab,where])=>`<div class="store"><div class="eyebrow">${lab}</div><div class="mono sv">${key==='bank'?cr(resGet(sh,key,where)):resGet(sh,key,where).toLocaleString()}</div><div class="step"><button onclick="adjustRes('${key}',-1)" title="Use">−</button><button onclick="adjustRes('${key}',1)" title="Add">+</button></div></div>`).join('')+`</div></div></div>`; }
+
+
+/* ============================ SHIP V: undo a day, DM reset ============================ */
+function pushHist(sh){ const snap=JSON.parse(JSON.stringify(sh)); delete snap.history; snap.reports=(snap.reports||[]).slice(0,5); sh.history=[snap,...(sh.history||[])].slice(0,7); }
+function shipBack(){ const sh=ship(); const h=sh.history||[]; if(!h.length) return toast('Nothing to undo','Up to 7 days are kept');
+  const prev=h[0]; prev.history=h.slice(1); const from=sh.day; S.ship=prev;
+  shipLog(shipWho()+' rewound Day '+from+' \u2192 Day '+prev.day); saveShip(); toast('Back to Day '+prev.day,'Resources, containers and reports restored'); renderMain(); }
+function shipReset(){ if(!isDM()) return toast('DM only','Sign in as Dungeon Master to reset the ship');
+  modal(`<div class="modal" style="width:min(400px,94vw)"><div class="modal-h"><h3>Reset ${esc(ship().name)}?</h3><button class="x" onclick="closeModal()">\u00d7</button></div>
+   <div class="modal-b"><p style="font-size:13px;color:var(--ink-mid);margin:0 0 12px">Rebuilds the starting ship at Day 1: starting rooms, empty bank, \u25c810M TCA debt, 150,000 containers. Reports, vault and history are cleared. Pilot sheets are not touched.</p>
+   <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn sec" onclick="closeModal()">Cancel</button><button class="btn" style="background:var(--danger)" onclick="closeModal();S.ship=defaultShip();ship();shipLog(shipWho()+' reset the ship to Day 1');saveShip();S.shipSel=null;renderMain();toast('Ship reset','Day 1')">Reset to Day 1</button></div></div></div>`); }
 
 /* ============================ modals ============================ */
 function modal(html){ $('#modalRoot').innerHTML=`<div class="scrim" onclick="if(event.target===this)closeModal()">${html}</div>`; }
