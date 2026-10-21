@@ -1291,7 +1291,7 @@ function placeRoom(cells,c){ const w=spans(c); for(let i=0;i<cells.length;i++){ 
 function defaultShip(){ const cells=Array(SHIP_COLS*SHIP_ROWS).fill(null);
   SHIP_START.forEach(n=>{ const cfg=SHIP_START_CFG[n]||{}; placeRoom(cells,{room:n,upgrades:[...(cfg.upgrades||[])],...(cfg.size?{size:cfg.size}:{})}); });
   return {v:2,debt:10000000,containers:150000,scale:1000,residents:95000,refugees:30000,name:"Eugene's Dream",day:1,bank:0,flying:true,party:5,passengers:0,holds:10,heat:0,renown:0,stock:{rations:0,components:0,data:0},cells,log:[]}; }
-function ship(){ if(!S.ship||!Array.isArray(S.ship.cells)) S.ship=defaultShip(); if(!S.ship.v||S.ship.v<2) migrateShip(S.ship); if(S.ship.v<3) migrateV3(S.ship); if(S.ship.containers==null) S.ship.containers=150000; if(S.ship.debt==null) S.ship.debt=10000000;
+function ship(){ if(S.ship&&Object.isFrozen(S.ship)) S.ship=JSON.parse(JSON.stringify(S.ship)); if(!S.ship||!Array.isArray(S.ship.cells)) S.ship=defaultShip(); if(!S.ship.v||S.ship.v<2) migrateShip(S.ship); if(S.ship.v<3) migrateV3(S.ship); if(S.ship.containers==null) S.ship.containers=150000; if(S.ship.debt==null) S.ship.debt=10000000;
   if(S.ship.v<5){ S.ship.overrides=S.ship.overrides||{}; S.ship.overrides['Mushroom Farm']={...(S.ship.overrides['Mushroom Farm']||{label:'Mushroom Lab'}),ra:50000}; if((S.ship.v||0)>=4) S.ship.v=5; }
   if(S.ship.v<4){ if(S.ship.scale==null) S.ship.scale=1000; if(!S.ship.holds||S.ship.holds===10) S.ship.holds=48; S.ship.v=5; } return S.ship; }
 function migrateV3(sh){ sh.overrides={...JSON.parse(JSON.stringify(DEFAULT_OVR)),...(sh.overrides||{})};
