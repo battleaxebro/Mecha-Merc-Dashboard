@@ -1237,21 +1237,33 @@ const SHIP_CAT_COLOR={Command:'#37e0c8',Engineering:'#f2a13e',Habitation:'#8b7bf
 const STATK=['crew','up','inc','ra','co','da','re','he','pw','mo','bu'];
 const cr=n=>'◈'+Math.round(n||0).toLocaleString();
 const sgn=n=>(n>0?'+':'')+Math.round(n*10)/10;
-function defaultShip(){ const cells=Array(SHIP_COLS*SHIP_ROWS).fill(null); SHIP_START.forEach((n,i)=>{ cells[i]={room:n,upgrades:[]}; });
-  return {name:"Eugene's Dream",day:1,bank:0,flying:true,party:5,passengers:0,holds:10,heat:0,renown:0,stock:{rations:0,components:0,data:0},cells,log:[]}; }
-function ship(){ if(!S.ship||!Array.isArray(S.ship.cells)) S.ship=defaultShip(); return S.ship; }
+const SQ={Pod:4,Hold:16,Deck:36}; const SCALEK=['crew','up','inc','ra','co','da','bu','pw'];
+const SHIP_START_CFG={'Bunk Pods':{size:'Deck'},'Mess Hall':{size:'Deck',upgrades:["Chef's Galley"]}};
+function cellSize(c){ return (c&&c.size)||((ROOMS[c&&c.room]||{}).space)||'Hold'; }
+function spans(c){ return cellSize(c)==='Deck'?2:1; }
+function canSpan(cells,i,ignore){ return (i%SHIP_COLS)<SHIP_COLS-1 && (cells[i+1]==null || (ignore!=null&&cells[i+1]&&cells[i+1].span===ignore)); }
+function placeRoom(cells,c){ const w=spans(c); for(let i=0;i<cells.length;i++){ if(cells[i]!=null) continue; if(w===2&&!canSpan(cells,i)) continue; cells[i]=c; if(w===2) cells[i+1]={span:i}; return true; } return false; }
+function defaultShip(){ const cells=Array(SHIP_COLS*SHIP_ROWS).fill(null);
+  SHIP_START.forEach(n=>{ const cfg=SHIP_START_CFG[n]||{}; placeRoom(cells,{room:n,upgrades:[...(cfg.upgrades||[])],...(cfg.size?{size:cfg.size}:{})}); });
+  return {v:2,name:"Eugene's Dream",day:1,bank:0,flying:true,party:5,passengers:0,holds:10,heat:0,renown:0,stock:{rations:0,components:0,data:0},cells,log:[]}; }
+function ship(){ if(!S.ship||!Array.isArray(S.ship.cells)) S.ship=defaultShip(); if(!S.ship.v||S.ship.v<2) migrateShip(S.ship); return S.ship; }
+function migrateShip(sh){ // v2: room sizes. Re-flow the grid, enlarge dorms + mess hall
+  const rooms=sh.cells.filter(c=>c&&c.span==null);
+  rooms.forEach(c=>{ const cfg=SHIP_START_CFG[c.room]; if(cfg&&cfg.size&&!c.size){ c.size=cfg.size; (cfg.upgrades||[]).forEach(u=>{ if(!(c.upgrades||[]).includes(u)) c.upgrades=[...(c.upgrades||[]),u]; }); } });
+  const cells=Array(SHIP_COLS*SHIP_ROWS).fill(null); rooms.forEach(c=>placeRoom(cells,c)); sh.cells=cells; sh.v=2; }
 function saveShip(){ const sh=ship(); if(S.db){ S.db.doc('ship/eugene').set(sh).catch(()=>{}); } else if(typeof socket!=='undefined'&&socket){ socket.emit('write',{auth:authPayload(),collection:'ship',id:'eugene',data:sh}); } }
 function shipLog(msg){ const sh=ship(); sh.log=[{t:Date.now(),day:sh.day,msg},...(sh.log||[])].slice(0,40); }
 function shipWho(){ return S.identity==='dm'?'DM':((S.chars[S.identity]||{}).name||'Someone'); }
 function upgradesFor(room){ return SHIPRULES.upgrades.map((u,i)=>({...u,i})).filter(u=>u.room===room).sort((a,b)=>a.tier-b.tier); }
-function roomStats(cell){ const r=ROOMS[cell.room]; if(!r) return null; const s={cf:r.cf}; STATK.forEach(k=>s[k]=r[k]||0);
+function roomStats(cell){ const r=ROOMS[cell.room]; if(!r) return null; const s={cf:r.cf}; const m=(SQ[cellSize(cell)]||16)/(SQ[r.space]||16);
+  STATK.forEach(k=>s[k]=SCALEK.includes(k)?Math.round((r[k]||0)*m):(r[k]||0));
   (cell.upgrades||[]).forEach(un=>{ const u=SHIPRULES.upgrades.find(x=>x.room===cell.room&&x.n===un); if(u) STATK.forEach(k=>s[k]+=u[k]||0); }); return s; }
 function heatTier(h){ return h>=75?'Kill Order':h>=50?'Most Wanted':h>=25?'Hunted':h>=10?'Watched':'Cold'; }
 function renownTier(r){ const T=[[5000,'Myth'],[2000,'Legend of the Lanes'],[1000,'Name in Lights'],[750,'Syndicate Player'],[500,'Port Favorite'],[300,'Street Legend'],[150,'Trusted Crew'],[50,'Known Hauler'],[0,'Nobody']]; return T.find(t=>r>=t[0])[1]; }
 function shipCalc(){ const sh=ship(); const t={inc:0,incCF:0,rooms:0,used:0}; STATK.forEach(k=>{ if(k!=='inc') t[k]=0; });
-  sh.cells.forEach(c=>{ if(!c) return; const s=roomStats(c); if(!s) return; t.rooms++;
+  sh.cells.forEach(c=>{ if(!c||c.span!=null) return; const s=roomStats(c); if(!s) return; t.rooms++;
     STATK.forEach(k=>{ if(k!=='inc') t[k]+=s[k]; }); if(s.cf) t.incCF+=s.inc; else t.inc+=s.inc;
-    const R=ROOMS[c.room]; if(R&&R.type!=='Stock') t.used+=R.space==='Deck'?2:R.space==='Hold'?1:0; });
+    const R=ROOMS[c.room]; const z=cellSize(c); if(R&&R.type!=='Stock') t.used+=z==='Deck'?2:z==='Hold'?1:0; });
   const people=t.crew+(+sh.party||0)+(+sh.passengers||0), bunks=12+t.bu, over=people>bunks, morale=t.mo-(over?2:0);
   const tier=morale<=-5?['Mutinous',0.8]:morale<=-1?['Grumbling',0.9]:morale<=4?['Steady',1]:morale<=9?['Loyal',1.1]:['Family',1.2];
   const famous=(sh.renown||0)>=1000;
@@ -1273,13 +1285,21 @@ function shipAdvance(n){ const sh=ship(); let tot=0;
   shipLog(shipWho()+' advanced '+n+' day'+(n>1?'s':'')+' → Day '+sh.day+' ('+(tot>=0?'+':'')+cr(tot)+')'); saveShip(); toast('Day '+sh.day,(tot>=0?'+':'')+cr(tot)+' to the bank'); renderMain(); }
 function shipPay(cost,what){ const sh=ship(); if(cost>(sh.bank||0)){ toast('Insufficient funds in the bank','Need '+cr(cost)+' · have '+cr(sh.bank)); return false; } sh.bank-=cost; return true; }
 function shipBuild(i,pay){ const sh=ship(); const nm=(document.getElementById('shipNewRoom')||{}).value||S.shipPreview; const R=ROOMS[nm]; if(!R) return;
+  const old=sh.cells[i]; const size=(old&&old.size)||R.space;
+  if(size==='Deck' && !(old&&spans(old)===2) && !canSpan(sh.cells,i)){ toast(nm+' is a Deck room','It needs this square and the empty one to its right'); return; }
   if(pay && !shipPay(R.cost,nm)) return;
-  const old=sh.cells[i]; sh.cells[i]={room:nm,upgrades:[]}; S.shipPreview=null;
+  if(old&&spans(old)===2&&size!=='Deck') sh.cells[i+1]=null;
+  sh.cells[i]={room:nm,upgrades:[],...(old&&old.size?{size:old.size}:{})}; if(size==='Deck') sh.cells[i+1]={span:i}; S.shipPreview=null;
   shipLog(shipWho()+(old?' converted '+old.room+' into ':' built ')+nm+(pay&&R.cost?' ('+cr(R.cost)+')':' (no charge)')); saveShip(); renderMain(); }
-function shipRemove(i){ const sh=ship(); const c=sh.cells[i]; if(!c) return; sh.cells[i]=null; shipLog(shipWho()+' cleared '+c.room); S.shipSel=null; saveShip(); renderMain(); }
+function shipRemove(i){ const sh=ship(); const c=sh.cells[i]; if(!c) return; if(spans(c)===2) sh.cells[i+1]=null; sh.cells[i]=null; shipLog(shipWho()+' cleared '+c.room); S.shipSel=null; saveShip(); renderMain(); }
 function shipUpgrade(i,ui,pay){ const sh=ship(); const c=sh.cells[i]; const u=SHIPRULES.upgrades[ui]; if(!c||!u) return;
   if(pay && !shipPay(u.cost,u.n)) return; c.upgrades=[...(c.upgrades||[]),u.n];
   shipLog(shipWho()+' installed '+u.n+' in '+c.room+(pay&&u.cost?' ('+cr(u.cost)+')':' (no charge)')); saveShip(); renderMain(); }
+const ENLARGE={Pod:['Hold',5000],Hold:['Deck',20000]};
+function shipEnlarge(i,pay){ const sh=ship(); const c=sh.cells[i]; if(!c) return; const z=cellSize(c); const e=ENLARGE[z]; if(!e) return;
+  if(e[0]==='Deck' && !canSpan(sh.cells,i)){ toast('No room to enlarge','Clear the square to the right of '+c.room+' first'); return; }
+  if(pay && !shipPay(e[1],'enlarge')) return; c.size=e[0]; if(e[0]==='Deck') sh.cells[i+1]={span:i};
+  shipLog(shipWho()+' enlarged '+c.room+' to a '+e[0]+(pay?' ('+cr(e[1])+')':' (no charge)')); saveShip(); renderMain(); }
 function shipUnupgrade(i,ui){ const sh=ship(); const c=sh.cells[i]; const u=SHIPRULES.upgrades[ui]; if(!c||!u) return; c.upgrades=(c.upgrades||[]).filter(n=>n!==u.n); shipLog(shipWho()+' removed '+u.n+' from '+c.room); saveShip(); renderMain(); }
 function shipDistribute(){ const sh=ship(); const chars=Object.values(S.chars); if(!chars.length) return; const share=Math.floor((sh.bank||0)/chars.length);
   if(share<=0) return toast('Nothing to distribute','The bank needs at least '+cr(chars.length)+' to split');
@@ -1315,10 +1335,10 @@ function renderShip(){ const main=$('#main'); const sh=ship(); const k=shipCalc(
     ${shipTile('Party / guests',sh.party+' / '+sh.passengers,'click to edit','',"shipEditNum('party','Party members aboard')")}
   </div>`;
   let grid='<div class="shipgrid">';
-  sh.cells.forEach((c,i)=>{ const sel=S.shipSel===i?'sel':'';
+  sh.cells.forEach((c,i)=>{ if(c&&c.span!=null) return; const sel=S.shipSel===i?'sel':'';
     if(!c){ grid+=`<div class="scell empty ${sel}" onclick="shipSelect(${i})"><span>＋</span><small>empty hold</small></div>`; return; }
     const R=ROOMS[c.room]||{}; const s=roomStats(c)||{}; const col=SHIP_CAT_COLOR[R.cat]||'var(--line-bright)';
-    grid+=`<div class="scell ${sel}" style="--rc:${col}" onclick="shipSelect(${i})"><div><div class="rn">${esc(c.room)}</div><div class="rm">${esc(R.cat||'')} · ${esc(R.space||'')}</div></div>
+    grid+=`<div class="scell ${sel}" style="--rc:${col};${spans(c)===2?'grid-column:span 2':''}" onclick="shipSelect(${i})"><div><div class="rn">${esc(c.room)}</div><div class="rm">${esc(R.cat||'')} · ${esc(cellSize(c))}${cellSize(c)!==R.space?' (enlarged)':''}</div></div>
       <div class="rm">${s.inc?'<span style="color:var(--good)">+'+s.inc+'</span> ':''}${s.up?'<span style="color:var(--danger)">−'+s.up+'</span>':''}${(c.upgrades||[]).length?' · <span style="color:var(--warn)">★'+c.upgrades.length+'</span>':''}</div></div>`; });
   grid+='</div>';
   const left=`<div class="panel"><div class="panel-h"><h3>Deck Plan</h3><span class="status" style="margin-left:6px">${SHIP_COLS}×${SHIP_ROWS}</span><span style="flex:1"></span><span class="status">click a room to edit or upgrade</span></div><div class="panel-b">${grid}</div></div>`;
@@ -1335,7 +1355,7 @@ function shipLedger(k){ const sh=ship(); const row=(a,b,c)=>`<div class="bonusro
     ${row('Unconverted cargo holds',`<button class="addbtn" onclick="shipEditNum('holds','Total cargo holds (unconverted + converted)')">${k.freeHolds} · edit</button>`)}
   </div></div>`; }
 function shipAbilities(){ const sh=ship(); const items=[];
-  sh.cells.forEach(c=>{ if(!c) return; const R=ROOMS[c.room]; if(!R) return;
+  sh.cells.forEach(c=>{ if(!c||c.span!=null) return; const R=ROOMS[c.room]; if(!R) return;
     const ups=(c.upgrades||[]).map(n=>SHIPRULES.upgrades.find(u=>u.room===c.room&&u.n===n)).filter(Boolean);
     items.push(`<div class="abrow"><div class="abn" style="--rc:${SHIP_CAT_COLOR[R.cat]||'var(--line-bright)'}">${esc(c.room)}</div><div class="abt">${esc(R.what||'')}</div>
       ${R.wo&&!/^None/.test(R.wo)?`<div class="abw"><b>Work order:</b> ${esc(R.wo)}</div>`:''}${ups.map(u=>`<div class="abw"><b style="color:var(--warn)">★ ${esc(u.n)}:</b> ${esc(u.adv||'')}</div>`).join('')}</div>`); });
@@ -1347,7 +1367,8 @@ function shipRoomPanel(i){ const sh=ship(); const c=sh.cells[i]; const R=c?ROOMS
   const opts=SHIPRULES.rooms.map(r=>`<option value="${esc(r.n)}" ${(pv?pv.n:(c?c.room:''))===r.n?'selected':''}>${esc(r.n)} — ${r.space}${r.cost?' · '+cr(r.cost):''}</option>`).join('');
   const target=pv||(!c?null:null);
   let h=`<div class="panel"><div class="panel-h"><h3>${c?esc(c.room):'Empty cargo space'}</h3><span class="status" style="margin-left:6px">cell ${i+1}</span><span style="flex:1"></span><button class="x" onclick="shipSelect(${i})">×</button></div><div class="panel-b">`;
-  if(R){ const s=roomStats(c); h+=`<div style="font-size:12px;color:var(--ink-mid);margin-bottom:8px">${esc(R.cat)} · ${esc(R.space)} · ${esc(R.type)}</div>
+  if(R){ const s=roomStats(c); const z=cellSize(c); const e=ENLARGE[z]; h+=`<div style="font-size:12px;color:var(--ink-mid);margin-bottom:8px">${esc(R.cat)} · <b>${esc(z)}</b>${z!==R.space?' (base '+esc(R.space)+', output scaled ×'+(Math.round(SQ[z]/SQ[R.space]*100)/100)+')':''} · ${esc(R.type)}</div>
+      ${e?`<div class="acts" style="margin-bottom:8px"><button class="rbtn" onclick="shipEnlarge(${i},true)">Enlarge to ${e[0]} −${cr(e[1])}</button><button class="rbtn ghost" onclick="shipEnlarge(${i},false)">Enlarge free</button></div>`:''}
       <p style="font-size:12.5px;margin:0 0 8px">${esc(R.what||'')}</p>
       ${R.wo&&!/^None/.test(R.wo)?`<p style="font-size:12px;color:var(--ink-mid);margin:0 0 8px"><b>Work order:</b> ${esc(R.wo)}</p>`:''}
       ${R.draw?`<p style="font-size:12px;color:var(--danger);margin:0 0 8px"><b>Drawback:</b> ${esc(R.draw)}</p>`:''}
