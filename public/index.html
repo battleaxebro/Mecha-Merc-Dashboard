@@ -1431,11 +1431,12 @@ function shipRoomPanel(i){ const sh=ship(); const c=sh.cells[i]; const R=c?ROOMS
       <div style="font-size:10.5px;color:var(--ink-faint)">House-rule values apply to every room of this type.</div>`;
     const ups=upgradesFor(c.room);
     if(CRAFT[c.room]){ const cr_=craftRecipe(c); h+=`<div class="sechead"><h3>Work Order</h3><div class="ln"></div></div><button class="btn" style="width:100%" onclick="openCraft(${i})">⚒ ${esc(cr_.label)}</button><div style="font-size:10.5px;color:var(--ink-faint);margin-top:4px">Paid from ship ${cr_.pay==='rations'?'rations':'components'}, then bank credits${cr_.data?' + Data':''}. Output goes to the Ship Vault.</div>`; }
+    const rp=(SHIP_PERKS[c.room]||[]); if(rp.length) h+=`<div class="upcard" style="border-style:dashed"><div style="font-size:11.5px"><b>${(c.upgrades||[]).length?'Player benefits (active)':'Upgrade to unlock player benefits'}:</b> ${rp.map(p=>esc(p.txt)+(p.v?' ('+p.v+'%)':'')).join(' \u00b7 ')}</div></div>`;
     h+=`<div class="sechead"><h3>Upgrades</h3><div class="ln"></div></div>`;
     h+= ups.length? ups.map(u=>{ const owned=(c.upgrades||[]).includes(u.n); const prev=ups.filter(x=>x.tier<u.tier); const unlocked=prev.every(x=>(c.upgrades||[]).includes(x.n));
         return `<div class="upcard ${owned?'own':''}"><div class="top"><b>T${u.tier} · ${esc(u.n)}</b><span class="mono" style="color:var(--accent)">${cr(u.cost*cscale(u.room))}</span></div>
           <div class="fxwrap">${fxList(u)}</div>
-          ${u.adv?`<div style="font-size:11.5px;color:var(--good)">+ ${esc(u.adv)}</div>`:''}${u.dis?`<div style="font-size:11.5px;color:var(--danger)">− ${esc(u.dis)}</div>`:''}
+          ${u.adv?`<div style="font-size:11.5px;color:var(--good)">+ ${esc(u.adv)}</div>`:''}${(UPG_PERKS[u.n]||[]).map(p=>`<div style="font-size:11.5px;color:var(--accent)">\u2605 Player: ${esc(p.txt)}</div>`).join('')}${u.dis?`<div style="font-size:11.5px;color:var(--danger)">− ${esc(u.dis)}</div>`:''}
           <div style="font-size:10.5px;color:var(--ink-faint);margin-top:3px">${u.days} build days · install DC ${esc(u.dc)}${u.comp?' · '+u.comp+' components':''}${u.req&&u.req!=='-'?' · requires '+esc(u.req):''}</div>
           <div class="acts" style="margin-top:6px">${owned?`<span class="chip" style="color:var(--good)">installed</span><button class="rbtn dngr" onclick="shipUnupgrade(${i},${u.i})">Remove</button>`
             : unlocked?`<button class="rbtn" onclick="shipUpgrade(${i},${u.i},true)">Install −${cr(u.cost*cscale(u.room))}</button><button class="rbtn ghost" onclick="shipUpgrade(${i},${u.i},false)">Add free</button>`
@@ -1608,18 +1609,30 @@ const SHIP_PERKS={
   'Mess Hall':[{k:'story',txt:'Morale meals: the crew rallies behind you in a vote or uprising.'}],
 };
 const SHIP_MECH_PERKS={};
+// Benefits from specific upgrades (5e rest-style perks for habitation, food and medical upgrades)
+const UPG_PERKS={
+  'Private Cabins':[{k:'rest',txt:'Well Rested (Private Cabins): a long rest aboard removes 2 exhaustion instead of 1.'}],
+  'Luxury Suites':[{k:'rest',txt:'Well Rested (Luxury Suites): a long rest aboard restores all spent Hit Dice and removes 2 exhaustion.'}],
+  'Capsule Hotel':[{k:'rest',txt:'Well Rested (Capsules): a short rest aboard takes 30 minutes instead of 1 hour.'}],
+  'Family Pods':[{k:'rest',txt:'Well Rested (Family Pods): on a short rest aboard, roll spent Hit Dice with advantage.'}],
+  'Rent-a-Bunk':[{k:'story',txt:'Night-shift ears: dock workers pass along one rumor per stay in port.'}],
+  "Chef's Galley":[{k:'rest',txt:"Well Fed (Chef's Galley): after a long rest aboard, gain temporary HP equal to your level."}],
+  'Public Canteen':[{k:'story',txt:'Open kitchen: feed someone to get a favor or a lead.'}],
+};
+// Base rooms give ship/resource benefits only. Player benefits switch on once a room has at least one upgrade.
 function shipPerks(table){ const sh=S.ship; if(!sh||!Array.isArray(sh.cells)) return []; const out={}; table=table||SHIP_PERKS;
-  sh.cells.forEach(c=>{ if(!c||c.span!=null) return; (table[c.room]||[]).forEach(p=>{ const key=c.room+'|'+p.k+'|'+p.txt; const ups=(c.upgrades||[]).length;
-    const value=p.v?p.v+2*ups:0; if(!out[key]) out[key]={...p,room:c.room,value,ups}; }); });
+  sh.cells.forEach(c=>{ if(!c||c.span!=null) return; const ups=(c.upgrades||[]); if(!ups.length) return;
+    (table[c.room]||[]).forEach(p=>{ const key=c.room+'|'+p.k+'|'+p.txt; const value=p.v?p.v+2*(ups.length-1):0; if(!out[key]) out[key]={...p,room:c.room,value,ups:ups.length,via:ups[0]}; });
+    ups.forEach(u=>(UPG_PERKS[u]||[]).forEach(p=>{ const key=u+'|'+p.txt; if(!out[key]) out[key]={...p,room:c.room,value:0,via:u}; })); });
   return Object.values(out); }
 function shopDiscount(){ const t=shipPerks().filter(x=>x.k==='shop').reduce((a,x)=>a+x.value,0); return Math.min(20,t)/100; }
 function craftDiscount(room){ const t=shipPerks().filter(x=>x.k==='craft'&&x.room===room).reduce((a,x)=>a+x.value,0); return Math.min(30,t)/100; }
 function crewBenefitsPanel(){ const P=shipPerks();
-  const grp=(k,title)=>{ const L=P.filter(x=>x.k===k); return L.length?`<div class="eyebrow" style="margin:8px 0 2px">${title}</div>`+L.map(x=>`<div class="bonusrow"><span>${esc(roomLabel(x.room))} \u00b7 ${esc(x.txt)}</span>${x.value?`<b>${x.value}%</b>`:''}</div>`).join(''):''; };
+  const grp=(k,title)=>{ const L=P.filter(x=>x.k===k); return L.length?`<div class="eyebrow" style="margin:8px 0 2px">${title}</div>`+L.map(x=>`<div class="bonusrow"><span>${esc(roomLabel(x.room))}${x.via?' <small style="color:var(--warn)">\u2605 '+esc(x.via)+'</small>':''} \u00b7 ${esc(x.txt)}</span>${x.value?`<b>${x.value}%</b>`:''}</div>`).join(''):''; };
   return `<div class="panel" style="margin-top:14px"><div class="panel-h"><h3>Crew Benefits</h3><span class="status" style="margin-left:6px">no stat bonuses \u2014 they don't stack</span></div><div class="panel-b" style="padding:6px 14px">
-    ${grp('craft','Cheaper crafting (that room\'s Work Orders)')}${grp('shop','Cheaper shopping (catalog purchases)')}${grp('mod','Item & ability changes')}${grp('story','Story benefits')}
-    ${P.length?'':'<div class="empty" style="padding:8px">No benefits yet.</div>'}
-    <p style="font-size:11px;color:var(--ink-faint);margin:8px 0 2px">Each upgrade adds +2% to that room's discount. Caps: crafting 30% per room, shopping 20%.</p></div></div>`; }
+    ${grp('rest','Rest benefits (5e long/short rests aboard)')}${grp('craft','Cheaper crafting (that room\'s Work Orders)')}${grp('shop','Cheaper shopping (catalog purchases)')}${grp('mod','Item & ability changes')}${grp('story','Story benefits')}
+    ${P.length?'':'<div class="empty" style="padding:8px">No player benefits yet \u2014 upgrade a room to unlock its perks.</div>'}
+    <p style="font-size:11px;color:var(--ink-faint);margin:8px 0 2px">Base rooms only help the ship. A room's player benefits unlock with its first upgrade; each further upgrade adds +2% to its discount. Caps: crafting 30% per room, shopping 20%.</p></div></div>`; }
 function payDebt(){ const sh=ship(); if((sh.bank||0)<=0) return toast('Ship bank is empty','Only a positive bank can pay TCA');
   const max=Math.min(sh.bank,sh.debt||0); if(max<=0) return toast('Debt cleared','Nothing owed to TCA');
   askNum('Pay TCA Debt from the ship bank (max '+cr(max)+')',max,v=>{ if(v==null) return; const amt=Math.max(0,Math.min(Math.round(v),max)); if(!amt) return;
