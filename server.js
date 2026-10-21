@@ -53,6 +53,7 @@ async function fullState() {
     mechs: await store.getAll('mechs'),
     library: await store.getAll('library'),
     settings: (await store.get('settings', 'settings')) || {},
+    ship: await store.get('ship', 'eugene'),
     rolls,
   };
 }
@@ -62,7 +63,7 @@ async function canWrite(auth, collection, id, data) {
   if (!partyOK(auth)) return false;
   if (isDM(auth)) return true;
   if (collection === 'settings') return false;              // DM only
-  if (collection === 'library' || collection === 'rolls') return true; // any member
+  if (collection === 'library' || collection === 'rolls' || collection === 'ship') return true; // any member
   if (collection === 'characters') return auth.pilotId === id;
   if (collection === 'mechs') {
     const owner = (await store.getAll('characters')).find(c => c.id === auth.pilotId);
@@ -91,6 +92,25 @@ io.on('connection', (socket) => {
     if (!authed || !(await canWrite(auth, collection, id, {}))) return;
     await store.del(collection, id);
     io.to('party').emit('removed', { collection, id });
+  });
+
+  // split the ship bank equally across every pilot (server-side so it can credit all sheets)
+  socket.on('shipDistribute', async ({ auth }) => {
+    if (!authed || !partyOK(auth)) return;
+    const sh = await store.get('ship', 'eugene');
+    const chars = await store.getAll('characters');
+    if (!sh || !chars.length) return;
+    const share = Math.floor((sh.bank || 0) / chars.length);
+    if (share <= 0) return;
+    for (const c of chars) {
+      c.credits = (c.credits || 0) + share;
+      const saved = await store.put('characters', c.id, c);
+      io.to('party').emit('update', { collection: 'characters', id: c.id, data: saved });
+    }
+    sh.bank = (sh.bank || 0) - share * chars.length;
+    sh.log = [{ t: Date.now(), day: sh.day, msg: `Distributed ◈${share.toLocaleString()} to each of ${chars.length} pilots` }, ...(sh.log || [])].slice(0, 40);
+    const saved = await store.put('ship', 'eugene', sh);
+    io.to('party').emit('update', { collection: 'ship', id: 'eugene', data: saved });
   });
 
   socket.on('roll', async ({ auth, roll }) => {
