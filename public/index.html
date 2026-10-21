@@ -379,6 +379,9 @@ textarea{resize:vertical;min-height:60px;font-size:12px}
 .stores{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
 .store{border:1px solid var(--line);border-radius:var(--radius-sm);padding:8px 10px;background:var(--ground-2)}
 .store .sv{font-size:17px;font-weight:600;margin:2px 0}
+.zonebox{display:flex;flex-direction:column;gap:2px;min-width:210px}.zonelabs{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint)}.zonelabs span{cursor:pointer}.zonelabs span.on{color:var(--ink);font-weight:700}
+.zonebox input{width:100%}.zonebox input.zone-althus{accent-color:var(--danger)}.zonebox input.zone-frontier{accent-color:#4a8fe7}.zonebox input.zone-neutral{accent-color:var(--good)}
+.actrow{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--line)}.actrow>div{flex:1}.actrow .n{font-weight:600;font-size:13px}.actrow .n small{font-weight:400;color:var(--ink-faint)}.actrow .m{font-size:11px;color:var(--ink-mid)}.actrow .cost{font-size:11px;white-space:nowrap}.rbtn[disabled]{opacity:.4;cursor:not-allowed}
 .report{border-bottom:1px solid var(--line-soft);padding:6px 0}.report:last-child{border-bottom:0}
 .report .rhead{display:flex;justify-content:space-between;cursor:pointer;font-size:12.5px}
 .report ul{margin:6px 0 2px;padding-left:18px;font-size:11.5px;color:var(--ink-mid)}.report ul.finds{color:var(--ink)}
@@ -1372,7 +1375,7 @@ function shipTile(lab,val,sub,cls,onclick){ return `<div class="vital ${onclick?
 
 function renderShip(){ const main=$('#main'); const sh=ship(); const k=shipCalc(); $('#topTitle').textContent=sh.name;
   const head=`<div class="shiphead"><div><div class="eyebrow">Communal Ship</div><h2 style="font-size:24px">${esc(sh.name)}</h2><div style="color:var(--ink-mid);font-size:12px">3 km city-ship · ~100,000 containers · ${k.rooms} districts · ${k.freeHolds} unconverted holds · anyone aboard can edit</div></div>
-    <div class="shipctl"><div class="daybox"><span class="eyebrow">Day</span><b class="mono">${sh.day}</b></div>
+    <div class="shipctl">${zoneSlider(sh)}<div class="daybox"><span class="eyebrow">Day</span><b class="mono">${sh.day}</b></div>
       <div class="modeswitch" style="min-width:150px"><button class="${sh.flying?'on':''}" onclick="shipSet('flying',true)">Flying</button><button class="${!sh.flying?'on':''}" onclick="shipSet('flying',false)">Docked</button></div>
       <button class="btn sec" ${(sh.history||[]).length?'':'disabled'} onclick="shipBack()" title="Undo the last day (up to 7)">◂ Back a day</button><button class="btn" onclick="shipAdvance(1)">Advance day ▸</button><button class="btn sec" onclick="shipAdvance(7)">+7 days</button>${isDM()?'<button class="rbtn dngr" onclick="shipReset()">Reset to Day 1</button>':''}</div></div>`;
   const bank=`<div class="bankbar"><div><div class="eyebrow">Ship bank</div><div class="mono bankval" onclick="shipEditNum('bank','Ship bank (credits)')" title="Click to set">${cr(sh.bank)}</div></div>
@@ -1394,7 +1397,7 @@ function renderShip(){ const main=$('#main'); const sh=ship(); const k=shipCalc(
     ${shipTile('Containers aboard',(sh.containers||0).toLocaleString(),sortRate()?('breaking down '+sortRate()+'/day'):'build a Container Sorting Room','',"shipEditNum('containers','Containers aboard')")}
     ${shipTile('Components',(sh.stock.components||0),sgn(k.co)+' / day','')}
     ${shipTile('Data',(sh.stock.data||0),sgn(k.da)+' / day','')}
-    ${shipTile('Heat',(sh.heat||0),`${heatTier(sh.heat||0)} · ${sgn(k.heatDay)} / day`,(sh.heat||0)>=25?'neg':'',"shipEditNum('heat','Current Heat')")}
+    ${(()=>{ const HD=heatDaily(sh,k.he); return ['heatFP','heatA'].map(h=>shipTile(h==='heatFP'?'Heat · Frontier Protectorate':'Heat · Althus',(sh[h]||0),`${heatTier(sh[h]||0)} · ${sgn(Math.max(0,(sh[h]||0)+HD[h])-Math.min(2,Math.max(0,(sh[h]||0)+HD[h]))-(sh[h]||0))} / day`,(sh[h]||0)>=25?'neg':'',"shipEditNum('"+h+"','"+(h==='heatFP'?'Frontier Protectorate':'Althus')+" Heat')")).join(''); })()}
     ${shipTile('Renown',(sh.renown||0),`${renownTier(sh.renown||0)} · ${sgn(k.renownDay)} / day`,'',"shipEditNum('renown','Current Renown')")}
     ${shipTile('Jobs filled',k.crew.toLocaleString(),k.crew>k.people?'<span style="color:var(--danger)">'+(k.crew-k.people).toLocaleString()+' unfilled</span>':((k.people-k.crew).toLocaleString()+' unemployed'),k.crew>k.people?'neg':'')}
     ${shipTile('Fuel / flight day',cr(sh.fuelCost!=null?sh.fuelCost:FUEL_DEFAULT),'docking '+cr(sh.dockCost!=null?sh.dockCost:1500)+'/day','',"shipEditNum('fuelCost','Fuel cost per flight day')")}
@@ -1408,7 +1411,7 @@ function renderShip(){ const main=$('#main'); const sh=ship(); const k=shipCalc(
   grid+='</div>';
   const left=`<div class="panel"><div class="panel-h"><h3>Deck Plan</h3><span class="status" style="margin-left:6px">${SHIP_COLS}×${SHIP_ROWS}</span><span style="flex:1"></span><span class="status">click a room to edit or upgrade</span></div><div class="panel-b">${grid}</div></div>`;
   const right= S.shipSel!=null ? shipRoomPanel(S.shipSel) : shipLedger(k);
-  main.innerHTML=head+bank+stats+storesPanel()+`<div class="shiplayout"><div>${left}${shipReportsPanel()}${shipAbilities()}</div><div>${right}${crewBenefitsPanel()}${vaultPanel()}${shipLogPanel()}</div></div>`;
+  main.innerHTML=head+bank+stats+storesPanel()+`<div class="shiplayout"><div>${left}${shipReportsPanel()}${shipAbilities()}</div><div>${right}${roomActionsPanel()}${crewBenefitsPanel()}${vaultPanel()}${shipLogPanel()}</div></div>`;
 }
 function shipLedger(k){ const sh=ship(); const row=(a,b,c)=>`<div class="bonusrow ${c||''}"><span>${a}</span><b>${b}</b></div>`;
   return `<div class="panel"><div class="panel-h"><h3>Daily Ledger</h3><span style="flex:1"></span><span class="status">${sh.flying?'flying':'docked'}</span></div><div class="panel-b" style="padding:6px 14px">
@@ -1416,7 +1419,7 @@ function shipLedger(k){ const sh=ship(); const row=(a,b,c)=>`<div class="bonusro
     ${row('Room upkeep (wages + running)','−'+cr(k.up),'neg')}${sh.flying?row('Fuel','−'+cr(k.fuel),'neg'):row('Docking fees','−'+cr(k.dock),'neg')}
     ${k.rationBuy?row('Food purchases ('+(-k.rationBal).toLocaleString()+' short, 10 cr/1,000)','−'+cr(k.rationBuy),'neg'):''}
     <div class="bonusrow" style="border-top:1px solid var(--line-bright);margin-top:4px;padding-top:8px"><span><b style="color:var(--ink)">NET CREDITS / DAY</b></span><b style="color:${k.net>=0?'var(--good)':'var(--danger)'};font-size:15px">${k.net>=0?'+':''}${cr(k.net)}</b></div>
-    <p style="font-size:11px;color:var(--ink-faint);margin:10px 0 4px">Customer-facing rooms earn half while flying until Renown 1,000. Heat decays 2/day. Each person eats 1 ration/day; shortfalls are bought in bulk at 10 cr per 1,000.</p>
+    <p style="font-size:11px;color:var(--ink-faint);margin:10px 0 4px">Customer-facing rooms earn half while flying until Renown 1,000. Heat decays 2/day for each faction. Room heat goes to whoever controls the zone you're parked in (Frontier Protectorate or Althus); neutral space adds none. Each person eats 1 ration/day; shortfalls are bought in bulk at 10 cr per 1,000.</p>
     ${row('Unconverted cargo holds',`<button class="addbtn" onclick="shipEditNum('holds','Total cargo holds (unconverted + converted)')">${k.freeHolds} · edit</button>`)}
   </div></div>`; }
 function shipAbilities(){ const sh=ship(); const items=[];
@@ -1657,8 +1660,8 @@ function contributeBank(){ const c=S.chars[S.identity]; if(!c) return toast('Pic
 
 /* ============================ SHIP IV: per-resource daily ledger (overrides earlier shipAdvance/report panel) ============================ */
 const RES_ROWS=[['credits','Credits',v=>cr(v)],['rations','Rations',v=>Math.round(v).toLocaleString()],['components','Components',v=>Math.round(v).toLocaleString()],['data','Data',v=>Math.round(v).toLocaleString()],
-  ['renown','Renown',v=>Math.round(v).toLocaleString()],['heat','Heat',v=>Math.round(v).toLocaleString()],['containers','Containers',v=>Math.round(v).toLocaleString()],['debt','TCA Debt',v=>cr(v)]];
-function shipSnap(sh){ return {credits:sh.bank||0,rations:sh.stock.rations||0,components:sh.stock.components||0,data:sh.stock.data||0,renown:sh.renown||0,heat:sh.heat||0,containers:sh.containers||0,debt:sh.debt||0}; }
+  ['renown','Renown',v=>Math.round(v).toLocaleString()],['heatFP','Heat · Frontier',v=>Math.round(v).toLocaleString()],['heatA','Heat · Althus',v=>Math.round(v).toLocaleString()],['containers','Containers',v=>Math.round(v).toLocaleString()],['debt','TCA Debt',v=>cr(v)]];
+function shipSnap(sh){ return {credits:sh.bank||0,rations:sh.stock.rations||0,components:sh.stock.components||0,data:sh.stock.data||0,renown:sh.renown||0,heatFP:sh.heatFP||0,heatA:sh.heatA||0,containers:sh.containers||0,debt:sh.debt||0}; }
 function shipAdvance(n){ const sh=ship(); let tot=0;
   for(let day=0;day<n;day++){ pushHist(sh); const k=shipCalc(); const start=shipSnap(sh);
     const R={}; RES_ROWS.forEach(([key])=>R[key]={start:start[key],gain:[],spend:[]});
@@ -1673,13 +1676,14 @@ function shipAdvance(n){ const sh=ship(); let tot=0;
     add('components','gain',coPos,'Produced by rooms'); add('components','spend',coNeg,'Consumed by rooms');
     add('data','gain',daPos,'Produced by rooms'); add('data','spend',daNeg,'Consumed by rooms');
     add('renown','gain',k.renownDay,'Earned by rooms'+(k.tier==='Family'?' (+1 Family morale)':''));
-    add('heat','gain',k.he,'Shady rooms'); add('heat','spend',Math.min(2,(sh.heat||0)+k.he),'Natural decay');
+    const HD=heatDaily(sh,k.he), zn=(ZONES.find(z=>z[0]===sh.zone)||[0,'Neutral'])[1];
+    ['heatFP','heatA'].forEach(h=>{ const cur=sh[h]||0, d=HD[h]; if(d>0) add(h,'gain',d,'Shady rooms ('+zn+' space)'); if(d<0) add(h,'spend',Math.min(cur,-d),'Heat-reducing rooms'); add(h,'spend',Math.min(2,Math.max(0,cur+d)),'Natural decay'); });
     // apply credits & resources
     let bank=(sh.bank||0)+k.roomIncome+k.freight-k.up-k.fuel-k.dock;
     let rat=(sh.stock.rations||0)+raPos-raNeg-k.people;
     if(rat<0){ const buy=-rat; add('rations','gain',buy,'Bought from outside'); const bc=Math.round(buy*RATION_CR); add('credits','spend',bc,'Bought '+buy.toLocaleString()+' rations'); bank-=bc; rat=0; }
     sh.bank=bank; sh.stock.rations=rat; sh.stock.components=(sh.stock.components||0)+coPos-coNeg; sh.stock.data=(sh.stock.data||0)+daPos-daNeg;
-    sh.renown=(sh.renown||0)+k.renownDay; sh.heat=Math.max(0,(sh.heat||0)+k.he-2);
+    sh.renown=(sh.renown||0)+k.renownDay; sh.heatFP=Math.max(0,Math.max(0,(sh.heatFP||0)+HD.heatFP)-2); sh.heatA=Math.max(0,Math.max(0,(sh.heatA||0)+HD.heatA)-2);
     // containers
     const finds=[]; const rate=Math.min(sortRate(),sh.containers||0); const found={credits:0,rations:0,components:0,data:0,items:0};
     for(let c=0;c<rate;c++){ const r=rollContainer(); applyLoot(sh,r.g); finds.push(lootText(r)); found.credits+=r.g.credits; found.rations+=r.g.rations; found.components+=r.g.components; found.data+=r.g.data; found.items+=r.g.items.length; }
@@ -1704,7 +1708,7 @@ function shipReportsPanel(){ const sh=ship(); const reps=sh.reports||[];
       return `<div class="report"><div class="rhead" onclick="S.shipReportOpen=${r.day};renderMain()"><b>Day ${r.from!=null?r.from+' → '+r.day:r.day}</b><span class="mono" style="color:${(r.net||0)>=0?'var(--good)':'var(--danger)'}">${r.net!=null?((r.net>=0?'+':'−')+cr(Math.abs(r.net))):''}</span></div>
         ${open?`${r.res?`<div style="overflow-x:auto">${resTable(r.res)}</div>`:''}${(r.lines||[]).length?`<ul>${r.lines.map(l=>`<li>${esc(l)}</li>`).join('')}</ul>`:''}${(r.finds||[]).length?`<div class="eyebrow" style="margin:8px 0 2px">Containers opened (${r.finds.length})</div><ul class="finds">${r.finds.map(f=>`<li>${esc(f)}</li>`).join('')}</ul>`:''}`:''}</div>`; }).join('')||'<div class="empty" style="padding:8px">Advance the day to generate the first report.</div>')+`</div></div>`; }
 /* manual resource adjustments (logged into the current day's report) */
-const STORE_ROWS=[['rations','Rations','stock'],['components','Components','stock'],['data','Data','stock'],['renown','Renown','top'],['heat','Heat','top'],['containers','Containers','top'],['bank','Credits (bank)','top']];
+const STORE_ROWS=[['rations','Rations','stock'],['components','Components','stock'],['data','Data','stock'],['renown','Renown','top'],['heatFP','Heat · Frontier','top'],['heatA','Heat · Althus','top'],['containers','Containers','top'],['bank','Credits (bank)','top']];
 function resGet(sh,key,where){ return where==='stock'?(sh.stock[key]||0):(sh[key]||0); }
 function adjustRes(key,sign){ const sh=ship(); const row=STORE_ROWS.find(r=>r[0]===key); if(!row) return; const [_,lab,where]=row;
   modal(`<div class="modal" style="width:min(380px,94vw)"><div class="modal-h"><h3>${sign>0?'Add':'Use'} ${esc(lab)}</h3><button class="x" onclick="closeModal()">×</button></div>
@@ -1732,6 +1736,79 @@ function shipReset(){ if(!isDM()) return toast('DM only','Sign in as Dungeon Mas
   modal(`<div class="modal" style="width:min(400px,94vw)"><div class="modal-h"><h3>Reset ${esc(ship().name)}?</h3><button class="x" onclick="closeModal()">\u00d7</button></div>
    <div class="modal-b"><p style="font-size:13px;color:var(--ink-mid);margin:0 0 12px">Rebuilds the starting ship at Day 1: starting rooms, empty bank, \u25c810M TCA debt, 150,000 containers. Reports, vault and history are cleared. Pilot sheets are not touched.</p>
    <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn sec" onclick="closeModal()">Cancel</button><button class="btn" style="background:var(--danger)" onclick="closeModal();S.ship=defaultShip();ship();shipLog(shipWho()+' reset the ship to Day 1');saveShip();S.shipSel=null;renderMain();toast('Ship reset','Day 1')">Reset to Day 1</button></div></div></div>`); }
+
+
+/* ============================ SHIP V: faction heat, zones, room actions ============================ */
+const ZONES=[['althus','Althusian'],['neutral','Neutral'],['frontier','Frontier']];
+const __ship0=ship;
+ship=function(){ const sh=__ship0(); if(sh.heatFP==null){ sh.heatFP=sh.heat||0; sh.heatA=sh.heat||0; } if(!sh.zone) sh.zone='neutral'; if(!sh.used) sh.used={}; return sh; };
+function zoneKey(sh){ return sh.zone==='frontier'?'heatFP':sh.zone==='althus'?'heatA':null; }
+// Daily heat from rooms lands on whoever controls the zone. Neutral space: no gain; heat-reducing rooms still work on both.
+function heatDaily(sh,he){ const z=zoneKey(sh), d={heatFP:0,heatA:0};
+  if(he>0){ if(z) d[z]=he; } else if(he<0){ if(z) d[z]=he; else { d.heatFP=he; d.heatA=he; } } return d; }
+function heatShift(sh,amt){ const z=zoneKey(sh); const ks=z?[z]:['heatFP','heatA']; ks.forEach(k=>sh[k]=Math.max(0,(sh[k]||0)+amt)); return ks; }
+function setZone(v){ const sh=ship(); const z=ZONES[+v]?ZONES[+v][0]:'neutral'; if(sh.zone===z) return; sh.zone=z; shipLog(shipWho()+' moved the ship into '+ZONES.find(x=>x[0]===z)[1]+' space'); saveShip(); renderMain(); }
+function zoneSlider(sh){ const ix=ZONES.findIndex(z=>z[0]===sh.zone);
+  return `<div class="zonebox"><div class="zonelabs">${ZONES.map((z,i)=>`<span class="${i===ix?'on':''}" onclick="setZone(${i})">${z[1]}</span>`).join('')}</div><input type="range" min="0" max="2" step="1" value="${ix<0?1:ix}" onchange="setZone(this.value)" class="zone-${sh.zone}"></div>`; }
+/* Room actions: spend Components / Data in special or upgraded rooms. Once per room per day. */
+// fx: bank, renown, components, data, containers, heat (current zone; both in neutral), heatBoth. vault = item name sent to the Ship Vault. note = logged boon.
+const ROOM_ACTIONS={
+  'Engineering Core':[{n:'Emergency Overhaul',co:10,note:'Remove one system damage from the ship or a docked mech.'}],
+  'Ship Bridge':[{n:'Spoof IFF',up:'Ghost Transponder',da:5,fx:{heat:-5},note:'Fake transponder codes for the local patrols.'}],
+  'Engineering Workshop':[{n:'Field Repairs',co:5,note:'Fully repair one broken item, or restore a mech to full Hull.'},{n:'Scrap Run',up:'Salvage Line',fx:{components:8,heat:1},note:'Strip derelict parts from the lanes.'}],
+  'Fabrication Forge':[{n:'Reforge',co:10,note:'Swap one weapon or armor property (damage type, Finesse / Reach) until next cycle.'},{n:'Press Ammo',co:3,vault:'Power Cell Crate (10 reloads)'}],
+  'Droid Bay':[{n:'Refurbish Droid',co:5,vault:'Refurbished Utility Droid'}],
+  'Medbay':[{n:'Synthesize Medpacs',co:3,vault:'Medpac x2'}],
+  'Hospital':[{n:'Surgical Theater',co:6,da:2,note:'One pilot removes a lasting injury or one level of exhaustion.'}],
+  'Laboratory':[{n:'Analyze Sample',da:5,note:'Learn a creature, toxin or tech weakness: +2 on related checks this mission.'},{n:'Brew Stims',co:4,vault:'Adrenal Stim x2'}],
+  'Datavault Library':[{n:'Deep Research',da:5,note:'+2 on one Research / Intelligence check (party).'}],
+  'Deep Archive':[{n:'Data Auction',up:'Data Auctions',da:20,fx:{bank:1000},note:'Auction sealed files to the highest bidder.'},{n:'Cold Case',da:10,note:'Uncover one secret about a faction, person or job target.'}],
+  'Netrunner Den':[{n:'Scrub Records',da:10,fx:{heatBoth:-4},note:'Wipe the crew from Frontier and Althusian databases.'},{n:'Sell Intel',up:'Data Brokerage',da:10,fx:{bank:450}},{n:'Hack Contract',co:3,da:6,note:'Advantage on one slicing / computer check next mission.'}],
+  'Holonet Uplink':[{n:'PR Campaign',da:10,fx:{renown:10}},{n:'Bury the Story',up:'Encrypted Relay',da:8,fx:{heat:-6}}],
+  'Forgery Den':[{n:'Forge Papers',da:5,fx:{heatBoth:-2},note:'Fresh IDs for the crew.'},{n:'Clean Manifest',up:'Ghost Manifests',co:5,da:10,fx:{heat:-8}}],
+  'Chop Shop':[{n:'Strip a Hull',fx:{components:15,heat:2},note:'Part out a "found" ship.'},{n:'Scrub Transponders',up:'Transponder Scrubber',co:10,fx:{heat:-6}}],
+  "Smuggler's Hold":[{n:'Run Contraband',co:10,fx:{bank:1500,heat:3}}],
+  'Open Market':[{n:'Sell Salvage',co:10,fx:{bank:500}},{n:'Sell Data',da:10,fx:{bank:250}},{n:'Black Market Sale',up:'Black Market Row',co:10,fx:{bank:800,heat:1}}],
+  'Bonded Warehouse':[{n:'Bulk Freight Sale',co:25,fx:{bank:1400}}],
+  'Council Meeting Chamber':[{n:'Diplomatic Gift',co:15,da:10,fx:{heat:-10},note:'Smooth things over with whoever controls this space.'}],
+  'Syndicate Hall':[{n:'Call in a Favor',da:10,fx:{heat:-5}}],
+  'Tactical Command Center':[{n:'Intel Briefing',da:5,note:'Party has advantage on initiative at the start of the next mission.'}],
+  'AI Combat Simulator':[{n:'Scenario Sim',da:8,note:'Advantage on the first attack roll of the next mission.'}],
+  'Armory':[{n:'Arm the Militia',co:20,note:'Next boarding or ship Event fight: residents hold the line (+5 to repel).'}],
+  'Mech Bay':[{n:'Mech Overhaul',co:10,note:'One mech returns to full Hull, Armor and Shields.'}],
+  'Ship Hangar':[{n:'Launch Prep',co:4,note:'Mechs deploy with +10 ft speed on the first round.'}],
+  'Cyberclinic':[{n:'Chrome Tune-up',co:5,da:3,note:'Reset one cybernetic\'s limited uses.'}],
+  'Ripperdoc Cyberware Table':[{n:'Back-Alley Install',co:8,fx:{heat:1},note:'Install a standard cybernetic without the usual wait.'}],
+  'Trophy Gallery':[{n:'New Exhibit',co:5,fx:{renown:5}}],
+  'Neon Holo-Theater':[{n:'Propaganda Reel',da:6,fx:{renown:5,heat:-2}}],
+  'Container Sorting Room':[{n:'Deep Scan',up:'Salvage Scanner',da:5,fx:{containers:-1,components:10,data:3},note:'Scan and strip one extra container for parts.'}],
+  'Supercharger Station':[{n:'Overcharge Cells',co:4,note:'Each pilot regains 2 Tech Points.'}],
+  'Soothsayer':[{n:'Read the Lanes',da:4,note:'DM reveals one hint about the next ship Event.'}],
+};
+function roomActionList(){ const out=[]; ship().cells.forEach(c=>{ if(!c||c.span!=null||!c.room) return;
+  (ROOM_ACTIONS[c.room]||[]).forEach(a=>{ if(a.up&&!(c.upgrades||[]).includes(a.up)) return; if(!out.find(o=>o.room===c.room&&o.a.n===a.n)) out.push({room:c.room,a}); }); }); return out; }
+function fxText(a){ const f=a.fx||{}, L=[];
+  if(f.bank) L.push('+'+cr(f.bank)); if(f.components) L.push('+'+f.components+' components'); if(f.data) L.push('+'+f.data+' data'); if(f.renown) L.push('+'+f.renown+' renown');
+  if(f.heat) L.push((f.heat>0?'+':'')+f.heat+' heat (zone)'); if(f.heatBoth) L.push(f.heatBoth+' heat (FP & Althus)'); if(a.vault) L.push(a.vault+' to Vault'); return L.join(' · '); }
+function doRoomAction(ix){ const sh=ship(); const it=roomActionList()[ix]; if(!it) return; const {room,a}=it; const key=room+'|'+a.n;
+  if(sh.used[key]===sh.day) return toast('Already used today','Once per room per day');
+  if((a.co||0)>(sh.stock.components||0)) return toast('Not enough Components','Need '+a.co+', have '+(sh.stock.components||0));
+  if((a.da||0)>(sh.stock.data||0)) return toast('Not enough Data','Need '+a.da+', have '+(sh.stock.data||0));
+  const f=a.fx||{}; if(f.containers&&(sh.containers||0)<-f.containers) return toast('No containers left','');
+  sh.stock.components=(sh.stock.components||0)-(a.co||0); sh.stock.data=(sh.stock.data||0)-(a.da||0);
+  if(f.bank) sh.bank=(sh.bank||0)+f.bank; if(f.renown) sh.renown=(sh.renown||0)+f.renown; if(f.components) sh.stock.components+=f.components; if(f.data) sh.stock.data+=f.data;
+  if(f.containers) sh.containers=(sh.containers||0)+f.containers; if(f.heat) heatShift(sh,f.heat); if(f.heatBoth){ sh.heatFP=Math.max(0,sh.heatFP+f.heatBoth); sh.heatA=Math.max(0,sh.heatA+f.heatBoth); }
+  if(a.vault) sh.vault=[...(sh.vault||[]),{key:uid(),name:a.vault,cat:'gear',src:roomLabel(room),day:sh.day}];
+  sh.used[key]=sh.day;
+  const cost=[a.co?a.co+' components':null,a.da?a.da+' data':null].filter(Boolean).join(', ');
+  const line=shipWho()+' used '+roomLabel(room)+': '+a.n+(cost?' (-'+cost+')':'')+(fxText(a)?' -> '+fxText(a):'')+(a.note?' - '+a.note:'');
+  shipLog(line); addReportLine(sh,line); saveShip(); toast(a.n,a.note||fxText(a)); renderMain(); }
+function roomActionsPanel(){ const sh=ship(); const L=roomActionList();
+  return `<div class="panel" style="margin-top:14px"><div class="panel-h"><h3>Room Actions</h3><span class="status" style="margin-left:6px">spend Components & Data · once per room per day</span></div><div class="panel-b" style="padding:6px 14px">`+
+   (L.map(({room,a},ix)=>{ const used=sh.used[room+'|'+a.n]===sh.day, short=(a.co||0)>(sh.stock.components||0)||(a.da||0)>(sh.stock.data||0);
+     const cost=[a.co?a.co+' comp':null,a.da?a.da+' data':null].filter(Boolean).join(' + ')||'free';
+     return `<div class="actrow"><div><div class="n">${esc(a.n)} <small>${esc(roomLabel(room))}${a.up?' \u2605 '+esc(a.up):''}</small></div><div class="m">${esc([fxText(a),a.note].filter(Boolean).join(' \u2014 '))}</div></div><span class="mono cost">${cost}</span><button class="rbtn" ${used||short?'disabled':''} onclick="doRoomAction(${ix})">${used?'Used':'Use'}</button></div>`; }).join('')
+    ||'<div class="empty" style="padding:8px">Build special rooms (Netrunner Den, Forgery Den, Open Market...) or install upgrades to unlock actions.</div>')+`</div></div>`; }
 
 /* ============================ modals ============================ */
 function modal(html){ $('#modalRoot').innerHTML=`<div class="scrim" onclick="if(event.target===this)closeModal()">${html}</div>`; }
