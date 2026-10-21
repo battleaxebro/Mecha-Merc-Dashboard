@@ -369,6 +369,16 @@ textarea{resize:vertical;min-height:60px;font-size:12px}
 .pilot.shipbtn .avatar{background:var(--mech)}
 .debtbox{padding-left:14px;border-left:1px solid var(--line)}.debtval{font-size:20px;font-weight:600;color:var(--danger);cursor:pointer}
 .btn[disabled]{opacity:.4;cursor:not-allowed}
+.restab{width:100%;border-collapse:collapse;font-size:11.5px;margin:6px 0;font-variant-numeric:tabular-nums}
+.restab th{text-align:right;font-family:var(--f-display);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-dim);padding:4px 6px;border-bottom:1px solid var(--line)}
+.restab th:first-child,.restab td:first-child{text-align:left}
+.restab td{text-align:right;padding:4px 6px;border-bottom:1px solid var(--line-soft);font-family:var(--f-mono)}
+.restab td:first-child{font-family:var(--f-body);color:var(--ink)}
+.restab td.pos{color:var(--good)}.restab td.neg{color:var(--danger)}
+.restab tr.why td{font-family:var(--f-body);font-size:10.5px;color:var(--ink-faint);text-align:left;border-bottom:1px solid var(--line-soft);padding-top:0}
+.stores{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.store{border:1px solid var(--line);border-radius:var(--radius-sm);padding:8px 10px;background:var(--ground-2)}
+.store .sv{font-size:17px;font-weight:600;margin:2px 0}
 .report{border-bottom:1px solid var(--line-soft);padding:6px 0}.report:last-child{border-bottom:0}
 .report .rhead{display:flex;justify-content:space-between;cursor:pointer;font-size:12.5px}
 .report ul{margin:6px 0 2px;padding-left:18px;font-size:11.5px;color:var(--ink-mid)}.report ul.finds{color:var(--ink)}
@@ -1387,7 +1397,7 @@ function renderShip(){ const main=$('#main'); const sh=ship(); const k=shipCalc(
   grid+='</div>';
   const left=`<div class="panel"><div class="panel-h"><h3>Deck Plan</h3><span class="status" style="margin-left:6px">${SHIP_COLS}×${SHIP_ROWS}</span><span style="flex:1"></span><span class="status">click a room to edit or upgrade</span></div><div class="panel-b">${grid}</div></div>`;
   const right= S.shipSel!=null ? shipRoomPanel(S.shipSel) : shipLedger(k);
-  main.innerHTML=head+bank+stats+`<div class="shiplayout"><div>${left}${shipReportsPanel()}${shipAbilities()}</div><div>${right}${crewBenefitsPanel()}${vaultPanel()}${shipLogPanel()}</div></div>`;
+  main.innerHTML=head+bank+stats+storesPanel()+`<div class="shiplayout"><div>${left}${shipReportsPanel()}${shipAbilities()}</div><div>${right}${crewBenefitsPanel()}${vaultPanel()}${shipLogPanel()}</div></div>`;
 }
 function shipLedger(k){ const sh=ship(); const row=(a,b,c)=>`<div class="bonusrow ${c||''}"><span>${a}</span><b>${b}</b></div>`;
   return `<div class="panel"><div class="panel-h"><h3>Daily Ledger</h3><span style="flex:1"></span><span class="status">${sh.flying?'flying':'docked'}</span></div><div class="panel-b" style="padding:6px 14px">
@@ -1622,6 +1632,73 @@ function contributeBank(){ const c=S.chars[S.identity]; if(!c) return toast('Pic
   askNum(c.name+' pays into the ship bank (has '+cr(c.credits)+')',Math.min(1000,c.credits),v=>{ if(v==null) return; const amt=Math.max(0,Math.min(Math.round(v),c.credits||0)); if(!amt) return;
     const sh=ship(); c.credits-=amt; saveChar(c); sh.bank=(sh.bank||0)+amt; const line=c.name+' paid '+cr(amt)+' into the ship bank'; shipLog(line); addReportLine(sh,line); saveShip();
     toast('Contributed',cr(amt)+' from '+c.name); renderMain(); }); }
+
+/* ============================ SHIP IV: per-resource daily ledger (overrides earlier shipAdvance/report panel) ============================ */
+const RES_ROWS=[['credits','Credits',v=>cr(v)],['rations','Rations',v=>Math.round(v).toLocaleString()],['components','Components',v=>Math.round(v).toLocaleString()],['data','Data',v=>Math.round(v).toLocaleString()],
+  ['renown','Renown',v=>Math.round(v).toLocaleString()],['heat','Heat',v=>Math.round(v).toLocaleString()],['containers','Containers',v=>Math.round(v).toLocaleString()],['debt','TCA Debt',v=>cr(v)]];
+function shipSnap(sh){ return {credits:sh.bank||0,rations:sh.stock.rations||0,components:sh.stock.components||0,data:sh.stock.data||0,renown:sh.renown||0,heat:sh.heat||0,containers:sh.containers||0,debt:sh.debt||0}; }
+function shipAdvance(n){ const sh=ship(); let tot=0;
+  for(let day=0;day<n;day++){ const k=shipCalc(); const start=shipSnap(sh);
+    const R={}; RES_ROWS.forEach(([key])=>R[key]={start:start[key],gain:[],spend:[]});
+    const add=(key,side,amt,why)=>{ if(amt) R[key][side].push([why,Math.round(amt)]); };
+    // credits
+    add('credits','gain',k.roomIncome,'Room income (morale ×'+k.mult+')'); add('credits','gain',k.freight,'Freight ('+k.freeHolds+' holds)');
+    add('credits','spend',k.up,'Room upkeep & wages'); add('credits','spend',k.fuel,'Fuel'); add('credits','spend',k.dock,'Docking fees');
+    // rations: production split by room
+    let raPos=0,raNeg=0,coPos=0,coNeg=0,daPos=0,daNeg=0;
+    sh.cells.forEach(c=>{ if(!c||c.span!=null) return; const s=roomStats(c); if(!s) return; if(s.ra>0)raPos+=s.ra; else raNeg-=s.ra; if(s.co>0)coPos+=s.co; else coNeg-=s.co; if(s.da>0)daPos+=s.da; else daNeg-=s.da; });
+    add('rations','gain',raPos,'Grown & cooked by rooms'); add('rations','spend',raNeg,'Used by kitchens & bars'); add('rations','spend',k.people,'Eaten by '+k.people.toLocaleString()+' people');
+    add('components','gain',coPos,'Produced by rooms'); add('components','spend',coNeg,'Consumed by rooms');
+    add('data','gain',daPos,'Produced by rooms'); add('data','spend',daNeg,'Consumed by rooms');
+    add('renown','gain',k.renownDay,'Earned by rooms'+(k.tier==='Family'?' (+1 Family morale)':''));
+    add('heat','gain',k.he,'Shady rooms'); add('heat','spend',Math.min(2,(sh.heat||0)+k.he),'Natural decay');
+    // apply credits & resources
+    let bank=(sh.bank||0)+k.roomIncome+k.freight-k.up-k.fuel-k.dock;
+    let rat=(sh.stock.rations||0)+raPos-raNeg-k.people;
+    if(rat<0){ const buy=-rat; add('rations','gain',buy,'Bought from outside'); add('credits','spend',buy*10,'Bought '+buy.toLocaleString()+' rations'); bank-=buy*10; rat=0; }
+    sh.bank=bank; sh.stock.rations=rat; sh.stock.components=(sh.stock.components||0)+coPos-coNeg; sh.stock.data=(sh.stock.data||0)+daPos-daNeg;
+    sh.renown=(sh.renown||0)+k.renownDay; sh.heat=Math.max(0,(sh.heat||0)+k.he-2);
+    // containers
+    const finds=[]; const rate=Math.min(sortRate(),sh.containers||0); const found={credits:0,rations:0,components:0,data:0,items:0};
+    for(let c=0;c<rate;c++){ const r=rollContainer(); applyLoot(sh,r.g); finds.push(lootText(r)); found.credits+=r.g.credits; found.rations+=r.g.rations; found.components+=r.g.components; found.data+=r.g.data; found.items+=r.g.items.length; }
+    sh.containers=(sh.containers||0)-rate;
+    add('credits','gain',found.credits,'Found in containers'); add('rations','gain',found.rations,'Found in containers'); add('components','gain',found.components,'Found in containers'); add('data','gain',found.data,'Found in containers');
+    add('containers','spend',rate,'Broken down by sorting rooms');
+    sh.day=(sh.day||1)+1; const end=shipSnap(sh); RES_ROWS.forEach(([key])=>R[key].end=end[key]);
+    const net=end.credits-start.credits; tot+=net;
+    const notes=[found.items?found.items+' special item'+(found.items>1?'s':'')+' sent to the Ship Vault':null, k.pw<0?'Power brownout ('+k.pw+'): some rooms offline':null,
+      k.over?(k.people-k.bunks).toLocaleString()+' people without housing (−2 Morale)':null].filter(Boolean);
+    sh.reports=[{day:sh.day,from:sh.day-1,res:R,lines:notes,finds,net,t:Date.now()},...(sh.reports||[])].slice(0,40); }
+  shipLog(shipWho()+' advanced '+n+' day'+(n>1?'s':'')+' → Day '+sh.day+' ('+(tot>=0?'+':'')+cr(tot)+')'); saveShip();
+  S.shipReportOpen=sh.day; toast('Day '+sh.day+' report',(tot>=0?'+':'')+cr(tot)); renderMain(); }
+function resTable(R){ return `<table class="restab"><thead><tr><th>Resource</th><th>Start</th><th>Gained</th><th>Spent</th><th>End</th><th>Change</th></tr></thead><tbody>`+
+  RES_ROWS.map(([key,lab,f])=>{ const r=R[key]; if(!r) return ''; const g=r.gain.reduce((t,x)=>t+x[1],0), s=r.spend.reduce((t,x)=>t+x[1],0), ch=r.end-r.start;
+    const tip=[...r.gain.map(x=>'+'+f(x[1])+' '+x[0]),...r.spend.map(x=>'−'+f(x[1])+' '+x[0])];
+    return `<tr><td>${lab}</td><td>${f(r.start)}</td><td class="pos">${g?'+'+f(g):'—'}</td><td class="neg">${s?'−'+f(s):'—'}</td><td><b>${f(r.end)}</b></td><td class="${ch>0?'pos':ch<0?'neg':''}">${ch?(ch>0?'+':'−')+f(Math.abs(ch)):'0'}</td></tr>`+
+      (tip.length?`<tr class="why"><td></td><td colspan="5">${tip.map(esc).join(' · ')}</td></tr>`:''); }).join('')+`</tbody></table>`; }
+function shipReportsPanel(){ const sh=ship(); const reps=sh.reports||[];
+  return `<div class="panel" style="margin-top:14px"><div class="panel-h"><h3>Daily Reports</h3><span class="status" style="margin-left:6px">${reps.length}</span><span style="flex:1"></span><span class="status">click a day to expand</span></div><div class="panel-b" style="padding:6px 14px;max-height:620px;overflow:auto">`+
+    (reps.map((r,ix)=>{ const open=S.shipReportOpen===r.day||(S.shipReportOpen==null&&ix===0);
+      return `<div class="report"><div class="rhead" onclick="S.shipReportOpen=${r.day};renderMain()"><b>Day ${r.from!=null?r.from+' → '+r.day:r.day}</b><span class="mono" style="color:${(r.net||0)>=0?'var(--good)':'var(--danger)'}">${r.net!=null?((r.net>=0?'+':'−')+cr(Math.abs(r.net))):''}</span></div>
+        ${open?`${r.res?`<div style="overflow-x:auto">${resTable(r.res)}</div>`:''}${(r.lines||[]).length?`<ul>${r.lines.map(l=>`<li>${esc(l)}</li>`).join('')}</ul>`:''}${(r.finds||[]).length?`<div class="eyebrow" style="margin:8px 0 2px">Containers opened (${r.finds.length})</div><ul class="finds">${r.finds.map(f=>`<li>${esc(f)}</li>`).join('')}</ul>`:''}`:''}</div>`; }).join('')||'<div class="empty" style="padding:8px">Advance the day to generate the first report.</div>')+`</div></div>`; }
+/* manual resource adjustments (logged into the current day's report) */
+const STORE_ROWS=[['rations','Rations','stock'],['components','Components','stock'],['data','Data','stock'],['renown','Renown','top'],['heat','Heat','top'],['containers','Containers','top'],['bank','Credits (bank)','top']];
+function resGet(sh,key,where){ return where==='stock'?(sh.stock[key]||0):(sh[key]||0); }
+function adjustRes(key,sign){ const sh=ship(); const row=STORE_ROWS.find(r=>r[0]===key); if(!row) return; const [_,lab,where]=row;
+  modal(`<div class="modal" style="width:min(380px,94vw)"><div class="modal-h"><h3>${sign>0?'Add':'Use'} ${esc(lab)}</h3><button class="x" onclick="closeModal()">×</button></div>
+   <div class="modal-b"><div style="font-size:12px;color:var(--ink-mid);margin-bottom:8px">Current: <b class="mono">${resGet(sh,key,where).toLocaleString()}</b></div>
+   <label class="fld"><span>Amount</span><input id="resamt" type="number" min="0" value="" placeholder="0" style="font-size:18px"></label>
+   <label class="fld"><span>What for (logged in today's report)</span><input id="resnote" placeholder="${sign>0?'e.g. salvage from the mission':'e.g. repaired the mech'}"></label>
+   <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn sec" onclick="closeModal()">Cancel</button><button class="btn" id="resok">${sign>0?'Add':'Use'}</button></div></div></div>`);
+  setTimeout(()=>{const i=document.getElementById('resamt'); if(i) i.focus();},40);
+  document.getElementById('resok').onclick=()=>{ const amt=Math.abs(Math.round(+document.getElementById('resamt').value||0)); const note=document.getElementById('resnote').value.trim(); closeModal(); if(!amt) return;
+    const cur=resGet(sh,key,where); if(sign<0&&amt>cur&&key!=='bank') return toast('Not enough '+lab,'Have '+cur.toLocaleString());
+    const nv=cur+sign*amt; if(where==='stock') sh.stock[key]=nv; else sh[key]=nv;
+    const line=shipWho()+(sign>0?' added ':' used ')+amt.toLocaleString()+' '+lab.toLowerCase()+(note?' — '+note:'')+' ('+nv.toLocaleString()+' now)';
+    shipLog(line); addReportLine(sh,'Manual: '+line); saveShip(); toast(sign>0?'Added':'Used',amt.toLocaleString()+' '+lab); renderMain(); }; }
+function storesPanel(){ const sh=ship();
+  return `<div class="panel" style="margin-bottom:14px"><div class="panel-h"><h3>Ship Stores</h3><span style="flex:1"></span><span class="status">add or use resources by hand — logged to today's report</span></div><div class="panel-b"><div class="stores">`+
+    STORE_ROWS.map(([key,lab,where])=>`<div class="store"><div class="eyebrow">${lab}</div><div class="mono sv">${key==='bank'?cr(resGet(sh,key,where)):resGet(sh,key,where).toLocaleString()}</div><div class="step"><button onclick="adjustRes('${key}',-1)" title="Use">−</button><button onclick="adjustRes('${key}',1)" title="Add">+</button></div></div>`).join('')+`</div></div></div>`; }
 
 /* ============================ modals ============================ */
 function modal(html){ $('#modalRoot').innerHTML=`<div class="scrim" onclick="if(event.target===this)closeModal()">${html}</div>`; }
