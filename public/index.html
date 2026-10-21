@@ -1267,9 +1267,17 @@ const ROOM_SCALE={ // what one grid square represents on a 3 km city-ship
   'Noodle Bar':1,'Boxing Gym':1,'Deathstick Den':1,'Soothsayer':1,'Deep Archive':1,'Reliquary Vault':1,'Sensory Deprivation Tank':1,'Ripperdoc Cyberware Table':1 };
 const SCALE_NAME={1000:'District',100:'Complex',10:'Venue',1:'Single'};
 function rscale(room){ const o=ovr(room); return o.scale!=null?o.scale:(ROOM_SCALE[room]!=null?ROOM_SCALE[room]:100); }
-const COST_SCALE={1000:10000,100:500,10:20,1:1};
+const COST_SCALE={1000:200,100:20,10:5,1:1};
+const MONEY_SCALE={1000:10,100:3,10:2,1:1}; // credits flow much smaller than people/food at city scale
+function mscale(room){ const n=rscale(room); return MONEY_SCALE[n]!=null?MONEY_SCALE[n]:1; }
+const RATION_CR=0.01; // bulk food at city scale: 10 cr per 1,000 rations
+function topTier(u){ return u.tier===Math.max(...SHIPRULES.upgrades.filter(x=>x.room===u.room).map(x=>x.tier)); }
+function capPrice(room,v,top){ const lim=(rscale(room)>=1000||top)?10000000:999999; return Math.min(lim,Math.round(v)); }
+function roomPrice(room,base){ return capPrice(room,(base||0)*cscale(room),false); }
+function upPrice(u){ return capPrice(u.room,(u.cost||0)*cscale(u.room),topTier(u)); }
 function cscale(room){ const n=rscale(room); return COST_SCALE[n]!=null?COST_SCALE[n]:n*10; }
 function scaleName(n){ return SCALE_NAME[n]||('×'+n); }
+let FUEL_DEFAULT=4000;
 function SC(){ return (S.ship&&+S.ship.scale)||1; }
 const SQ={Pod:4,Hold:16,Deck:36}; const SCALEK=['crew','up','inc','ra','co','da','bu','pw'];
 const SHIP_START_CFG={'Bunk Pods':{size:'Deck'},'Mess Hall':{size:'Deck',upgrades:["Chef's Galley"]}};
@@ -1294,14 +1302,17 @@ function migrateShip(sh){ // v2: room sizes. Re-flow the grid, enlarge dorms + m
   const rooms=sh.cells.filter(c=>c&&c.span==null);
   rooms.forEach(c=>{ const cfg=SHIP_START_CFG[c.room]; if(cfg&&cfg.size&&!c.size){ c.size=cfg.size; (cfg.upgrades||[]).forEach(u=>{ if(!(c.upgrades||[]).includes(u)) c.upgrades=[...(c.upgrades||[]),u]; }); } });
   const cells=Array(SHIP_COLS*SHIP_ROWS).fill(null); rooms.forEach(c=>placeRoom(cells,c)); sh.cells=cells; sh.v=2; }
-function saveShip(){ const sh=ship(); if(S.db){ S.db.doc('ship/eugene').set(sh).catch(()=>{}); } else if(typeof socket!=='undefined'&&socket){ socket.emit('write',{auth:authPayload(),collection:'ship',id:'eugene',data:sh}); } }
+function shipClean(sh){ sh.reports=(sh.reports||[]).slice(0,20); sh.log=(sh.log||[]).slice(0,40);
+  sh.vault=(sh.vault||[]).map(v=>({...v,item:v.item?{name:v.item.name,category:v.item.category,rarity:v.item.rarity||null,cost:v.item.cost||0,slotType:v.item.slotType||null,mount:v.item.mount||null,equipType:v.item.equipType||null,subtype:v.item.subtype||null,properties:v.item.properties||null,weight:v.item.weight||0,description:(v.item.description||'').slice(0,300)}:null}));
+  return JSON.parse(JSON.stringify(sh)); }
+function saveShip(){ const sh=ship(); const clean=shipClean(sh); S.ship=clean; if(S.db){ S.db.doc('ship/eugene').set(clean).catch(e=>{ console.error('ship save failed',e); toast('Ship save failed',(e&&e.code)||'try again'); }); } else if(typeof socket!=='undefined'&&socket){ socket.emit('write',{auth:authPayload(),collection:'ship',id:'eugene',data:clean}); } }
 function shipLog(msg){ const sh=ship(); sh.log=[{t:Date.now(),day:sh.day,msg},...(sh.log||[])].slice(0,40); }
 function shipWho(){ return S.identity==='dm'?'DM':((S.chars[S.identity]||{}).name||'Someone'); }
 function upgradesFor(room){ return SHIPRULES.upgrades.map((u,i)=>({...u,i})).filter(u=>u.room===room).sort((a,b)=>a.tier-b.tier); }
 function roomStats(cell){ const r=ROOMS[cell.room]; if(!r) return null; const s={cf:r.cf}; const m=(SQ[cellSize(cell)]||16)/(SQ[r.space]||16);
-  STATK.forEach(k=>s[k]=SCALEK.includes(k)?Math.round((r[k]||0)*m*rscale(cell.room)):(r[k]||0));
+  STATK.forEach(k=>s[k]=SCALEK.includes(k)?Math.round((r[k]||0)*m*((k==='up'||k==='inc')?mscale(cell.room):rscale(cell.room))):(r[k]||0));
   const o=ovr(cell.room); STATK.forEach(k=>{ if(o[k]!=null) s[k]=o[k]; });
-  (cell.upgrades||[]).forEach(un=>{ const u=SHIPRULES.upgrades.find(x=>x.room===cell.room&&x.n===un); if(u) STATK.forEach(k=>s[k]+=(u[k]||0)*(SCALEK.includes(k)?rscale(cell.room):1)); }); return s; }
+  (cell.upgrades||[]).forEach(un=>{ const u=SHIPRULES.upgrades.find(x=>x.room===cell.room&&x.n===un); if(u) STATK.forEach(k=>s[k]+=(u[k]||0)*(SCALEK.includes(k)?((k==='up'||k==='inc')?mscale(cell.room):rscale(cell.room)):1)); }); return s; }
 function heatTier(h){ return h>=75?'Kill Order':h>=50?'Most Wanted':h>=25?'Hunted':h>=10?'Watched':'Cold'; }
 function renownTier(r){ const T=[[5000,'Myth'],[2000,'Legend of the Lanes'],[1000,'Name in Lights'],[750,'Syndicate Player'],[500,'Port Favorite'],[300,'Street Legend'],[150,'Trusted Crew'],[50,'Known Hauler'],[0,'Nobody']]; return T.find(t=>r>=t[0])[1]; }
 function shipCalc(){ const sh=ship(); const t={inc:0,incCF:0,rooms:0,used:0}; STATK.forEach(k=>{ if(k!=='inc') t[k]=0; });
@@ -1312,9 +1323,9 @@ function shipCalc(){ const sh=ship(); const t={inc:0,incCF:0,rooms:0,used:0}; ST
   const tier=morale<=-5?['Mutinous',0.8]:morale<=-1?['Grumbling',0.9]:morale<=4?['Steady',1]:morale<=9?['Loyal',1.1]:['Family',1.2];
   const famous=(sh.renown||0)>=1000;
   const roomIncome=Math.round((t.inc+t.incCF*((sh.flying&&!famous)?0.5:1))*tier[1]);
-  const freeHolds=Math.max(0,(+sh.holds||0)-t.used), freight=sh.flying?freeHolds*120*SC():0;
-  const fuel=sh.flying?1000*SC():0, dock=(!sh.flying&&(sh.renown||0)<500)?200*SC():0;
-  const rationBal=t.ra-people, rationBuy=rationBal<0?-rationBal*10:0;
+  const freeHolds=Math.max(0,(+sh.holds||0)-t.used), freight=sh.flying?freeHolds*120:0;
+  const fuel=sh.flying?(sh.fuelCost!=null?+sh.fuelCost:FUEL_DEFAULT):0, dock=(!sh.flying&&(sh.renown||0)<500)?(sh.dockCost!=null?+sh.dockCost:1500):0;
+  const rationBal=t.ra-people, rationBuy=rationBal<0?Math.round(-rationBal*RATION_CR):0;
   const net=roomIncome+freight-t.up-fuel-dock-rationBuy;
   return {...t,people,bunks,over,morale,tier:tier[0],mult:tier[1],roomIncome,freight,freeHolds,fuel,dock,rationBal,rationBuy,net,renownDay:t.re+(tier[0]==='Family'?1:0),heatDay:t.he-2}; }
 
@@ -1331,19 +1342,19 @@ function shipPay(cost,what){ const sh=ship(); if(cost>(sh.bank||0)){ toast('Insu
 function shipBuild(i,pay){ const sh=ship(); const nm=(document.getElementById('shipNewRoom')||{}).value||S.shipPreview; const R=ROOMS[nm]; if(!R) return;
   const old=sh.cells[i]; const size=(old&&old.size)||R.space;
   if(size==='Deck' && !(old&&spans(old)===2) && !canSpan(sh.cells,i)){ toast(nm+' is a Deck room','It needs this square and the empty one to its right'); return; }
-  if(pay && !shipPay(R.cost*cscale(nm),nm)) return;
+  if(pay && !shipPay(roomPrice(nm,R.cost),nm)) return;
   if(old&&spans(old)===2&&size!=='Deck') sh.cells[i+1]=null;
   sh.cells[i]={room:nm,upgrades:[],...(old&&old.size?{size:old.size}:{})}; if(size==='Deck') sh.cells[i+1]={span:i}; S.shipPreview=null;
-  shipLog(shipWho()+(old?' converted '+old.room+' into ':' built ')+nm+(pay&&R.cost*cscale(nm)?' ('+cr(R.cost*cscale(nm))+')':' (no charge)')); saveShip(); renderMain(); }
+  shipLog(shipWho()+(old?' converted '+old.room+' into ':' built ')+nm+(pay&&roomPrice(nm,R.cost)?' ('+cr(roomPrice(nm,R.cost))+')':' (no charge)')); saveShip(); renderMain(); }
 function shipRemove(i){ const sh=ship(); const c=sh.cells[i]; if(!c) return; if(spans(c)===2) sh.cells[i+1]=null; sh.cells[i]=null; shipLog(shipWho()+' cleared '+c.room); S.shipSel=null; saveShip(); renderMain(); }
 function shipUpgrade(i,ui,pay){ const sh=ship(); const c=sh.cells[i]; const u=SHIPRULES.upgrades[ui]; if(!c||!u) return;
-  if(pay && !shipPay(u.cost*cscale(u.room),u.n)) return; c.upgrades=[...(c.upgrades||[]),u.n];
-  shipLog(shipWho()+' installed '+u.n+' in '+c.room+(pay&&u.cost*cscale(u.room)?' ('+cr(u.cost*cscale(u.room))+')':' (no charge)')); saveShip(); renderMain(); }
+  if(pay && !shipPay(upPrice(u),u.n)) return; c.upgrades=[...(c.upgrades||[]),u.n];
+  shipLog(shipWho()+' installed '+u.n+' in '+c.room+(pay&&upPrice(u)?' ('+cr(upPrice(u))+')':' (no charge)')); saveShip(); renderMain(); }
 const ENLARGE={Pod:['Hold',5000],Hold:['Deck',20000]};
 function shipEnlarge(i,pay){ const sh=ship(); const c=sh.cells[i]; if(!c) return; const z=cellSize(c); const e=ENLARGE[z]; if(!e) return;
   if(e[0]==='Deck' && !canSpan(sh.cells,i)){ toast('No room to enlarge','Clear the square to the right of '+c.room+' first'); return; }
-  if(pay && !shipPay(e[1]*cscale(c.room),'enlarge')) return; c.size=e[0]; if(e[0]==='Deck') sh.cells[i+1]={span:i};
-  shipLog(shipWho()+' enlarged '+c.room+' to a '+e[0]+(pay?' ('+cr(e[1]*cscale(c.room))+')':' (no charge)')); saveShip(); renderMain(); }
+  if(pay && !shipPay(roomPrice(c.room,e[1]),'enlarge')) return; c.size=e[0]; if(e[0]==='Deck') sh.cells[i+1]={span:i};
+  shipLog(shipWho()+' enlarged '+c.room+' to a '+e[0]+(pay?' ('+cr(roomPrice(c.room,e[1]))+')':' (no charge)')); saveShip(); renderMain(); }
 function shipOvrNum(i,k,label){ const sh=ship(); const c=sh.cells[+i]; if(!c)return; const cur=k==='scale'?rscale(c.room):roomStats(c)[k]; askNum(label+' — '+roomLabel(c.room),cur,v=>{ if(v==null)return; sh.overrides=sh.overrides||{}; sh.overrides[c.room]={...(sh.overrides[c.room]||{}),[k]:Math.round(v)}; shipLog(shipWho()+' set '+roomLabel(c.room)+' '+label+' to '+Math.round(v).toLocaleString()); saveShip(); renderMain(); }); }
 function shipOvrLabel(i){ const sh=ship(); const c=sh.cells[+i]; if(!c)return;
   modal(`<div class="modal" style="width:min(360px,94vw)"><div class="modal-h"><h3>Rename ${esc(roomLabel(c.room))}</h3><button class="x" onclick="closeModal()">×</button></div><div class="modal-b"><input id="ovlbl" value="${esc(roomLabel(c.room))}"><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button class="btn sec" onclick="closeModal()">Cancel</button><button class="btn" id="ovok">Save</button></div></div></div>`);
@@ -1386,7 +1397,7 @@ function renderShip(){ const main=$('#main'); const sh=ship(); const k=shipCalc(
     ${shipTile('Heat',(sh.heat||0),`${heatTier(sh.heat||0)} · ${sgn(k.heatDay)} / day`,(sh.heat||0)>=25?'neg':'',"shipEditNum('heat','Current Heat')")}
     ${shipTile('Renown',(sh.renown||0),`${renownTier(sh.renown||0)} · ${sgn(k.renownDay)} / day`,'',"shipEditNum('renown','Current Renown')")}
     ${shipTile('Jobs filled',k.crew.toLocaleString(),k.crew>k.people?'<span style="color:var(--danger)">'+(k.crew-k.people).toLocaleString()+' unfilled</span>':((k.people-k.crew).toLocaleString()+' unemployed'),k.crew>k.people?'neg':'')}
-    ${shipTile('Freight / fuel scale','×'+SC().toLocaleString(),'ship-wide trade &amp; fuel','',"shipEditNum('scale','Freight & fuel multiplier')")}
+    ${shipTile('Fuel / flight day',cr(sh.fuelCost!=null?sh.fuelCost:FUEL_DEFAULT),'docking '+cr(sh.dockCost!=null?sh.dockCost:1500)+'/day','',"shipEditNum('fuelCost','Fuel cost per flight day')")}
   </div>`;
   let grid='<div class="shipgrid">';
   sh.cells.forEach((c,i)=>{ if(c&&c.span!=null) return; const sel=S.shipSel===i?'sel':'';
@@ -1403,9 +1414,9 @@ function shipLedger(k){ const sh=ship(); const row=(a,b,c)=>`<div class="bonusro
   return `<div class="panel"><div class="panel-h"><h3>Daily Ledger</h3><span style="flex:1"></span><span class="status">${sh.flying?'flying':'docked'}</span></div><div class="panel-b" style="padding:6px 14px">
     ${row('Room income (morale ×'+k.mult+')',cr(k.roomIncome))}${row('Freight ('+k.freeHolds+' holds × 120)',cr(k.freight))}
     ${row('Room upkeep (wages + running)','−'+cr(k.up),'neg')}${sh.flying?row('Fuel','−'+cr(k.fuel),'neg'):row('Docking fees','−'+cr(k.dock),'neg')}
-    ${k.rationBuy?row('Ration purchases ('+(-k.rationBal)+' short)','−'+cr(k.rationBuy),'neg'):''}
+    ${k.rationBuy?row('Food purchases ('+(-k.rationBal).toLocaleString()+' short, 10 cr/1,000)','−'+cr(k.rationBuy),'neg'):''}
     <div class="bonusrow" style="border-top:1px solid var(--line-bright);margin-top:4px;padding-top:8px"><span><b style="color:var(--ink)">NET CREDITS / DAY</b></span><b style="color:${k.net>=0?'var(--good)':'var(--danger)'};font-size:15px">${k.net>=0?'+':''}${cr(k.net)}</b></div>
-    <p style="font-size:11px;color:var(--ink-faint);margin:10px 0 4px">Customer-facing rooms earn half while flying until Renown 1,000. Heat decays 2/day. Each person eats 1 ration/day; shortfalls are bought at 10 cr.</p>
+    <p style="font-size:11px;color:var(--ink-faint);margin:10px 0 4px">Customer-facing rooms earn half while flying until Renown 1,000. Heat decays 2/day. Each person eats 1 ration/day; shortfalls are bought in bulk at 10 cr per 1,000.</p>
     ${row('Unconverted cargo holds',`<button class="addbtn" onclick="shipEditNum('holds','Total cargo holds (unconverted + converted)')">${k.freeHolds} · edit</button>`)}
   </div></div>`; }
 function shipAbilities(){ const sh=ship(); const items=[];
@@ -1418,11 +1429,11 @@ function shipLogPanel(){ const sh=ship(); return `<div class="panel" style="marg
 function shipPreview(v){ S.shipPreview=v; renderMain(); }
 function shipRoomPanel(i){ const sh=ship(); const c=sh.cells[i]; const R=c?ROOMS[c.room]:null;
   const pv=S.shipPreview&&ROOMS[S.shipPreview]?ROOMS[S.shipPreview]:null;
-  const opts=SHIPRULES.rooms.map(r=>`<option value="${esc(r.n)}" ${(pv?pv.n:(c?c.room:''))===r.n?'selected':''}>${esc(roomLabel(r.n))} — ${scaleName(rscale(r.n))}, ${r.space}${r.cost*cscale(r.n)?' · '+cr(r.cost*cscale(r.n)):''}</option>`).join('');
+  const opts=SHIPRULES.rooms.map(r=>`<option value="${esc(r.n)}" ${(pv?pv.n:(c?c.room:''))===r.n?'selected':''}>${esc(roomLabel(r.n))} — ${scaleName(rscale(r.n))}, ${r.space}${roomPrice(r.n,r.cost)?' · '+cr(roomPrice(r.n,r.cost)):''}</option>`).join('');
   const target=pv||(!c?null:null);
   let h=`<div class="panel"><div class="panel-h"><h3>${c?esc(roomLabel(c.room)):'Empty cargo space'}</h3><span class="status" style="margin-left:6px">cell ${i+1}</span><span style="flex:1"></span><button class="x" onclick="shipSelect(${i})">×</button></div><div class="panel-b">`;
   if(R){ const s=roomStats(c); const z=cellSize(c); const e=ENLARGE[z]; h+=`<div style="font-size:12px;color:var(--ink-mid);margin-bottom:8px">${esc(R.cat)} · <b>${esc(z)}</b>${z!==R.space?' (base '+esc(R.space)+', output scaled ×'+(Math.round(SQ[z]/SQ[R.space]*100)/100)+')':''} · ${esc(R.type)}</div>
-      ${e?`<div class="acts" style="margin-bottom:8px"><button class="rbtn" onclick="shipEnlarge(${i},true)">Enlarge to ${e[0]} −${cr(e[1]*cscale(c.room))}</button><button class="rbtn ghost" onclick="shipEnlarge(${i},false)">Enlarge free</button></div>`:''}
+      ${e?`<div class="acts" style="margin-bottom:8px"><button class="rbtn" onclick="shipEnlarge(${i},true)">Enlarge to ${e[0]} −${cr(roomPrice(c.room,e[1]))}</button><button class="rbtn ghost" onclick="shipEnlarge(${i},false)">Enlarge free</button></div>`:''}
       <p style="font-size:12.5px;margin:0 0 8px">${esc(R.what||'')}</p>
       ${R.wo&&!/^None/.test(R.wo)?`<p style="font-size:12px;color:var(--ink-mid);margin:0 0 8px"><b>Work order:</b> ${esc(R.wo)}</p>`:''}
       ${R.draw?`<p style="font-size:12px;color:var(--danger);margin:0 0 8px"><b>Drawback:</b> ${esc(R.draw)}</p>`:''}
@@ -1434,22 +1445,22 @@ function shipRoomPanel(i){ const sh=ship(); const c=sh.cells[i]; const R=c?ROOMS
     const rp=(SHIP_PERKS[c.room]||[]); if(rp.length) h+=`<div class="upcard" style="border-style:dashed"><div style="font-size:11.5px"><b>${(c.upgrades||[]).length?'Player benefits (active)':'Upgrade to unlock player benefits'}:</b> ${rp.map(p=>esc(p.txt)+(p.v?' ('+p.v+'%)':'')).join(' \u00b7 ')}</div></div>`;
     h+=`<div class="sechead"><h3>Upgrades</h3><div class="ln"></div></div>`;
     h+= ups.length? ups.map(u=>{ const owned=(c.upgrades||[]).includes(u.n); const prev=ups.filter(x=>x.tier<u.tier); const unlocked=prev.every(x=>(c.upgrades||[]).includes(x.n));
-        return `<div class="upcard ${owned?'own':''}"><div class="top"><b>T${u.tier} · ${esc(u.n)}</b><span class="mono" style="color:var(--accent)">${cr(u.cost*cscale(u.room))}</span></div>
+        return `<div class="upcard ${owned?'own':''}"><div class="top"><b>T${u.tier} · ${esc(u.n)}</b><span class="mono" style="color:var(--accent)">${cr(upPrice(u))}</span></div>
           <div class="fxwrap">${fxList(u)}</div>
           ${u.adv?`<div style="font-size:11.5px;color:var(--good)">+ ${esc(u.adv)}</div>`:''}${(UPG_PERKS[u.n]||[]).map(p=>`<div style="font-size:11.5px;color:var(--accent)">\u2605 Player: ${esc(p.txt)}</div>`).join('')}${u.dis?`<div style="font-size:11.5px;color:var(--danger)">− ${esc(u.dis)}</div>`:''}
           <div style="font-size:10.5px;color:var(--ink-faint);margin-top:3px">${u.days} build days · install DC ${esc(u.dc)}${u.comp?' · '+u.comp+' components':''}${u.req&&u.req!=='-'?' · requires '+esc(u.req):''}</div>
           <div class="acts" style="margin-top:6px">${owned?`<span class="chip" style="color:var(--good)">installed</span><button class="rbtn dngr" onclick="shipUnupgrade(${i},${u.i})">Remove</button>`
-            : unlocked?`<button class="rbtn" onclick="shipUpgrade(${i},${u.i},true)">Install −${cr(u.cost*cscale(u.room))}</button><button class="rbtn ghost" onclick="shipUpgrade(${i},${u.i},false)">Add free</button>`
+            : unlocked?`<button class="rbtn" onclick="shipUpgrade(${i},${u.i},true)">Install −${cr(upPrice(u))}</button><button class="rbtn ghost" onclick="shipUpgrade(${i},${u.i},false)">Add free</button>`
             :`<span class="chip">needs tier ${u.tier-1} first</span>`}</div></div>`; }).join('')
       : '<div class="empty" style="padding:8px">No upgrades for this room.</div>';
   }
   h+=`<div class="sechead"><h3>${c?'Convert to a different room':'Build a room here'}</h3><div class="ln"></div></div>
     <select id="shipNewRoom" onchange="shipPreview(this.value)"><option value="">— choose a room —</option>${opts}</select>`;
-  if(pv){ h+=`<div class="upcard" style="margin-top:8px"><div class="top"><b>${esc(pv.n)}</b><span class="mono" style="color:var(--accent)">${cr(pv.cost*cscale(pv.n))}</span></div>
+  if(pv){ h+=`<div class="upcard" style="margin-top:8px"><div class="top"><b>${esc(pv.n)}</b><span class="mono" style="color:var(--accent)">${cr(roomPrice(pv.n,pv.cost))}</span></div>
       <div style="font-size:11.5px;color:var(--ink-mid)">${esc(pv.cat)} · ${esc(pv.space)} · ${pv.days} build days${pv.pre&&pv.pre!=='None'?' · prereq: '+esc(pv.pre):''}</div>
       <p style="font-size:12px;margin:6px 0">${esc(pv.what||'')}</p><div class="fxwrap">${fxList(pv)}</div>
-      <div style="font-size:11px;color:var(--ink-dim);margin-top:6px"><b>Available upgrades:</b> ${upgradesFor(pv.n).map(u=>'T'+u.tier+' '+esc(u.n)+' ('+cr(u.cost*cscale(u.room))+')').join(' · ')||'none'}</div>
-      <div class="acts" style="margin-top:8px"><button class="rbtn" onclick="shipBuild(${i},true)">Build −${cr(pv.cost*cscale(pv.n))}</button><button class="rbtn ghost" onclick="shipBuild(${i},false)">Place free</button></div></div>`; }
+      <div style="font-size:11px;color:var(--ink-dim);margin-top:6px"><b>Available upgrades:</b> ${upgradesFor(pv.n).map(u=>'T'+u.tier+' '+esc(u.n)+' ('+cr(upPrice(u))+')').join(' · ')||'none'}</div>
+      <div class="acts" style="margin-top:8px"><button class="rbtn" onclick="shipBuild(${i},true)">Build −${cr(roomPrice(pv.n,pv.cost))}</button><button class="rbtn ghost" onclick="shipBuild(${i},false)">Place free</button></div></div>`; }
   if(c) h+=`<button class="rbtn dngr" style="margin-top:12px" onclick="shipRemove(${i})">Clear this space</button>`;
   return h+`</div></div>`; }
 
@@ -1651,7 +1662,7 @@ function shipSnap(sh){ return {credits:sh.bank||0,rations:sh.stock.rations||0,co
 function shipAdvance(n){ const sh=ship(); let tot=0;
   for(let day=0;day<n;day++){ const k=shipCalc(); const start=shipSnap(sh);
     const R={}; RES_ROWS.forEach(([key])=>R[key]={start:start[key],gain:[],spend:[]});
-    const add=(key,side,amt,why)=>{ if(amt) R[key][side].push([why,Math.round(amt)]); };
+    const add=(key,side,amt,why)=>{ if(amt) R[key][side].push({w:why,a:Math.round(amt)}); };
     // credits
     add('credits','gain',k.roomIncome,'Room income (morale ×'+k.mult+')'); add('credits','gain',k.freight,'Freight ('+k.freeHolds+' holds)');
     add('credits','spend',k.up,'Room upkeep & wages'); add('credits','spend',k.fuel,'Fuel'); add('credits','spend',k.dock,'Docking fees');
@@ -1666,7 +1677,7 @@ function shipAdvance(n){ const sh=ship(); let tot=0;
     // apply credits & resources
     let bank=(sh.bank||0)+k.roomIncome+k.freight-k.up-k.fuel-k.dock;
     let rat=(sh.stock.rations||0)+raPos-raNeg-k.people;
-    if(rat<0){ const buy=-rat; add('rations','gain',buy,'Bought from outside'); add('credits','spend',buy*10,'Bought '+buy.toLocaleString()+' rations'); bank-=buy*10; rat=0; }
+    if(rat<0){ const buy=-rat; add('rations','gain',buy,'Bought from outside'); const bc=Math.round(buy*RATION_CR); add('credits','spend',bc,'Bought '+buy.toLocaleString()+' rations'); bank-=bc; rat=0; }
     sh.bank=bank; sh.stock.rations=rat; sh.stock.components=(sh.stock.components||0)+coPos-coNeg; sh.stock.data=(sh.stock.data||0)+daPos-daNeg;
     sh.renown=(sh.renown||0)+k.renownDay; sh.heat=Math.max(0,(sh.heat||0)+k.he-2);
     // containers
@@ -1683,8 +1694,8 @@ function shipAdvance(n){ const sh=ship(); let tot=0;
   shipLog(shipWho()+' advanced '+n+' day'+(n>1?'s':'')+' → Day '+sh.day+' ('+(tot>=0?'+':'')+cr(tot)+')'); saveShip();
   S.shipReportOpen=sh.day; toast('Day '+sh.day+' report',(tot>=0?'+':'')+cr(tot)); renderMain(); }
 function resTable(R){ return `<table class="restab"><thead><tr><th>Resource</th><th>Start</th><th>Gained</th><th>Spent</th><th>End</th><th>Change</th></tr></thead><tbody>`+
-  RES_ROWS.map(([key,lab,f])=>{ const r=R[key]; if(!r) return ''; const g=r.gain.reduce((t,x)=>t+x[1],0), s=r.spend.reduce((t,x)=>t+x[1],0), ch=r.end-r.start;
-    const tip=[...r.gain.map(x=>'+'+f(x[1])+' '+x[0]),...r.spend.map(x=>'−'+f(x[1])+' '+x[0])];
+  RES_ROWS.map(([key,lab,f])=>{ const r=R[key]; if(!r) return ''; const A=x=>Array.isArray(x)?x[1]:x.a, W=x=>Array.isArray(x)?x[0]:x.w; const g=r.gain.reduce((t,x)=>t+A(x),0), s=r.spend.reduce((t,x)=>t+A(x),0), ch=r.end-r.start;
+    const tip=[...r.gain.map(x=>'+'+f(A(x))+' '+W(x)),...r.spend.map(x=>'−'+f(A(x))+' '+W(x))];
     return `<tr><td>${lab}</td><td>${f(r.start)}</td><td class="pos">${g?'+'+f(g):'—'}</td><td class="neg">${s?'−'+f(s):'—'}</td><td><b>${f(r.end)}</b></td><td class="${ch>0?'pos':ch<0?'neg':''}">${ch?(ch>0?'+':'−')+f(Math.abs(ch)):'0'}</td></tr>`+
       (tip.length?`<tr class="why"><td></td><td colspan="5">${tip.map(esc).join(' · ')}</td></tr>`:''); }).join('')+`</tbody></table>`; }
 function shipReportsPanel(){ const sh=ship(); const reps=sh.reports||[];
