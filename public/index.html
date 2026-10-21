@@ -367,6 +367,11 @@ textarea{resize:vertical;min-height:60px;font-size:12px}
 .abn{font-family:var(--f-display);font-weight:600;font-size:12.5px;border-left:3px solid var(--rc);padding-left:7px}
 .abt{font-size:12px;color:var(--ink-mid);margin-top:3px}.abw{font-size:11.5px;color:var(--ink-dim);margin-top:3px}
 .pilot.shipbtn .avatar{background:var(--mech)}
+.debtbox{padding-left:14px;border-left:1px solid var(--line)}.debtval{font-size:20px;font-weight:600;color:var(--danger);cursor:pointer}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.report{border-bottom:1px solid var(--line-soft);padding:6px 0}.report:last-child{border-bottom:0}
+.report .rhead{display:flex;justify-content:space-between;cursor:pointer;font-size:12.5px}
+.report ul{margin:6px 0 2px;padding-left:18px;font-size:11.5px;color:var(--ink-mid)}.report ul.finds{color:var(--ink)}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 
@@ -524,6 +529,7 @@ function activeCharEffects(c){
   const list=[];
   (c.inventory||[]).forEach(i=>{ if(i.slot)(i.effects||[]).forEach(e=>list.push(e)); });
   (c.cybernetics||[]).forEach(cy=>(cy.effects||[]).forEach(e=>list.push(e)));
+  if(typeof shipPerks==='function') shipPerks(SHIP_PERKS).forEach(p=>{ if(p.t!=='shop') list.push({target:p.t,value:p.value}); });
   return list;
 }
 // returns a display-only clone with effects + cybernetic overload applied
@@ -559,6 +565,7 @@ function withMechEffects(m){
   (m.mods||[]).forEach(md=>{ if(md.slot) apply(md.effects); });        // installed parts only
   (m.weapons||[]).forEach(w=>{ if(w.slot) apply(w.effects); });
   (m.augments||[]).forEach(a=>apply(a.effects));
+  if(typeof shipPerks==='function') apply(shipPerks(SHIP_MECH_PERKS).map(p=>({target:p.t,value:p.value})));
   const cap=m.modSlots?.capacity??4; const used=(m.mods||[]).filter(x=>x.slot==='mod').length;  // extras only
   const over=Math.max(0,used-cap); atk-=over; save-=over;
   Object.keys(em.abilities||{}).forEach(k=>{ const a=em.abilities[k]; a.mod=Math.floor((a.score-10)/2); });
@@ -638,7 +645,7 @@ function renderDice(){
 }
 function renderRail(){
   const rail=$('#rail'); const chars=Object.values(S.chars).sort((a,b)=>a.name.localeCompare(b.name));
-  let h=`<div class="eyebrow">Ship</div><button class="pilot shipbtn ${S.view==='ship'?'active':''}" onclick="openShip()"><span class="avatar">⛴</span><span style="flex:1;min-width:0"><span class="nm">Eugene's Dream</span><div class="rl">Day ${ship().day} · bank ${cr(ship().bank)}</div></span></button><div class="eyebrow" style="margin-top:8px">Squad Roster</div>`;
+  let h=`<div class="eyebrow">Ship</div><button class="pilot shipbtn ${S.view==='ship'?'active':''}" onclick="openShip()"><span class="avatar">⛴</span><span style="flex:1;min-width:0"><span class="nm">Eugene's Dream</span><div class="rl">Day ${ship().day} · bank ${cr(ship().bank)} · debt ${cr(ship().debt)}</div></span></button><div class="eyebrow" style="margin-top:8px">Squad Roster</div>`;
   if(!chars.length) h+='<div class="empty" style="font-size:12px">No pilots loaded yet.</div>';
   chars.forEach(c=>{
     const you=S.identity===c.id?'<span class="you">YOU</span>':'';
@@ -1265,8 +1272,9 @@ function canSpan(cells,i,ignore){ return (i%SHIP_COLS)<SHIP_COLS-1 && (cells[i+1
 function placeRoom(cells,c){ const w=spans(c); for(let i=0;i<cells.length;i++){ if(cells[i]!=null) continue; if(w===2&&!canSpan(cells,i)) continue; cells[i]=c; if(w===2) cells[i+1]={span:i}; return true; } return false; }
 function defaultShip(){ const cells=Array(SHIP_COLS*SHIP_ROWS).fill(null);
   SHIP_START.forEach(n=>{ const cfg=SHIP_START_CFG[n]||{}; placeRoom(cells,{room:n,upgrades:[...(cfg.upgrades||[])],...(cfg.size?{size:cfg.size}:{})}); });
-  return {v:2,scale:1000,residents:95000,refugees:30000,name:"Eugene's Dream",day:1,bank:0,flying:true,party:5,passengers:0,holds:10,heat:0,renown:0,stock:{rations:0,components:0,data:0},cells,log:[]}; }
-function ship(){ if(!S.ship||!Array.isArray(S.ship.cells)) S.ship=defaultShip(); if(!S.ship.v||S.ship.v<2) migrateShip(S.ship); if(S.ship.v<3) migrateV3(S.ship); if(S.ship.v<5){ S.ship.overrides=S.ship.overrides||{}; S.ship.overrides['Mushroom Farm']={...(S.ship.overrides['Mushroom Farm']||{label:'Mushroom Lab'}),ra:50000}; if((S.ship.v||0)>=4) S.ship.v=5; }
+  return {v:2,debt:10000000,containers:150000,scale:1000,residents:95000,refugees:30000,name:"Eugene's Dream",day:1,bank:0,flying:true,party:5,passengers:0,holds:10,heat:0,renown:0,stock:{rations:0,components:0,data:0},cells,log:[]}; }
+function ship(){ if(!S.ship||!Array.isArray(S.ship.cells)) S.ship=defaultShip(); if(!S.ship.v||S.ship.v<2) migrateShip(S.ship); if(S.ship.v<3) migrateV3(S.ship); if(S.ship.containers==null) S.ship.containers=150000; if(S.ship.debt==null) S.ship.debt=10000000;
+  if(S.ship.v<5){ S.ship.overrides=S.ship.overrides||{}; S.ship.overrides['Mushroom Farm']={...(S.ship.overrides['Mushroom Farm']||{label:'Mushroom Lab'}),ra:50000}; if((S.ship.v||0)>=4) S.ship.v=5; }
   if(S.ship.v<4){ if(S.ship.scale==null) S.ship.scale=1000; if(!S.ship.holds||S.ship.holds===10) S.ship.holds=48; S.ship.v=5; } return S.ship; }
 function migrateV3(sh){ sh.overrides={...JSON.parse(JSON.stringify(DEFAULT_OVR)),...(sh.overrides||{})};
   if(sh.residents==null) sh.residents=95000; if(sh.refugees==null) sh.refugees=30000;
@@ -1348,8 +1356,11 @@ function renderShip(){ const main=$('#main'); const sh=ship(); const k=shipCalc(
       <button class="btn" onclick="shipAdvance(1)">Advance day ▸</button><button class="btn sec" onclick="shipAdvance(7)">+7 days</button></div></div>`;
   const bank=`<div class="bankbar"><div><div class="eyebrow">Ship bank</div><div class="mono bankval" onclick="shipEditNum('bank','Ship bank (credits)')" title="Click to set">${cr(sh.bank)}</div></div>
     <div style="flex:1;font-size:12px;color:var(--ink-mid)">Daily net <b class="mono" style="color:${k.net>=0?'var(--good)':'var(--danger)'}">${k.net>=0?'+':''}${cr(k.net)}</b> · per 7-day cycle <b class="mono">${cr(k.net*7)}</b></div>
+    <div class="debtbox"><div class="eyebrow">TCA Debt</div><div class="mono debtval" onclick="shipEditNum('debt','TCA Debt outstanding')" title="Click to set">${cr(sh.debt)}</div></div>
+    <button class="btn sec" ${(sh.bank||0)>0&&(sh.debt||0)>0?'':'disabled'} onclick="payDebt()">Pay TCA debt</button>
+    <button class="btn sec" onclick="contributeBank()">Contribute</button>
     <button class="rbtn ghost" onclick="shipEditNum('bank','Ship bank (credits)')">Adjust</button>
-    <button class="btn" onclick="shipDistribute()">Distribute equally to ${Object.keys(S.chars).length} pilots</button></div>`;
+    ${sortRooms().length?'<button class="btn sec" onclick="crackContainer()">⚄ Crack a container (d100)</button>':''}<button class="btn" onclick="shipDistribute()">Distribute equally to ${Object.keys(S.chars).length} pilots</button></div>`;
   const stats=`<div class="shipstats">
     ${shipTile('Population',k.people.toLocaleString(),`${(+sh.residents||0).toLocaleString()} residents · ${(+sh.refugees||0).toLocaleString()} refugees · ${sh.party} party`,'',"shipEditNum('residents','Permanent residents')")}
     ${shipTile('Refugees (temporary)',(+sh.refugees||0).toLocaleString(),'click to edit','',"shipEditNum('refugees','Refugees aboard')")}
@@ -1359,6 +1370,7 @@ function renderShip(){ const main=$('#main'); const sh=ship(); const k=shipCalc(
     ${shipTile('Food / day',sgn(k.rationBal).toLocaleString(),`${Math.round(k.ra).toLocaleString()} made · ${k.people.toLocaleString()} eaten · stock ${sh.stock.rations||0}`,k.rationBal<0?'neg':'pos')}
     ${shipTile('Power',sgn(k.pw),k.pw<0?'<span style="color:var(--danger)">Brownout — rooms go offline</span>':'balance',k.pw<0?'neg':'pos')}
     ${shipTile('Morale',sgn(k.morale),`${k.tier} · income ×${k.mult}`,k.morale<0?'neg':'')}
+    ${shipTile('Containers aboard',(sh.containers||0).toLocaleString(),sortRate()?('breaking down '+sortRate()+'/day'):'build a Container Sorting Room','',"shipEditNum('containers','Containers aboard')")}
     ${shipTile('Components',(sh.stock.components||0),sgn(k.co)+' / day','')}
     ${shipTile('Data',(sh.stock.data||0),sgn(k.da)+' / day','')}
     ${shipTile('Heat',(sh.heat||0),`${heatTier(sh.heat||0)} · ${sgn(k.heatDay)} / day`,(sh.heat||0)>=25?'neg':'',"shipEditNum('heat','Current Heat')")}
@@ -1375,7 +1387,7 @@ function renderShip(){ const main=$('#main'); const sh=ship(); const k=shipCalc(
   grid+='</div>';
   const left=`<div class="panel"><div class="panel-h"><h3>Deck Plan</h3><span class="status" style="margin-left:6px">${SHIP_COLS}×${SHIP_ROWS}</span><span style="flex:1"></span><span class="status">click a room to edit or upgrade</span></div><div class="panel-b">${grid}</div></div>`;
   const right= S.shipSel!=null ? shipRoomPanel(S.shipSel) : shipLedger(k);
-  main.innerHTML=head+bank+stats+`<div class="shiplayout"><div>${left}${shipAbilities()}</div><div>${right}${shipLogPanel()}</div></div>`;
+  main.innerHTML=head+bank+stats+`<div class="shiplayout"><div>${left}${shipReportsPanel()}${shipAbilities()}</div><div>${right}${crewBenefitsPanel()}${vaultPanel()}${shipLogPanel()}</div></div>`;
 }
 function shipLedger(k){ const sh=ship(); const row=(a,b,c)=>`<div class="bonusrow ${c||''}"><span>${a}</span><b>${b}</b></div>`;
   return `<div class="panel"><div class="panel-h"><h3>Daily Ledger</h3><span style="flex:1"></span><span class="status">${sh.flying?'flying':'docked'}</span></div><div class="panel-b" style="padding:6px 14px">
@@ -1408,6 +1420,7 @@ function shipRoomPanel(i){ const sh=ship(); const c=sh.cells[i]; const R=c?ROOMS
       <div class="acts" style="margin:6px 0 2px"><button class="rbtn ghost" onclick="shipOvrNum('${i}','scale','Scale (1 single, 10 venue, 100 complex, 1000 district)')">Scale: ${scaleName(rscale(c.room))}</button><button class="rbtn ghost" onclick="shipOvrLabel('${i}')">Rename type</button><button class="rbtn ghost" onclick="shipOvrNum('${i}','bu','Housing (bunks) per room')">Set housing</button><button class="rbtn ghost" onclick="shipOvrNum('${i}','ra','Food (rations/day) per room')">Set food</button><button class="rbtn ghost" onclick="shipOvrNum('${i}','pw','Power per room')">Set power</button></div>
       <div style="font-size:10.5px;color:var(--ink-faint)">House-rule values apply to every room of this type.</div>`;
     const ups=upgradesFor(c.room);
+    if(CRAFT[c.room]){ const cr_=craftRecipe(c); h+=`<div class="sechead"><h3>Work Order</h3><div class="ln"></div></div><button class="btn" style="width:100%" onclick="openCraft(${i})">⚒ ${esc(cr_.label)}</button><div style="font-size:10.5px;color:var(--ink-faint);margin-top:4px">Paid from ship ${cr_.pay==='rations'?'rations':'components'}, then bank credits${cr_.data?' + Data':''}. Output goes to the Ship Vault.</div>`; }
     h+=`<div class="sechead"><h3>Upgrades</h3><div class="ln"></div></div>`;
     h+= ups.length? ups.map(u=>{ const owned=(c.upgrades||[]).includes(u.n); const prev=ups.filter(x=>x.tier<u.tier); const unlocked=prev.every(x=>(c.upgrades||[]).includes(x.n));
         return `<div class="upcard ${owned?'own':''}"><div class="top"><b>T${u.tier} · ${esc(u.n)}</b><span class="mono" style="color:var(--accent)">${cr(u.cost*rscale(u.room))}</span></div>
@@ -1428,6 +1441,187 @@ function shipRoomPanel(i){ const sh=ship(); const c=sh.cells[i]; const R=c?ROOMS
       <div class="acts" style="margin-top:8px"><button class="rbtn" onclick="shipBuild(${i},true)">Build −${cr(pv.cost*rscale(pv.n))}</button><button class="rbtn ghost" onclick="shipBuild(${i},false)">Place free</button></div></div>`; }
   if(c) h+=`<button class="rbtn dngr" style="margin-top:12px" onclick="shipRemove(${i})">Clear this space</button>`;
   return h+`</div></div>`; }
+
+/* ============================ SHIP II: containers, vault, reports, crafting ============================ */
+// Custom room: Container Sorting Room (single facility, stats as written)
+(function(){ if(ROOMS['Container Sorting Room']) return;
+  const r={n:'Container Sorting Room',type:'Special',cat:'Logistics',space:'Hold',pre:'None',cost:15000,days:8,dc:12,crew:6,up:150,inc:0,cf:false,ra:0,co:0,da:0,re:0,he:0,pw:-1,mo:0,bu:0,
+    what:'Cranes, cutting rigs and a sort line that cracks open the ship\'s 100-ft cargo containers. Breaks down 5 containers a day and logs what\'s inside. Unlocks Crack a Container (d100).',
+    wo:'Deep Sort (7 days): pick 10 containers and roll each twice, keeping the better result.',draw:'Some containers are sealed for a reason. On a natural 1, roll on the Events table.'};
+  SHIPRULES.rooms.push(r); ROOMS[r.n]=r;
+  SHIPRULES.upgrades.push(
+    {room:r.n,tier:1,n:'Automated Sort Line',req:'-',cost:10000,comp:0,days:5,dc:12,crew:-2,up:20,inc:0,ra:0,co:0,da:0,re:0,he:0,pw:-1,mo:0,bu:0,adv:'+5 containers broken down per day.',dis:'+20 cr/day maintenance, -1 Power.'},
+    {room:r.n,tier:2,n:'Salvage Scanner',req:'-',cost:15000,comp:0,days:6,dc:15,crew:0,up:10,inc:0,ra:0,co:0,da:1,re:0,he:0,pw:-1,mo:0,bu:0,adv:'+10 to every container roll (max 100). +1 Data/day.',dis:'-1 Power.'},
+    {room:r.n,tier:3,n:'Hazmat Vault',req:'-',cost:20000,comp:0,days:8,dc:18,crew:1,up:40,inc:0,ra:0,co:0,da:0,re:0,he:1,pw:-1,mo:0,bu:0,adv:'Natural 1s no longer trigger events; sealed hazardous cargo sells for +500 cr each.',dis:'+1 Heat/day (people notice what you keep).'});
+  ROOM_SCALE['Container Sorting Room']=1; SHIP_CAT_COLOR.Logistics=SHIP_CAT_COLOR.Logistics||'#b0c4de';
+})();
+const dice=(n,s)=>{ let t=0; for(let i=0;i<n;i++) t+=1+Math.floor(Math.random()*s); return t; };
+function sortRooms(){ return ship().cells.filter(c=>c&&c.span==null&&c.room==='Container Sorting Room'); }
+function sortRate(){ return sortRooms().reduce((t,c)=>t+5+((c.upgrades||[]).includes('Automated Sort Line')?5:0),0); }
+function sortBonus(){ return sortRooms().some(c=>(c.upgrades||[]).includes('Salvage Scanner'))?10:0; }
+function randomItem(rars,cats){ const pool=(S.catalog||[]).filter(i=>(!rars||rars.includes(i.rarity))&&(!cats||cats.includes(i.category))); return pool.length?pool[Math.floor(Math.random()*pool.length)]:null; }
+// Large-container loot table (d100)
+function rollContainer(){ const nat=1+Math.floor(Math.random()*100); const roll=Math.min(100,nat+sortBonus()); const g={rations:0,components:0,data:0,credits:0,items:[]}; let what;
+  if(roll<=15){ g.components=dice(2,10); what='Scrap metal and loose fittings'; }
+  else if(roll<=30){ g.rations=dice(1,6)*500; what='Sealed food stores'; }
+  else if(roll<=45){ g.components=dice(3,10); what='Machine parts and wiring'; }
+  else if(roll<=55){ g.data=dice(2,6); what='Crates of data cores and manifests'; }
+  else if(roll<=68){ g.credits=dice(1,10)*500; what='Trade goods (sold on the market)'; }
+  else if(roll<=78){ g.rations=dice(1,4)*250; g.components=dice(1,10); g.data=dice(1,4); what='Mixed household cargo'; }
+  else if(roll<=86){ g.credits=dice(1,6)*300; g.components=dice(1,6); what='Fuel cells and power packs'; }
+  else if(roll<=93){ const it=randomItem(['standard','premium']); if(it) g.items.push(it); what='A crated enhanced item'; }
+  else if(roll<=98){ const it=randomItem(['prototype','advanced']); if(it) g.items.push(it); what='A rare prototype in shock foam'; }
+  else if(roll<=99){ const it=randomItem(null,['ship-weapon','ship-modification']); if(it) g.items.push(it); what='Salvaged mech/ship hardware'; }
+  else { const it=randomItem(['legendary']); if(it) g.items.push(it); g.credits=5000; what='JACKPOT: a legendary piece and a hidden credit cache'; }
+  return {nat,roll,what,g}; }
+function applyLoot(sh,g){ sh.stock.rations=(sh.stock.rations||0)+g.rations; sh.stock.components=(sh.stock.components||0)+g.components; sh.stock.data=(sh.stock.data||0)+g.data; sh.bank=(sh.bank||0)+g.credits;
+  g.items.forEach(it=>{ sh.vault=[...(sh.vault||[]),{key:uid(),name:it.name,cat:it.category,rarity:it.rarity||null,src:'container',item:it,day:sh.day}]; }); }
+function lootText(r){ const g=r.g; const bits=[]; if(g.rations)bits.push('+'+g.rations.toLocaleString()+' rations'); if(g.components)bits.push('+'+g.components+' components'); if(g.data)bits.push('+'+g.data+' data'); if(g.credits)bits.push('+'+cr(g.credits));
+  g.items.forEach(it=>bits.push('★ '+it.name+(it.rarity?' ('+it.rarity+')':''))); return 'd100 '+r.nat+(r.roll!==r.nat?' (+'+(r.roll-r.nat)+')':'')+' — '+r.what+(bits.length?': '+bits.join(', '):''); }
+function crackContainer(){ const sh=ship(); if(!sortRooms().length) return toast('No Container Sorting Room','Build one to access containers');
+  if((sh.containers||0)<=0) return toast('No containers left',''); const r=rollContainer(); sh.containers--; applyLoot(sh,r.g);
+  const line=shipWho()+' cracked a container: '+lootText(r); shipLog(line); addReportLine(sh,line); saveShip();
+  showToast(r.roll,'Container',r.what+(r.g.items.length?' ★ '+r.g.items[0].name:''),r.nat===100?1:r.nat===1?-1:0);
+  pushRoll({id:uid(),who:shipWho(),wid:S.identity||'?',label:'Container (d100)',kind:'check',total:r.roll,brk:lootText(r).slice(0,90),crit:r.nat===100?1:r.nat===1?-1:0,t:Date.now()}); renderMain(); }
+function addReportLine(sh,line){ sh.reports=sh.reports||[]; let rep=sh.reports[0]; if(!rep||rep.day!==sh.day){ rep={day:sh.day,lines:[],finds:[],t:Date.now()}; sh.reports=[rep,...sh.reports].slice(0,40); } rep.lines.push(line); }
+// Day advance with containers + daily report (overrides the earlier definition)
+function shipAdvance(n){ const sh=ship(); let tot=0;
+  for(let i=0;i<n;i++){ const k=shipCalc();
+    const before={bank:sh.bank||0,rations:sh.stock.rations||0,components:sh.stock.components||0,data:sh.stock.data||0,renown:sh.renown||0,heat:sh.heat||0,containers:sh.containers||0};
+    sh.bank=(sh.bank||0)+k.net; tot+=k.net;
+    sh.stock.rations=(sh.stock.rations||0)+Math.max(0,k.rationBal); sh.stock.components=(sh.stock.components||0)+k.co; sh.stock.data=(sh.stock.data||0)+k.da;
+    const short=Math.max(0,-k.rationBal), eaten=Math.min(sh.stock.rations||0,short); if(eaten){ sh.stock.rations-=eaten; sh.bank+=eaten*10; tot+=eaten*10; }
+    const bought=short-eaten;
+    sh.renown=(sh.renown||0)+k.renownDay; sh.heat=Math.max(0,(sh.heat||0)+k.he-2);
+    const finds=[]; const rate=Math.min(sortRate(),sh.containers||0);
+    for(let c=0;c<rate;c++){ const r=rollContainer(); applyLoot(sh,r.g); finds.push(lootText(r)); }
+    sh.containers=(sh.containers||0)-rate; sh.day=(sh.day||1)+1;
+    const delta=(a,b,lab,fmt)=>{ const v=b-a; return v?(lab+' '+(v>0?'+':'')+(fmt?fmt(v):v.toLocaleString())):null; };
+    const lines=[delta(before.bank,sh.bank,'Bank',v=>cr(v)),delta(before.rations,sh.stock.rations,'Ration stock'),delta(before.components,sh.stock.components,'Components'),
+      delta(before.data,sh.stock.data,'Data'),delta(before.renown,sh.renown,'Renown'),delta(before.heat,sh.heat,'Heat'),
+      rate?('Containers broken down: '+rate+' ('+(sh.containers).toLocaleString()+' left)'):null,
+      eaten?('Ate '+eaten.toLocaleString()+' rations from ship stores'):null, bought?('Bought '+bought.toLocaleString()+' rations from outside ('+cr(bought*10)+')'):null,
+      k.pw<0?'Power brownout: '+k.pw+' — rooms offline':null, k.over?(k.people-k.bunks).toLocaleString()+' people without housing (−2 Morale)':null].filter(Boolean);
+    sh.reports=[{day:sh.day,from:sh.day-1,lines,finds,net:k.net,t:Date.now()},...(sh.reports||[])].slice(0,40); }
+  shipLog(shipWho()+' advanced '+n+' day'+(n>1?'s':'')+' → Day '+sh.day+' ('+(tot>=0?'+':'')+cr(tot)+')'); saveShip();
+  S.shipReportOpen=sh.reports[0]&&sh.reports[0].day; toast('Day '+sh.day+' report',(tot>=0?'+':'')+cr(tot)+' · '+(sh.reports[0].finds.length)+' containers'); renderMain(); }
+function shipReportsPanel(){ const sh=ship(); const reps=sh.reports||[];
+  return `<div class="panel" style="margin-top:14px"><div class="panel-h"><h3>Daily Reports</h3><span class="status" style="margin-left:6px">${reps.length}</span></div><div class="panel-b" style="padding:6px 14px;max-height:420px;overflow:auto">`+
+    (reps.map((r,ix)=>{ const open=S.shipReportOpen===r.day||(S.shipReportOpen==null&&ix===0);
+      return `<div class="report"><div class="rhead" onclick="S.shipReportOpen=${r.day};renderMain()"><b>Day ${r.from!=null?r.from+' → '+r.day:r.day}</b><span class="mono" style="color:${(r.net||0)>=0?'var(--good)':'var(--danger)'}">${r.net!=null?((r.net>=0?'+':'')+cr(r.net)):''}</span></div>
+        ${open?`<ul>${(r.lines||[]).map(l=>`<li>${esc(l)}</li>`).join('')}</ul>${(r.finds||[]).length?`<div class="eyebrow" style="margin:6px 0 2px">Containers opened</div><ul class="finds">${r.finds.map(f=>`<li>${esc(f)}</li>`).join('')}</ul>`:''}`:''}</div>`; }).join('')||'<div class="empty" style="padding:8px">Advance the day to generate the first report.</div>')+`</div></div>`; }
+// Vault: found/crafted items, taken into a pilot's own inventory
+function vaultPanel(){ const sh=ship(); const v=sh.vault||[]; const pilots=Object.values(S.chars);
+  return `<div class="panel" style="margin-top:14px"><div class="panel-h"><h3>Ship Vault</h3><span class="status" style="margin-left:6px">${v.length} item${v.length===1?'':'s'}</span></div><div class="panel-b" style="padding:8px 12px;max-height:320px;overflow:auto">`+
+    (v.map((x,ix)=>`<div class="itemrow"><span class="ico">★</span><div class="info"><div class="n">${esc(x.name)}${x.rarity?` <small style="color:var(--warn)">${esc(x.rarity)}</small>`:''}</div><div class="d">${esc(x.cat||'')} · ${x.src==='container'?'found in a container':'crafted'} · day ${x.day}</div></div>
+      ${isDM()?`<select onchange="vaultGive(${ix},this.value)" style="width:auto"><option value="">Give to…</option>${pilots.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select>`
+        :(S.chars[S.identity]?`<button class="rbtn" onclick="vaultGive(${ix},'${S.identity}')">Take</button>`:'')}</div>`).join('')||'<div class="empty" style="padding:8px">Nothing yet. Items from containers and crafting land here.</div>')+`</div></div>`; }
+function vaultGive(ix,pid){ if(!pid) return; const sh=ship(); const x=(sh.vault||[])[ix]; const c=S.chars[pid]; if(!x||!c) return;
+  if(!canEdit(pid)) return toast('Pilots can only take items for themselves','Sign in as DM to hand items to others');
+  const it=x.item||{}; const mech=Object.values(S.mechs).find(m=>m.id===c.mechRef);
+  if(it.category==='ship-weapon'&&mech){ mech.weapons=[...(mech.weapons||[]),{id:(it.id||uid())+'-'+uid().slice(0,3),name:it.name,damage:[],properties:it.properties||'',desc:it.description||'',mount:it.mount||'hand'}]; saveMech(mech); }
+  else if(it.category==='ship-modification'&&mech){ mech.mods=[...(mech.mods||[]),{id:(it.id||uid())+'-'+uid().slice(0,3),name:it.name,grade:it.grade??null,equipType:it.equipType||'mod',system:it.subtype||'',desc:it.description||''}]; saveMech(mech); }
+  else if(it.category==='cybernetic'){ c.cybernetics=[...(c.cybernetics||[]),{name:it.name,subtype:it.subtype||it.rarity||'',desc:it.description||'',effects:[]}]; saveChar(c); }
+  else { c.inventory=[...(c.inventory||[]),{id:(it.id||uid())+'-'+uid().slice(0,3),name:it.name,type:catToItemType(it.category),slotType:it.slotType,qty:x.qty||1,weight:it.weight||0,equipped:false,damage:[],properties:it.properties||'',
+      actionType:it.category==='weapon-melee'?'mwak':'rwak',attackAbility:it.category==='weapon-melee'?'str':'dex',desc:it.description||''}]; saveChar(c); }
+  sh.vault.splice(ix,1); shipLog(shipWho()+' gave '+x.name+' to '+c.name); addReportLine(sh,x.name+' went to '+c.name); saveShip(); toast('Delivered',x.name+' → '+c.name); renderMain(); }
+// Crafting work orders: paid from ship components (50 cr each) or rations (10 cr each), remainder in bank credits (bought outside)
+const CRAFT={
+  'Engineering Workshop':{label:'Craft gear',cats:['equipment'],rar:['standard','premium'],up:{'Prototype Bench':['prototype']},disc:0.5},
+  'Fabrication Forge':{label:'Forge weapons & armor',cats:['weapon-ranged','weapon-melee','armor','shield'],rar:['standard','premium'],upCats:{'Mech Plating Line':['ship-weapon','ship-modification']},disc:0.5},
+  'Netrunner Den':{label:'Code tech items',cats:['equipment'],match:/tech/i,rar:['standard','premium'],disc:0.5,data:true},
+  'Supercharger Station':{label:'Charge a focus',cats:['equipment'],match:/focus/i,rar:['standard','premium'],disc:0.5},
+  'Religious Hall':{label:'Sacred focus',cats:['equipment'],match:/force/i,rar:['standard'],disc:0.25},
+  'Laboratory':{label:'Brew chemicals',cats:['consumable'],match:/poison|substance|adrenal|stimpac/i,disc:0.5},
+  'Medbay':{label:'Make medpacs',cats:['consumable'],match:/medpac|stimpac/i,disc:0.25},
+  'Hospital':{label:'Make medpacs',cats:['consumable'],match:/medpac|stimpac/i,disc:0.25},
+  'Mushroom Farm':{label:'Medicinal caps',cats:['consumable'],match:/medpac/i,disc:0.5,pay:'rations'},
+  'Hydroponics Garden':{label:'Med-herb harvest',cats:['consumable'],match:/medpac|antitox/i,disc:0.5,pay:'rations'},
+  'Bio-Greenhouse':{label:'Restoration harvest',cats:['consumable'],match:/medpac/i,disc:0.5,pay:'rations'},
+  'Cyberclinic':{label:'Install chrome (20% off)',cats:['cybernetic'],disc:0.8},
+  'Ripperdoc Cyberware Table':{label:'Back-alley chrome (10% off)',cats:['cybernetic'],rar:['standard'],disc:0.9},
+};
+function craftRecipe(cell){ const R=CRAFT[cell.room]; if(!R) return null; const ups=cell.upgrades||[]; let rar=R.rar?[...R.rar]:null, cats=[...R.cats];
+  Object.entries(R.up||{}).forEach(([u,x])=>{ if(ups.includes(u)&&rar) rar.push(...x); }); Object.entries(R.upCats||{}).forEach(([u,x])=>{ if(ups.includes(u)) cats.push(...x); });
+  return {...R,rar,cats}; }
+function craftPrice(R,it){ const price=Math.round((it.cost||0)*R.disc); const unit=R.pay==='rations'?10:50; const sh=ship();
+  const have=R.pay==='rations'?(sh.stock.rations||0):(sh.stock.components||0); const need=Math.ceil(price/unit); const use=Math.min(have,need);
+  return {price,unit,need,use,credits:(need-use)*unit,data:R.data?Math.max(1,Math.ceil((it.cost||0)/2000)):0,res:R.pay==='rations'?'rations':'components'}; }
+let CRAFTX={i:null,q:''};
+function openCraft(i){ CRAFTX={i,q:''}; renderCraft(); }
+function renderCraft(){ const sh=ship(); const cell=sh.cells[CRAFTX.i]; const R=craftRecipe(cell); if(!R) return;
+  let pool=(S.catalog||[]).filter(it=>R.cats.includes(it.category)&&(!R.match||R.match.test((it.subtype||'')+' '+it.name))&&(!R.rar||!it.rarity||R.rar.includes(it.rarity))&&(it.cost||0)>0);
+  if(CRAFTX.q){ const q=CRAFTX.q.toLowerCase(); pool=pool.filter(it=>it.name.toLowerCase().includes(q)); } pool=pool.slice(0,150);
+  window.__craft=pool;
+  modal(`<div class="modal wide"><div class="modal-h"><h3>${esc(roomLabel(cell.room))} — ${esc(R.label)}</h3><span class="status" style="margin-left:8px">pays from ship: ${(sh.stock[R.pay==='rations'?'rations':'components']||0).toLocaleString()} ${R.pay==='rations'?'rations':'components'} · bank ${cr(sh.bank)}${R.data?' · data '+(sh.stock.data||0):''}</span><span style="flex:1"></span><button class="x" onclick="closeModal()">×</button></div>
+   <div class="modal-b"><p style="font-size:12px;color:var(--ink-mid);margin:0 0 10px">Cost is ${Math.round(R.disc*100)}% of the item's value, paid in ship ${R.pay==='rations'?'rations (10 cr each)':'components (50 cr each)'} first; anything short is bought from outside with bank credits. The item goes to the Ship Vault.</p>
+   <div class="catsearch"><input id="craftq" placeholder="Search…" value="${esc(CRAFTX.q)}" oninput="CRAFTX.q=this.value;renderCraft();this.focus()"></div><div class="catlist">${pool.map((it,ix)=>{ const p=craftPrice(R,it);
+     return `<div class="catrow"><div class="info"><div class="n">${esc(it.name)}${it.rarity?` <small style="color:var(--warn)">${esc(it.rarity)}</small>`:''}</div><div class="m">value ${cr(it.cost)} → ${p.use?p.use+' '+p.res:''}${p.use&&p.credits?' + ':''}${p.credits?cr(p.credits):''}${p.data?' + '+p.data+' data':''}</div></div><button class="rbtn" onclick="doCraft(${ix})">Craft</button></div>`; }).join('')||'<div class="empty">No matching items.</div>'}</div></div></div>`);
+  const q=document.getElementById('craftq'); if(q&&CRAFTX.q){ q.focus(); q.setSelectionRange(q.value.length,q.value.length); } }
+function doCraft(ix){ const sh=ship(); const cell=sh.cells[CRAFTX.i]; const R=craftRecipe(cell); const it=(window.__craft||[])[ix]; if(!R||!it) return; const p=craftPrice(R,it);
+  if(p.credits>(sh.bank||0)) return toast('Not enough resources','Short '+cr(p.credits-(sh.bank||0))+' after using ship '+p.res);
+  if(p.data>(sh.stock.data||0)) return toast('Not enough Data','Needs '+p.data+' data, ship has '+(sh.stock.data||0));
+  sh.stock[p.res]=(sh.stock[p.res]||0)-p.use; sh.bank=(sh.bank||0)-p.credits; sh.stock.data=(sh.stock.data||0)-p.data;
+  sh.vault=[...(sh.vault||[]),{key:uid(),name:it.name,cat:it.category,rarity:it.rarity||null,src:'crafted',item:it,day:sh.day}];
+  const line=shipWho()+' crafted '+it.name+' in the '+roomLabel(cell.room)+' (−'+[p.use?p.use+' '+p.res:null,p.credits?cr(p.credits):null,p.data?p.data+' data':null].filter(Boolean).join(', ')+')';
+  shipLog(line); addReportLine(sh,line); saveShip(); closeModal(); toast('Crafted',it.name+' → Ship Vault'); renderMain(); }
+
+
+/* ============================ SHIP III: crew benefits, TCA debt, contributions ============================ */
+// Each built room grants pilots a perk; every upgrade installed in that room adds the base value again.
+const SHIP_PERKS={
+  'Mess Hall':[{t:'hpMax',v:5,txt:'Well fed: max HP'}],
+  'Mushroom Farm':[{t:'hpMax',v:3,txt:'Medicinal caps: max HP'}],
+  'Medbay':[{t:'hpMax',v:5,txt:'Biobed checkups: max HP'}],
+  'Hospital':[{t:'hpMax',v:10,txt:'Bacta ward: max HP'}],
+  'Noodle Bar':[{t:'con',v:1,txt:'Special Bowl: Constitution'}],
+  'Restaurant':[{t:'cha',v:1,txt:'Fine dining & connections: Charisma'}],
+  'Boxing Gym':[{t:'str',v:1,txt:'Training camp: Strength'},{t:'attack',v:1,txt:'Sparring: attack rolls'}],
+  'AI Combat Simulator':[{t:'attack',v:1,txt:'Sim drills: attack rolls'}],
+  'Armory':[{t:'ac',v:1,txt:'Fitted armor: AC'}],
+  'Fabrication Forge':[{t:'damage',v:1,txt:'Tuned weapons: damage'}],
+  'Engineering Workshop':[{t:'tpMax',v:2,txt:'Spare cells: max Tech Points'}],
+  'Laboratory':[{t:'int',v:1,txt:'Research access: Intelligence'}],
+  'Datavault Library':[{t:'checkAll',v:1,txt:'Archives: all ability checks'}],
+  'Netrunner Den':[{t:'tpMax',v:2,txt:'Cyberdeck tuning: max Tech Points'}],
+  'Supercharger Station':[{t:'tpMax',v:3,txt:'Charging thrones: max Tech Points'}],
+  'Religious Hall':[{t:'saveAll',v:1,txt:'Blessing: all saving throws'}],
+  'Soothsayer':[{t:'wis',v:1,txt:'Foresight: Wisdom'}],
+  'Council Meeting Chamber':[{t:'initiative',v:1,txt:'Briefings: initiative'}],
+  'Tactical Command Center':[{t:'initiative',v:2,txt:'Battle plans: initiative'}],
+  'Atrium':[{t:'wis',v:1,txt:'Open sky: Wisdom'}],
+  'Lounge':[{t:'saveAll',v:1,txt:'Real rest: all saving throws'}],
+  'Cyberclinic':[{t:'con',v:1,txt:'Chrome maintenance: Constitution'}],
+  'Ripperdoc Cyberware Table':[{t:'dex',v:1,txt:'Reflex tuning: Dexterity'}],
+  'Open Market':[{t:'shop',v:10,txt:'Market contacts: % off catalog purchases'}],
+  'Container Sorting Room':[{t:'shop',v:5,txt:'Salvage contacts: % off catalog purchases'}],
+};
+const SHIP_MECH_PERKS={
+  'Mech Bay':[{t:'ac',v:1,txt:'Mech cradles: mech AC'}],
+  'Ship Hangar':[{t:'speed',v:10,txt:'Launch rails: mech speed'}],
+  'Engineering Core':[{t:'saveAll',v:1,txt:'Clean power: mech saving throws'}],
+};
+function shipPerks(table){ const sh=S.ship; if(!sh||!Array.isArray(sh.cells)) return []; const out={};
+  sh.cells.forEach(c=>{ if(!c||c.span!=null) return; (table[c.room]||[]).forEach(p=>{ if(!p.v) return; const mult=1+(c.upgrades||[]).length; const key=c.room+'|'+p.t;
+    if(!out[key]) out[key]={...p,room:c.room,value:p.v*mult,ups:(c.upgrades||[]).length}; else out[key].value+=p.v*mult; }); });
+  return Object.values(out); }
+function shopDiscount(){ const p=shipPerks(SHIP_PERKS).filter(x=>x.t==='shop').reduce((t,x)=>t+x.value,0); return Math.min(50,p)/100; }
+function crewBenefitsPanel(){ const P=shipPerks(SHIP_PERKS), M=shipPerks(SHIP_MECH_PERKS);
+  const row=x=>`<div class="bonusrow"><span>${esc(roomLabel(x.room))} \u00b7 ${esc(x.txt)}${x.ups?` <small style="color:var(--warn)">\u2605\u00d7${x.ups+1}</small>`:''}</span><b>${x.t==='shop'?x.value+'%':sgn(x.value)}</b></div>`;
+  return `<div class="panel" style="margin-top:14px"><div class="panel-h"><h3>Crew Benefits</h3><span class="status" style="margin-left:6px">applied to every pilot sheet</span></div><div class="panel-b" style="padding:6px 14px">
+    ${P.map(row).join('')||'<div class="empty" style="padding:8px">No pilot perks yet.</div>'}
+    ${M.length?`<div class="eyebrow" style="margin:8px 0 2px">Mech perks</div>${M.map(row).join('')}`:''}
+    <p style="font-size:11px;color:var(--ink-faint);margin:8px 0 2px">Each room grants a perk; every upgrade installed in that room adds the base perk again. Shop discounts cap at 50%. All of these show in each pilot's Secondary Bonuses.</p></div></div>`; }
+function payDebt(){ const sh=ship(); if((sh.bank||0)<=0) return toast('Ship bank is empty','Only a positive bank can pay TCA');
+  const max=Math.min(sh.bank,sh.debt||0); if(max<=0) return toast('Debt cleared','Nothing owed to TCA');
+  askNum('Pay TCA Debt from the ship bank (max '+cr(max)+')',max,v=>{ if(v==null) return; const amt=Math.max(0,Math.min(Math.round(v),max)); if(!amt) return;
+    sh.bank-=amt; sh.debt=(sh.debt||0)-amt; const line=shipWho()+' paid '+cr(amt)+' to TCA Debt ('+cr(sh.debt)+' remaining)'; shipLog(line); addReportLine(sh,line); saveShip();
+    toast(sh.debt>0?'Payment sent to TCA':'TCA DEBT PAID OFF',cr(sh.debt)+' remaining'); renderMain(); }); }
+function contributeBank(){ const c=S.chars[S.identity]; if(!c) return toast('Pick your pilot first','Switch identity to the pilot who is paying');
+  if((c.credits||0)<=0) return toast('No credits to contribute',c.name+' has '+cr(c.credits));
+  askNum(c.name+' pays into the ship bank (has '+cr(c.credits)+')',Math.min(1000,c.credits),v=>{ if(v==null) return; const amt=Math.max(0,Math.min(Math.round(v),c.credits||0)); if(!amt) return;
+    const sh=ship(); c.credits-=amt; saveChar(c); sh.bank=(sh.bank||0)+amt; const line=c.name+' paid '+cr(amt)+' into the ship bank'; shipLog(line); addReportLine(sh,line); saveShip();
+    toast('Contributed',cr(amt)+' from '+c.name); renderMain(); }); }
 
 /* ============================ modals ============================ */
 function modal(html){ $('#modalRoot').innerHTML=`<div class="scrim" onclick="if(event.target===this)closeModal()">${html}</div>`; }
@@ -1547,7 +1741,7 @@ function chitToPower(i){ const d=String(i.description||'');
     tpCost: tp?parseInt(tp[1]):(i.resourceCost||null), desc:i.description||'' }; }
 function addFromCatalog(key){
   const i=window.__cat[key]; if(!i) return; const scope=CATX.scope; const c=cur(); if(!canEdit(c.id))return warnEdit();
-  const cost=Math.max(0,Math.round(i.cost||0));
+  const cost=Math.max(0,Math.round((i.cost||0)*(1-(typeof shopDiscount==='function'?shopDiscount():0))));
   if(cost>(c.credits||0)){ toast('Insufficient credits','Need ◈'+cost.toLocaleString()+' · have ◈'+(c.credits||0).toLocaleString()); return; }
   const asPower=()=>{ c.powers=c.powers||[]; c.powers.push(chitToPower(i)); saveChar(c); toast('Ability card added',i.name); };
   const asCyber=()=>{ c.cybernetics=c.cybernetics||[]; c.cybernetics.push({name:i.name,subtype:i.subtype||i.rarity||'',desc:i.description||'',effects:[]}); saveChar(c); toast('Augment installed',i.name); };
