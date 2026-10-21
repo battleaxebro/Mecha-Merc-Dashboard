@@ -1237,10 +1237,26 @@ const SHIP_CAT_COLOR={Command:'#37e0c8',Engineering:'#f2a13e',Habitation:'#8b7bf
 const STATK=['crew','up','inc','ra','co','da','re','he','pw','mo','bu'];
 const cr=n=>'◈'+Math.round(n||0).toLocaleString();
 const sgn=n=>(n>0?'+':'')+(Math.round(n*10)/10).toLocaleString();
+const ROOM_SCALE={ // what one grid square represents on a 3 km city-ship
+  // districts x1000: city infrastructure
+  'Engineering Core':1000,'Atrium':1000,'Bunk Pods':1000,'Communal Quarters':1000,'Mess Hall':1000,'Galley Kitchen':1000,'Sealed Storage':1000,
+  'Bonded Warehouse':1000,'Hydroponics Garden':1000,'Mushroom Farm':1000,'Open Market':1000,'Ship Hangar':1000,'Droid Bay':1000,'Hospital':1000,
+  // complexes x100: neighborhood-scale facilities
+  'Engineering Workshop':100,'Fabrication Forge':100,'Armory':100,'Medbay':100,"Soldiers' Barracks":100,'Merc Barracks':100,'Mech Bay':100,
+  'Religious Hall':100,'Lounge':100,'Bio-Greenhouse':100,'Datavault Library':100,'Brig':100,
+  // venues x10: one large establishment
+  'Ship Bridge':10,'Council Meeting Chamber':10,'Tactical Command Center':10,'Syndicate Hall':10,'Restaurant':10,'Casino':10,'Neon Holo-Theater':10,
+  'Chrome Cabaret':10,'Courtesan Boudoir':10,'Laboratory':10,'Netrunner Den':10,'Chop Shop':10,"Smuggler's Hold":10,'Xeno-Kennel':10,'VR Construct':10,
+  'AI Combat Simulator':10,'Cyberclinic':10,'Supercharger Station':10,'Trophy Gallery':10,'Resurrection Bay':10,'Holonet Uplink':10,
+  // single establishments x1
+  'Noodle Bar':1,'Boxing Gym':1,'Deathstick Den':1,'Soothsayer':1,'Deep Archive':1,'Reliquary Vault':1,'Sensory Deprivation Tank':1,'Ripperdoc Cyberware Table':1 };
+const SCALE_NAME={1000:'District',100:'Complex',10:'Venue',1:'Single'};
+function rscale(room){ const o=ovr(room); return o.scale!=null?o.scale:(ROOM_SCALE[room]!=null?ROOM_SCALE[room]:100); }
+function scaleName(n){ return SCALE_NAME[n]||('×'+n); }
 function SC(){ return (S.ship&&+S.ship.scale)||1; }
 const SQ={Pod:4,Hold:16,Deck:36}; const SCALEK=['crew','up','inc','ra','co','da','bu','pw'];
 const SHIP_START_CFG={'Bunk Pods':{size:'Deck'},'Mess Hall':{size:'Deck',upgrades:["Chef's Galley"]}};
-const DEFAULT_OVR={'Bunk Pods':{label:'Housing District',bu:20000},'Mess Hall':{label:'Food Hall',ra:20000},'Mushroom Farm':{label:'Mushroom Lab',ra:10000},'Open Market':{ra:20000}};
+const DEFAULT_OVR={'Bunk Pods':{label:'Housing District',bu:20000},'Mess Hall':{label:'Food Hall',ra:20000},'Mushroom Farm':{label:'Mushroom Lab',ra:50000},'Open Market':{ra:20000}};
 function ovr(room){ const sh=S.ship||{}; return ((sh.overrides||{})[room])||{}; }
 function roomLabel(room){ return ovr(room).label||room; }
 function cellSize(c){ return (c&&c.size)||((ROOMS[c&&c.room]||{}).space)||'Hold'; }
@@ -1250,7 +1266,8 @@ function placeRoom(cells,c){ const w=spans(c); for(let i=0;i<cells.length;i++){ 
 function defaultShip(){ const cells=Array(SHIP_COLS*SHIP_ROWS).fill(null);
   SHIP_START.forEach(n=>{ const cfg=SHIP_START_CFG[n]||{}; placeRoom(cells,{room:n,upgrades:[...(cfg.upgrades||[])],...(cfg.size?{size:cfg.size}:{})}); });
   return {v:2,scale:1000,residents:95000,refugees:30000,name:"Eugene's Dream",day:1,bank:0,flying:true,party:5,passengers:0,holds:10,heat:0,renown:0,stock:{rations:0,components:0,data:0},cells,log:[]}; }
-function ship(){ if(!S.ship||!Array.isArray(S.ship.cells)) S.ship=defaultShip(); if(!S.ship.v||S.ship.v<2) migrateShip(S.ship); if(S.ship.v<3) migrateV3(S.ship); if(S.ship.v<4){ if(S.ship.scale==null) S.ship.scale=1000; if(!S.ship.holds||S.ship.holds===10) S.ship.holds=48; S.ship.v=4; } return S.ship; }
+function ship(){ if(!S.ship||!Array.isArray(S.ship.cells)) S.ship=defaultShip(); if(!S.ship.v||S.ship.v<2) migrateShip(S.ship); if(S.ship.v<3) migrateV3(S.ship); if(S.ship.v<5){ S.ship.overrides=S.ship.overrides||{}; S.ship.overrides['Mushroom Farm']={...(S.ship.overrides['Mushroom Farm']||{label:'Mushroom Lab'}),ra:50000}; if((S.ship.v||0)>=4) S.ship.v=5; }
+  if(S.ship.v<4){ if(S.ship.scale==null) S.ship.scale=1000; if(!S.ship.holds||S.ship.holds===10) S.ship.holds=48; S.ship.v=5; } return S.ship; }
 function migrateV3(sh){ sh.overrides={...JSON.parse(JSON.stringify(DEFAULT_OVR)),...(sh.overrides||{})};
   if(sh.residents==null) sh.residents=95000; if(sh.refugees==null) sh.refugees=30000;
   sh.v=3; const core=sh.cells.find(c=>c&&c.room==='Engineering Core'); S.ship=sh;
@@ -1264,9 +1281,9 @@ function shipLog(msg){ const sh=ship(); sh.log=[{t:Date.now(),day:sh.day,msg},..
 function shipWho(){ return S.identity==='dm'?'DM':((S.chars[S.identity]||{}).name||'Someone'); }
 function upgradesFor(room){ return SHIPRULES.upgrades.map((u,i)=>({...u,i})).filter(u=>u.room===room).sort((a,b)=>a.tier-b.tier); }
 function roomStats(cell){ const r=ROOMS[cell.room]; if(!r) return null; const s={cf:r.cf}; const m=(SQ[cellSize(cell)]||16)/(SQ[r.space]||16);
-  STATK.forEach(k=>s[k]=SCALEK.includes(k)?Math.round((r[k]||0)*m*SC()):(r[k]||0));
+  STATK.forEach(k=>s[k]=SCALEK.includes(k)?Math.round((r[k]||0)*m*rscale(cell.room)):(r[k]||0));
   const o=ovr(cell.room); STATK.forEach(k=>{ if(o[k]!=null) s[k]=o[k]; });
-  (cell.upgrades||[]).forEach(un=>{ const u=SHIPRULES.upgrades.find(x=>x.room===cell.room&&x.n===un); if(u) STATK.forEach(k=>s[k]+=(u[k]||0)*(SCALEK.includes(k)?SC():1)); }); return s; }
+  (cell.upgrades||[]).forEach(un=>{ const u=SHIPRULES.upgrades.find(x=>x.room===cell.room&&x.n===un); if(u) STATK.forEach(k=>s[k]+=(u[k]||0)*(SCALEK.includes(k)?rscale(cell.room):1)); }); return s; }
 function heatTier(h){ return h>=75?'Kill Order':h>=50?'Most Wanted':h>=25?'Hunted':h>=10?'Watched':'Cold'; }
 function renownTier(r){ const T=[[5000,'Myth'],[2000,'Legend of the Lanes'],[1000,'Name in Lights'],[750,'Syndicate Player'],[500,'Port Favorite'],[300,'Street Legend'],[150,'Trusted Crew'],[50,'Known Hauler'],[0,'Nobody']]; return T.find(t=>r>=t[0])[1]; }
 function shipCalc(){ const sh=ship(); const t={inc:0,incCF:0,rooms:0,used:0}; STATK.forEach(k=>{ if(k!=='inc') t[k]=0; });
@@ -1296,20 +1313,20 @@ function shipPay(cost,what){ const sh=ship(); if(cost>(sh.bank||0)){ toast('Insu
 function shipBuild(i,pay){ const sh=ship(); const nm=(document.getElementById('shipNewRoom')||{}).value||S.shipPreview; const R=ROOMS[nm]; if(!R) return;
   const old=sh.cells[i]; const size=(old&&old.size)||R.space;
   if(size==='Deck' && !(old&&spans(old)===2) && !canSpan(sh.cells,i)){ toast(nm+' is a Deck room','It needs this square and the empty one to its right'); return; }
-  if(pay && !shipPay(R.cost*SC(),nm)) return;
+  if(pay && !shipPay(R.cost*rscale(nm),nm)) return;
   if(old&&spans(old)===2&&size!=='Deck') sh.cells[i+1]=null;
   sh.cells[i]={room:nm,upgrades:[],...(old&&old.size?{size:old.size}:{})}; if(size==='Deck') sh.cells[i+1]={span:i}; S.shipPreview=null;
-  shipLog(shipWho()+(old?' converted '+old.room+' into ':' built ')+nm+(pay&&R.cost*SC()?' ('+cr(R.cost*SC())+')':' (no charge)')); saveShip(); renderMain(); }
+  shipLog(shipWho()+(old?' converted '+old.room+' into ':' built ')+nm+(pay&&R.cost*rscale(nm)?' ('+cr(R.cost*rscale(nm))+')':' (no charge)')); saveShip(); renderMain(); }
 function shipRemove(i){ const sh=ship(); const c=sh.cells[i]; if(!c) return; if(spans(c)===2) sh.cells[i+1]=null; sh.cells[i]=null; shipLog(shipWho()+' cleared '+c.room); S.shipSel=null; saveShip(); renderMain(); }
 function shipUpgrade(i,ui,pay){ const sh=ship(); const c=sh.cells[i]; const u=SHIPRULES.upgrades[ui]; if(!c||!u) return;
-  if(pay && !shipPay(u.cost*SC(),u.n)) return; c.upgrades=[...(c.upgrades||[]),u.n];
-  shipLog(shipWho()+' installed '+u.n+' in '+c.room+(pay&&u.cost*SC()?' ('+cr(u.cost*SC())+')':' (no charge)')); saveShip(); renderMain(); }
+  if(pay && !shipPay(u.cost*rscale(u.room),u.n)) return; c.upgrades=[...(c.upgrades||[]),u.n];
+  shipLog(shipWho()+' installed '+u.n+' in '+c.room+(pay&&u.cost*rscale(u.room)?' ('+cr(u.cost*rscale(u.room))+')':' (no charge)')); saveShip(); renderMain(); }
 const ENLARGE={Pod:['Hold',5000],Hold:['Deck',20000]};
 function shipEnlarge(i,pay){ const sh=ship(); const c=sh.cells[i]; if(!c) return; const z=cellSize(c); const e=ENLARGE[z]; if(!e) return;
   if(e[0]==='Deck' && !canSpan(sh.cells,i)){ toast('No room to enlarge','Clear the square to the right of '+c.room+' first'); return; }
-  if(pay && !shipPay(e[1]*SC(),'enlarge')) return; c.size=e[0]; if(e[0]==='Deck') sh.cells[i+1]={span:i};
-  shipLog(shipWho()+' enlarged '+c.room+' to a '+e[0]+(pay?' ('+cr(e[1]*SC())+')':' (no charge)')); saveShip(); renderMain(); }
-function shipOvrNum(i,k,label){ const sh=ship(); const c=sh.cells[+i]; if(!c)return; const cur=roomStats(c)[k]; askNum(label+' — '+roomLabel(c.room),cur,v=>{ if(v==null)return; sh.overrides=sh.overrides||{}; sh.overrides[c.room]={...(sh.overrides[c.room]||{}),[k]:Math.round(v)}; shipLog(shipWho()+' set '+roomLabel(c.room)+' '+label+' to '+Math.round(v).toLocaleString()); saveShip(); renderMain(); }); }
+  if(pay && !shipPay(e[1]*rscale(c.room),'enlarge')) return; c.size=e[0]; if(e[0]==='Deck') sh.cells[i+1]={span:i};
+  shipLog(shipWho()+' enlarged '+c.room+' to a '+e[0]+(pay?' ('+cr(e[1]*rscale(c.room))+')':' (no charge)')); saveShip(); renderMain(); }
+function shipOvrNum(i,k,label){ const sh=ship(); const c=sh.cells[+i]; if(!c)return; const cur=k==='scale'?rscale(c.room):roomStats(c)[k]; askNum(label+' — '+roomLabel(c.room),cur,v=>{ if(v==null)return; sh.overrides=sh.overrides||{}; sh.overrides[c.room]={...(sh.overrides[c.room]||{}),[k]:Math.round(v)}; shipLog(shipWho()+' set '+roomLabel(c.room)+' '+label+' to '+Math.round(v).toLocaleString()); saveShip(); renderMain(); }); }
 function shipOvrLabel(i){ const sh=ship(); const c=sh.cells[+i]; if(!c)return;
   modal(`<div class="modal" style="width:min(360px,94vw)"><div class="modal-h"><h3>Rename ${esc(roomLabel(c.room))}</h3><button class="x" onclick="closeModal()">×</button></div><div class="modal-b"><input id="ovlbl" value="${esc(roomLabel(c.room))}"><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button class="btn sec" onclick="closeModal()">Cancel</button><button class="btn" id="ovok">Save</button></div></div></div>`);
   document.getElementById('ovok').onclick=()=>{ const v=document.getElementById('ovlbl').value.trim(); closeModal(); if(!v)return; sh.overrides=sh.overrides||{}; sh.overrides[c.room]={...(sh.overrides[c.room]||{}),label:v}; saveShip(); renderMain(); }; }
@@ -1347,13 +1364,13 @@ function renderShip(){ const main=$('#main'); const sh=ship(); const k=shipCalc(
     ${shipTile('Heat',(sh.heat||0),`${heatTier(sh.heat||0)} · ${sgn(k.heatDay)} / day`,(sh.heat||0)>=25?'neg':'',"shipEditNum('heat','Current Heat')")}
     ${shipTile('Renown',(sh.renown||0),`${renownTier(sh.renown||0)} · ${sgn(k.renownDay)} / day`,'',"shipEditNum('renown','Current Renown')")}
     ${shipTile('Jobs filled',k.crew.toLocaleString(),k.crew>k.people?'<span style="color:var(--danger)">'+(k.crew-k.people).toLocaleString()+' unfilled</span>':((k.people-k.crew).toLocaleString()+' unemployed'),k.crew>k.people?'neg':'')}
-    ${shipTile('District scale','×'+SC().toLocaleString(),'each room = a city district','',"shipEditNum('scale','District scale (room stats and costs multiplier)')")}
+    ${shipTile('Freight / fuel scale','×'+SC().toLocaleString(),'ship-wide trade &amp; fuel','',"shipEditNum('scale','Freight & fuel multiplier')")}
   </div>`;
   let grid='<div class="shipgrid">';
   sh.cells.forEach((c,i)=>{ if(c&&c.span!=null) return; const sel=S.shipSel===i?'sel':'';
     if(!c){ grid+=`<div class="scell empty ${sel}" onclick="shipSelect(${i})"><span>＋</span><small>empty hold</small></div>`; return; }
     const R=ROOMS[c.room]||{}; const s=roomStats(c)||{}; const col=SHIP_CAT_COLOR[R.cat]||'var(--line-bright)';
-    grid+=`<div class="scell ${sel}" style="--rc:${col};${spans(c)===2?'grid-column:span 2':''}" onclick="shipSelect(${i})"><div><div class="rn">${esc(roomLabel(c.room))}</div><div class="rm">${esc(R.cat||'')} · ${esc(cellSize(c))}${cellSize(c)!==R.space?' (enlarged)':''}</div></div>
+    grid+=`<div class="scell ${sel}" style="--rc:${col};${spans(c)===2?'grid-column:span 2':''}" onclick="shipSelect(${i})"><div><div class="rn">${esc(roomLabel(c.room))}</div><div class="rm">${scaleName(rscale(c.room))} · ${esc(cellSize(c))}${cellSize(c)!==R.space?' (enlarged)':''}</div></div>
       <div class="rm">${s.inc?'<span style="color:var(--good)">+'+s.inc+'</span> ':''}${s.up?'<span style="color:var(--danger)">−'+s.up+'</span>':''}${(c.upgrades||[]).length?' · <span style="color:var(--warn)">★'+c.upgrades.length+'</span>':''}</div></div>`; });
   grid+='</div>';
   const left=`<div class="panel"><div class="panel-h"><h3>Deck Plan</h3><span class="status" style="margin-left:6px">${SHIP_COLS}×${SHIP_ROWS}</span><span style="flex:1"></span><span class="status">click a room to edit or upgrade</span></div><div class="panel-b">${grid}</div></div>`;
@@ -1379,36 +1396,36 @@ function shipLogPanel(){ const sh=ship(); return `<div class="panel" style="marg
 function shipPreview(v){ S.shipPreview=v; renderMain(); }
 function shipRoomPanel(i){ const sh=ship(); const c=sh.cells[i]; const R=c?ROOMS[c.room]:null;
   const pv=S.shipPreview&&ROOMS[S.shipPreview]?ROOMS[S.shipPreview]:null;
-  const opts=SHIPRULES.rooms.map(r=>`<option value="${esc(r.n)}" ${(pv?pv.n:(c?c.room:''))===r.n?'selected':''}>${esc(r.n)} — ${r.space}${r.cost*SC()?' · '+cr(r.cost*SC()):''}</option>`).join('');
+  const opts=SHIPRULES.rooms.map(r=>`<option value="${esc(r.n)}" ${(pv?pv.n:(c?c.room:''))===r.n?'selected':''}>${esc(roomLabel(r.n))} — ${scaleName(rscale(r.n))}, ${r.space}${r.cost*rscale(r.n)?' · '+cr(r.cost*rscale(r.n)):''}</option>`).join('');
   const target=pv||(!c?null:null);
   let h=`<div class="panel"><div class="panel-h"><h3>${c?esc(roomLabel(c.room)):'Empty cargo space'}</h3><span class="status" style="margin-left:6px">cell ${i+1}</span><span style="flex:1"></span><button class="x" onclick="shipSelect(${i})">×</button></div><div class="panel-b">`;
   if(R){ const s=roomStats(c); const z=cellSize(c); const e=ENLARGE[z]; h+=`<div style="font-size:12px;color:var(--ink-mid);margin-bottom:8px">${esc(R.cat)} · <b>${esc(z)}</b>${z!==R.space?' (base '+esc(R.space)+', output scaled ×'+(Math.round(SQ[z]/SQ[R.space]*100)/100)+')':''} · ${esc(R.type)}</div>
-      ${e?`<div class="acts" style="margin-bottom:8px"><button class="rbtn" onclick="shipEnlarge(${i},true)">Enlarge to ${e[0]} −${cr(e[1]*SC())}</button><button class="rbtn ghost" onclick="shipEnlarge(${i},false)">Enlarge free</button></div>`:''}
+      ${e?`<div class="acts" style="margin-bottom:8px"><button class="rbtn" onclick="shipEnlarge(${i},true)">Enlarge to ${e[0]} −${cr(e[1]*rscale(c.room))}</button><button class="rbtn ghost" onclick="shipEnlarge(${i},false)">Enlarge free</button></div>`:''}
       <p style="font-size:12.5px;margin:0 0 8px">${esc(R.what||'')}</p>
       ${R.wo&&!/^None/.test(R.wo)?`<p style="font-size:12px;color:var(--ink-mid);margin:0 0 8px"><b>Work order:</b> ${esc(R.wo)}</p>`:''}
       ${R.draw?`<p style="font-size:12px;color:var(--danger);margin:0 0 8px"><b>Drawback:</b> ${esc(R.draw)}</p>`:''}
       <div class="fxwrap">${fxList(s)||'<span class="fxc">no daily effect</span>'}</div>
-      <div class="acts" style="margin:6px 0 2px"><button class="rbtn ghost" onclick="shipOvrLabel('${i}')">Rename type</button><button class="rbtn ghost" onclick="shipOvrNum('${i}','bu','Housing (bunks) per room')">Set housing</button><button class="rbtn ghost" onclick="shipOvrNum('${i}','ra','Food (rations/day) per room')">Set food</button><button class="rbtn ghost" onclick="shipOvrNum('${i}','pw','Power per room')">Set power</button></div>
+      <div class="acts" style="margin:6px 0 2px"><button class="rbtn ghost" onclick="shipOvrNum('${i}','scale','Scale (1 single, 10 venue, 100 complex, 1000 district)')">Scale: ${scaleName(rscale(c.room))}</button><button class="rbtn ghost" onclick="shipOvrLabel('${i}')">Rename type</button><button class="rbtn ghost" onclick="shipOvrNum('${i}','bu','Housing (bunks) per room')">Set housing</button><button class="rbtn ghost" onclick="shipOvrNum('${i}','ra','Food (rations/day) per room')">Set food</button><button class="rbtn ghost" onclick="shipOvrNum('${i}','pw','Power per room')">Set power</button></div>
       <div style="font-size:10.5px;color:var(--ink-faint)">House-rule values apply to every room of this type.</div>`;
     const ups=upgradesFor(c.room);
     h+=`<div class="sechead"><h3>Upgrades</h3><div class="ln"></div></div>`;
     h+= ups.length? ups.map(u=>{ const owned=(c.upgrades||[]).includes(u.n); const prev=ups.filter(x=>x.tier<u.tier); const unlocked=prev.every(x=>(c.upgrades||[]).includes(x.n));
-        return `<div class="upcard ${owned?'own':''}"><div class="top"><b>T${u.tier} · ${esc(u.n)}</b><span class="mono" style="color:var(--accent)">${cr(u.cost*SC())}</span></div>
+        return `<div class="upcard ${owned?'own':''}"><div class="top"><b>T${u.tier} · ${esc(u.n)}</b><span class="mono" style="color:var(--accent)">${cr(u.cost*rscale(u.room))}</span></div>
           <div class="fxwrap">${fxList(u)}</div>
           ${u.adv?`<div style="font-size:11.5px;color:var(--good)">+ ${esc(u.adv)}</div>`:''}${u.dis?`<div style="font-size:11.5px;color:var(--danger)">− ${esc(u.dis)}</div>`:''}
           <div style="font-size:10.5px;color:var(--ink-faint);margin-top:3px">${u.days} build days · install DC ${esc(u.dc)}${u.comp?' · '+u.comp+' components':''}${u.req&&u.req!=='-'?' · requires '+esc(u.req):''}</div>
           <div class="acts" style="margin-top:6px">${owned?`<span class="chip" style="color:var(--good)">installed</span><button class="rbtn dngr" onclick="shipUnupgrade(${i},${u.i})">Remove</button>`
-            : unlocked?`<button class="rbtn" onclick="shipUpgrade(${i},${u.i},true)">Install −${cr(u.cost*SC())}</button><button class="rbtn ghost" onclick="shipUpgrade(${i},${u.i},false)">Add free</button>`
+            : unlocked?`<button class="rbtn" onclick="shipUpgrade(${i},${u.i},true)">Install −${cr(u.cost*rscale(u.room))}</button><button class="rbtn ghost" onclick="shipUpgrade(${i},${u.i},false)">Add free</button>`
             :`<span class="chip">needs tier ${u.tier-1} first</span>`}</div></div>`; }).join('')
       : '<div class="empty" style="padding:8px">No upgrades for this room.</div>';
   }
   h+=`<div class="sechead"><h3>${c?'Convert to a different room':'Build a room here'}</h3><div class="ln"></div></div>
     <select id="shipNewRoom" onchange="shipPreview(this.value)"><option value="">— choose a room —</option>${opts}</select>`;
-  if(pv){ h+=`<div class="upcard" style="margin-top:8px"><div class="top"><b>${esc(pv.n)}</b><span class="mono" style="color:var(--accent)">${cr(pv.cost*SC())}</span></div>
+  if(pv){ h+=`<div class="upcard" style="margin-top:8px"><div class="top"><b>${esc(pv.n)}</b><span class="mono" style="color:var(--accent)">${cr(pv.cost*rscale(pv.n))}</span></div>
       <div style="font-size:11.5px;color:var(--ink-mid)">${esc(pv.cat)} · ${esc(pv.space)} · ${pv.days} build days${pv.pre&&pv.pre!=='None'?' · prereq: '+esc(pv.pre):''}</div>
       <p style="font-size:12px;margin:6px 0">${esc(pv.what||'')}</p><div class="fxwrap">${fxList(pv)}</div>
-      <div style="font-size:11px;color:var(--ink-dim);margin-top:6px"><b>Available upgrades:</b> ${upgradesFor(pv.n).map(u=>'T'+u.tier+' '+esc(u.n)+' ('+cr(u.cost*SC())+')').join(' · ')||'none'}</div>
-      <div class="acts" style="margin-top:8px"><button class="rbtn" onclick="shipBuild(${i},true)">Build −${cr(pv.cost*SC())}</button><button class="rbtn ghost" onclick="shipBuild(${i},false)">Place free</button></div></div>`; }
+      <div style="font-size:11px;color:var(--ink-dim);margin-top:6px"><b>Available upgrades:</b> ${upgradesFor(pv.n).map(u=>'T'+u.tier+' '+esc(u.n)+' ('+cr(u.cost*rscale(u.room))+')').join(' · ')||'none'}</div>
+      <div class="acts" style="margin-top:8px"><button class="rbtn" onclick="shipBuild(${i},true)">Build −${cr(pv.cost*rscale(pv.n))}</button><button class="rbtn ghost" onclick="shipBuild(${i},false)">Place free</button></div></div>`; }
   if(c) h+=`<button class="rbtn dngr" style="margin-top:12px" onclick="shipRemove(${i})">Clear this space</button>`;
   return h+`</div></div>`; }
 
