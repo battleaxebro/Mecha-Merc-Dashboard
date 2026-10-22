@@ -36,6 +36,52 @@ app.post('/api/party', (req, res) => {
 });
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 
+// ---- backups: per-save history + daily snapshots + DM download/restore ----
+const dmHeader = (req) => req.get('x-dm-token') || req.query.t;
+const today = () => new Date().toISOString().slice(0, 10);
+async function snapshot(id) {
+  const st = await fullState(); delete st.rolls;
+  await store.put('backups', id, { t: Date.now(), state: st });
+  const all = (await store.getAll('backups')).map(b => b.id).sort();
+  for (const old of all.slice(0, Math.max(0, all.length - 30))) await store.del('backups', old);
+}
+async function dailySnapshot() {
+  try { if (!(await store.get('backups', today()))) { await snapshot(today()); console.log('[backup] snapshot', today()); } }
+  catch (e) { console.error('[backup] failed', e.message); }
+}
+async function keepHistory(collection, id, prev) {
+  if (!prev || (collection !== 'characters' && collection !== 'mechs')) return;
+  const h = (await store.get('history', collection + ':' + id))?.list || [];
+  await store.put('history', collection + ':' + id, { list: [{ t: Date.now(), data: prev }, ...h].slice(0, 25) });
+}
+app.get('/api/backups', async (req, res) => {
+  if (dmHeader(req) !== dmToken()) return res.status(401).json({ ok: false });
+  const snaps = (await store.getAll('backups')).map(b => ({ id: b.id, t: b.t })).sort((a, b) => b.id.localeCompare(a.id));
+  res.json({ ok: true, snapshots: snaps });
+});
+app.get('/api/backup', async (req, res) => {
+  if (dmHeader(req) !== dmToken()) return res.status(401).send('DM only');
+  const st = await fullState();
+  res.setHeader('Content-Disposition', `attachment; filename="mecha-merc-backup-${today()}.json"`);
+  res.json({ backupOf: 'mecha-merc', t: Date.now(), state: st });
+});
+app.post('/api/restore', async (req, res) => {
+  if (dmHeader(req) !== dmToken()) return res.status(401).json({ ok: false });
+  const b = req.body || {};
+  let st = null;
+  if (b.snapshot) st = (await store.get('backups', b.snapshot))?.state;
+  else if (b.data) st = b.data.state || b.data;
+  if (!st || !Array.isArray(st.characters)) return res.status(400).json({ ok: false, error: 'No backup data' });
+  await snapshot('pre-restore-' + new Date().toISOString().replace(/[:.]/g, '-'));
+  for (const c of st.characters) await store.put('characters', c.id, c);
+  for (const m of st.mechs || []) await store.put('mechs', m.id, m);
+  for (const l of st.library || []) await store.put('library', l.id, l);
+  if (st.settings) await store.put('settings', 'settings', st.settings);
+  if (st.ship) await store.put('ship', 'eugene', st.ship);
+  io.to('party').emit('state', await fullState());
+  res.json({ ok: true });
+});
+
 // ---- seed on first boot ----
 async function seedIfEmpty() {
   if (!(await store.isEmpty())) return;
@@ -84,7 +130,13 @@ io.on('connection', (socket) => {
   socket.on('write', async ({ auth, collection, id, data }) => {
     if (!authed) return;
     if (!(await canWrite(auth, collection, id, data))) { socket.emit('nope', { collection, id }); return; }
-    const saved = await store.put(collection, id, data);
+    // never let a client (e.g. an older/newer UI) silently drop fields it doesn't know about
+    let body = data;
+    if (collection === 'characters' || collection === 'mechs') {
+      const prev = await store.get(collection, id);
+      if (prev) { body = { ...prev, ...data }; await keepHistory(collection, id, prev); }
+    }
+    const saved = await store.put(collection, id, body);
     io.to('party').emit('update', { collection, id, data: saved });
   });
 
@@ -124,4 +176,6 @@ io.on('connection', (socket) => {
 
 await store.init();
 await seedIfEmpty();
+await dailySnapshot();
+setInterval(dailySnapshot, 60 * 60 * 1000);
 server.listen(PORT, () => console.log(`Mecha Merc Terminal on :${PORT}  (party="${PARTY_CODE}")`));

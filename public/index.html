@@ -383,6 +383,7 @@ textarea{resize:vertical;min-height:60px;font-size:12px}
 .zonebox input{width:100%}.zonebox input.zone-althus{accent-color:var(--danger)}.zonebox input.zone-frontier{accent-color:#4a8fe7}.zonebox input.zone-neutral{accent-color:var(--good)}
 .actrow{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--line)}.actrow>div{flex:1}.actrow .n{font-weight:600;font-size:13px}.actrow .n small{font-weight:400;color:var(--ink-faint)}.actrow .m{font-size:11px;color:var(--ink-mid)}.actrow .cost{font-size:11px;white-space:nowrap}.rbtn[disabled]{opacity:.4;cursor:not-allowed}
 .mtier{font-size:11.5px;padding:5px 8px;border-radius:6px;margin-bottom:3px;color:var(--ink-mid)}.mtier b{color:var(--ink)}.mtier small{color:var(--ink-faint)}.mtier.on{background:color-mix(in srgb,var(--good) 14%,transparent);color:var(--ink)}
+.vital.insp .step{justify-content:center}.vital.insp.lit .val{color:var(--warn);text-shadow:0 0 10px color-mix(in srgb,var(--warn) 60%,transparent)}
 .report{border-bottom:1px solid var(--line-soft);padding:6px 0}.report:last-child{border-bottom:0}
 .report .rhead{display:flex;justify-content:space-between;cursor:pointer;font-size:12.5px}
 .report ul{margin:6px 0 2px;padding-left:18px;font-size:11.5px;color:var(--ink-mid)}.report ul.finds{color:var(--ink)}
@@ -521,7 +522,18 @@ function cur(){ return S.sel?S.chars[S.sel]:null; }
 function curMech(){ const c=cur(); return c&&c.mechRef?Object.values(S.mechs).find(m=>m.id===c.mechRef):null; }
 function canEdit(id){ return S.identity==='dm' || S.identity===id; }
 function isDM(){ return S.identity==='dm'; }
-function saveChar(c){ S.chars[c.id]=c; if(socket)socket.emit('write',{auth:authPayload(),collection:'characters',id:c.id,data:c}); }
+function localBackup(col,d){ try{ const k='mm_bak_'+col+'_'+d.id; const L=JSON.parse(localStorage.getItem(k)||'[]'); L.unshift({t:Date.now(),d}); localStorage.setItem(k,JSON.stringify(L.slice(0,20))); }catch(e){} }
+async function dmBackups(){ if(!isDM()) return; const r=await fetch('/api/backups',{headers:{'x-dm-token':S.auth.dmToken||''}}).then(r=>r.json()).catch(()=>null); if(!r||!r.ok) return toast('Backups unavailable','');
+  modal(`<div class="modal" style="width:min(520px,94vw)"><div class="modal-h"><h3>Backups</h3><button class="x" onclick="closeModal()">×</button></div><div class="modal-b">
+   <p style="font-size:12px;color:var(--ink-mid);margin:0 0 10px">The server snapshots everything once a day (last 30 kept) and keeps the last 25 versions of every pilot and mech. Download a copy any time.</p>
+   <a class="btn" href="/api/backup?t=${encodeURIComponent(S.auth.dmToken||'')}" download>⬇ Download full backup (.json)</a>
+   <div class="eyebrow" style="margin:12px 0 4px">Daily snapshots</div>
+   ${r.snapshots.map(x=>`<div class="bonusrow"><span>${esc(x.id)}</span><button class="rbtn ghost" onclick="dmRestore('${x.id}')">Restore</button></div>`).join('')||'<div class="empty">None yet</div>'}
+   <div class="eyebrow" style="margin:12px 0 4px">Restore from a downloaded file</div><input type="file" accept=".json" onchange="dmRestoreFile(this.files[0])"></div></div>`); }
+async function dmRestore(id){ const r=await fetch('/api/restore',{method:'POST',headers:{'content-type':'application/json','x-dm-token':S.auth.dmToken||''},body:JSON.stringify({snapshot:id})}).then(r=>r.json()).catch(()=>({})); closeModal(); toast(r.ok?'Restored':'Restore failed',id); }
+async function dmRestoreFile(f){ if(!f) return; const txt=await f.text(); let data; try{ data=JSON.parse(txt); }catch(e){ return toast('Not a backup file',''); }
+  const r=await fetch('/api/restore',{method:'POST',headers:{'content-type':'application/json','x-dm-token':S.auth.dmToken||''},body:JSON.stringify({data})}).then(r=>r.json()).catch(()=>({})); closeModal(); toast(r.ok?'Restored from file':'Restore failed',f.name); }
+function saveChar(c){ S.chars[c.id]=c; localBackup('characters',c); if(socket)socket.emit('write',{auth:authPayload(),collection:'characters',id:c.id,data:c}); }
 function saveMech(m){ S.mechs[m.id]=m; if(socket)socket.emit('write',{auth:authPayload(),collection:'mechs',id:m.id,data:m}); }
 function saveSettings(){ if(socket)socket.emit('write',{auth:authPayload(),collection:'settings',id:'settings',data:S.settings}); }
 const signed=n=>(n>=0?'+':'')+n;
@@ -632,6 +644,7 @@ function spend(label,use){ const c=cur(); if(!canEdit(c.id))return warnEdit(); a
 function vitalRef(kind){ const c=cur(),m=curMech();
   if(kind==='hp')return {g:()=>c.hp.value,s:v=>c.hp.value=v,mx:()=>withEffects(c).hp.max,sv:()=>saveChar(c),lab:'HP'};
   if(kind==='tp')return {g:()=>c.tp.value,s:v=>c.tp.value=v,mx:()=>withEffects(c).tp.max||99,sv:()=>saveChar(c),lab:'Tech Points'};
+  if(kind==='insp')return {g:()=>c.inspiration||0,s:v=>c.inspiration=v,mx:()=>99,sv:()=>saveChar(c),lab:'Inspiration'};
   if(kind==='mhp')return {g:()=>m.hp.value,s:v=>m.hp.value=v,mx:()=>m.hp.max,sv:()=>saveMech(m),lab:'Hull'};
   m.shields=m.shields||{value:0,max:0}; return {g:()=>m.shields.value,s:v=>m.shields.value=v,mx:()=>m.shields.max,sv:()=>saveMech(m),lab:'Shields'}; }
 function adjustVital(kind,n){ const c=cur(); if(!canEdit(c.id))return warnEdit(); const r=vitalRef(kind); r.s(Math.max(0,Math.min(r.mx(),(r.g()||0)+n))); r.sv(); renderMain(); }
@@ -850,7 +863,7 @@ function centerDash(c,ec,mech,em,inMech){
       <div style="color:var(--ink-mid);font-size:12px">${esc(c.species||'')} ${esc(c.class||'')} · Lvl ${c.level||5}${c.archetype?' · '+esc(c.archetype):''}</div>
       <div class="tags" style="margin-top:8px"><span class="tag">PB <b>${signed(pbOf(c))}</b></span><span class="tag">Init <b>${signed(ec.initiative||0)}</b></span><span class="tag">◈ <b>${(c.credits||0).toLocaleString()}</b></span></div>
     </div></div></div>`;
-  let vit=`<div class="vitals" style="grid-template-columns:repeat(4,1fr);margin:14px 0">`;
+  let vit=`<div class="vitals" style="grid-template-columns:repeat(5,1fr);margin:14px 0">`;
   if(inMech){
     vit+=vitalCard('Hull',mech.hp.value,mech.hp.max,'var(--mech)','mhp',ed);
     vit+=vitalCard('Shields',(mech.shields||{}).value||0,(mech.shields||{}).max||0,'var(--pilot)','msh',ed);
@@ -862,6 +875,7 @@ function centerDash(c,ec,mech,em,inMech){
     vit+=`<div class="vital"><div class="lab"><span>Armor</span></div><div class="val mono">${ec.ac}</div></div>`;
     vit+=`<div class="vital"><div class="lab"><span>Speed</span></div><div class="val mono">${ec.speed||30}<small>ft</small></div></div>`;
   }
+  vit+=inspCard(c,ed);
   vit+=`</div>`;
   const cards=handCards(c,ec,mech,em,inMech);
   let hand=`<div class="panel"><div class="panel-h"><h3>${inMech?'Mech Actions':'Abilities'} — Hand</h3><span style="flex:1"></span><span class="status">select a card to roll</span>${ed?`${inMech?`<button class="addbtn" onclick="openCatalog('maugment')">＋ Augment</button>`:`<button class="addbtn" onclick="openCatalog('techpower')">＋ Chit</button>`}<button class="addbtn" style="margin-left:6px" onclick="setTab('forge')">＋ New</button>`:''}</div>
@@ -905,6 +919,9 @@ function abilityItemCard(it,ec,scope){
   else if(Object.keys(use).length) acts+=`<button class="rbtn" onclick='spend(${JSON.stringify(it.name)},${JSON.stringify(use)})'>Use · ${esc(useMsg(use))}</button>`;
   return baseCard(it.name, it.description||it.desc||'', it.activation||'ability', acts||`<span class="chip">passive</span>`);
 }
+function inspCard(c,ed){ const v=c.inspiration||0;
+  return `<div class="vital insp${v?' lit':''}"><div class="lab"><span>Inspiration</span></div><div class="val mono">${v}</div>
+    ${ed?`<div class="step"><button onclick="adjustVital('insp',-1)" title="Spend one">▼</button><button onclick="adjustVital('insp',1)" title="Gain one">▲</button></div>`:''}</div>`; }
 function vitalCard(lab,val,max,col,kind,ed){
   const pct=max?Math.max(0,Math.min(100,100*val/max)):0;
   const clk=(ed&&kind)?`class="vital editable" onclick="setVital('${kind}')" title="Click the number to set exactly"`:`class="vital"`;
@@ -1379,7 +1396,7 @@ function renderShip(){ const main=$('#main'); const sh=ship(); const k=shipCalc(
   const head=`<div class="shiphead"><div><div class="eyebrow">Communal Ship</div><h2 style="font-size:24px">${esc(sh.name)}</h2><div style="color:var(--ink-mid);font-size:12px">3 km city-ship · ~100,000 containers · ${k.rooms} districts · ${k.freeHolds} unconverted holds · anyone aboard can edit</div></div>
     <div class="shipctl">${zoneSlider(sh)}<div class="daybox"><span class="eyebrow">Day</span><b class="mono">${sh.day}</b></div>
       <div class="modeswitch" style="min-width:150px"><button class="${sh.flying?'on':''}" onclick="shipSet('flying',true)">Flying</button><button class="${!sh.flying?'on':''}" onclick="shipSet('flying',false)">Docked</button></div>
-      <button class="btn sec" ${(sh.history||[]).length?'':'disabled'} onclick="shipBack()" title="Undo the last day (up to 7)">◂ Back a day</button><button class="btn" onclick="shipAdvance(1)">Advance day ▸</button><button class="btn sec" onclick="shipAdvance(7)">+7 days</button>${isDM()?'<button class="rbtn dngr" onclick="shipReset()">Reset to Day 1</button>':''}</div></div>`;
+      <button class="btn sec" ${(sh.history||[]).length?'':'disabled'} onclick="shipBack()" title="Undo the last day (up to 7)">◂ Back a day</button><button class="btn" onclick="shipAdvance(1)">Advance day ▸</button><button class="btn sec" onclick="shipAdvance(7)">+7 days</button>${isDM()?'<button class="rbtn dngr" onclick="shipReset()">Reset to Day 1</button><button class="rbtn ghost" onclick="dmBackups()">Backups</button>':''}</div></div>`;
   const bank=`<div class="bankbar"><div><div class="eyebrow">Ship bank</div><div class="mono bankval" onclick="shipEditNum('bank','Ship bank (credits)')" title="Click to set">${cr(sh.bank)}</div></div>
     <div style="flex:1;font-size:12px;color:var(--ink-mid)">Daily net <b class="mono" style="color:${k.net>=0?'var(--good)':'var(--danger)'}">${k.net>=0?'+':''}${cr(k.net)}</b> · per 7-day cycle <b class="mono">${cr(k.net*7)}</b></div>
     <div class="debtbox"><div class="eyebrow">TCA Debt</div><div class="mono debtval" onclick="shipEditNum('debt','TCA Debt outstanding')" title="Click to set">${cr(sh.debt)}</div></div>
