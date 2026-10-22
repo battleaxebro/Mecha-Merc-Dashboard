@@ -27,7 +27,7 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1h' }));
 
 // ---- DM login ----
 app.post('/api/dm-login', (req, res) => {
-  if ((req.body || {}).password === DM_PASSWORD) return res.json({ ok: true, dmToken: dmToken() });
+  if ((req.body || {}).password === DM_PASSWORD) return res.json({ ok: true, dmToken: dmToken(), party: PARTY_CODE });
   res.status(401).json({ ok: false, error: 'Wrong DM password.' });
 });
 // ---- validate a party code (used by the gate screen) ----

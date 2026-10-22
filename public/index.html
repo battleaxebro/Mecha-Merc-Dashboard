@@ -496,14 +496,18 @@ function showGate(err){
   g.innerHTML=`<div class="modal" style="width:min(420px,94vw)"><div class="modal-h"><div style="display:flex;align-items:center;gap:10px"><div class="logo" style="width:30px;height:30px;border:1.5px solid var(--accent);border-radius:7px;display:grid;place-items:center;color:var(--accent);font-family:var(--f-display);font-weight:700">MM</div><div><b style="font-family:var(--f-display);letter-spacing:.04em">MECHA MERC</b><div class="sub" style="font-size:9px;letter-spacing:.22em;color:var(--ink-dim);text-transform:uppercase">Pilot Terminal</div></div></div></div>
     <div class="modal-b"><p style="color:var(--ink-mid);font-size:13px;margin:0 0 12px">Enter the party access code your DM shared.</p>
     ${err?`<div class="warnchip" style="margin-bottom:10px">⚠ ${esc(err)}</div>`:''}
-    <label class="fld"><span>Party code</span><input id="gate_code" placeholder="party code" onkeydown="if(event.key==='Enter')submitGate()"></label>
+    <label class="fld"><span>Party code (or DM password)</span><input id="gate_code" type="password" placeholder="party code or DM password" onkeydown="if(event.key==='Enter')submitGate()"></label>
     <button class="btn" style="width:100%" onclick="submitGate()">Enter Terminal</button></div></div>`;
   setTimeout(()=>{const i=document.getElementById('gate_code');if(i)i.focus();},50);
 }
 async function submitGate(){
   const code=document.getElementById('gate_code').value.trim(); if(!code)return;
   const r=await fetch('/api/party',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({party:code})}).then(r=>r.json()).catch(()=>({ok:false}));
-  if(!r.ok){ showGate('That code was not recognized.'); return; }
+  if(!r.ok){ // the DM can sign in here with the DM password; the server hands back the party code
+    const d=await fetch('/api/dm-login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:code})}).then(r=>r.json()).catch(()=>({ok:false}));
+    if(!d.ok||!d.party){ showGate('That code was not recognized.'); return; }
+    S.auth.dmToken=d.dmToken; S.identity='dm'; localStorage.setItem('mm_identity','dm'); localStorage.setItem('mm_dmtoken',d.dmToken);
+    startSession(d.party); return; }
   startSession(code);
 }
 async function loadCatalog(){
